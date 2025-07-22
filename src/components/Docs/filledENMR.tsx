@@ -1,4 +1,3 @@
-// PENDING
 type WorkerData = {
   slNo: number;
   name: string;
@@ -142,7 +141,7 @@ const WageListPDF = ({
         {isFirstPage && (
           <>
             {/* Header Table */}
-            <div className="mb-2 border border-black  bg-red-100 pb-1">
+            <div className="mb-2 border border-black  bg-[#E9D7D0] pb-1">
               {/* Row 1 - 4 columns */}
               <div className="flex  border-b-2 border-black ">
                 <div className="flex-1 border-r border-gray-400 p-1 bg-gray-300 text-center  text-[12px]">
@@ -161,14 +160,14 @@ const WageListPDF = ({
 
               {/* Row 2 - 3 columns */}
               <div className="flex justify-between border-l border-r border-b border-gray-400">
-                <div className="w-full pt-2 border-r border-gray-400 p-1 bg-red-100 text-start text-[11px]">
+                <div className="w-full pt-2 border-r border-gray-400 p-1  bg-[#E9D7D0] text-start text-[11px]">
                   ಮಸ್ಟರ್ ರೋಲ್ ಸಂಖ್ಯೆ : {musterRollNo}
                 </div>
-                <div className="w-full pt-2  border-r border-gray-400 p-1 bg-red-100 text-start  text-[11px]">
+                <div className="w-full pt-2  border-r border-gray-400 p-1  bg-[#E9D7D0] text-start  text-[11px]">
                   ದಿನಾಂಕ ದಿಂದ : {fromDate}
                   ದಿನಾಂಕದ ವರೆಗೆ : {toDate}
                 </div>
-                <div className="w-full pt-1 p-1 bg-red-100 text-start  text-[10px]">
+                <div className="w-full pt-1 p-1  bg-[#E9D7D0] text-start  text-[10px]">
                   ಮುಂಜೂರಾತಿ ಸಂಖ್ಯೆ : {approvalNo}
                   <span className="pl-1">
                     ಮುಂಜೂರಾತಿ ದಿನಾಂಕ : {approvalDate}
@@ -178,164 +177,173 @@ const WageListPDF = ({
 
               {/* Row 3 - 2 columns */}
               <div className="flex border-l border-r border-gray-400">
-                <div className="w-[33.4%] border-r border-gray-400 p-1 bg-red-100 text-start  text-[11px]">
+                <div className="w-[33.4%] border-r border-gray-400 p-1  bg-[#E9D7D0] text-start  text-[11px]">
                   ಕಾಮಗಾರಿ ಸಂಕೇತ ಸಂಖ್ಯೆ : {workCode}
                 </div>
-                <div className="w-[66.6%] p-1 bg-red-100 text-start  text-[11px]">
+                <div className="w-[66.6%] p-1  bg-[#E9D7D0] text-start  text-[11px]">
                   ಕಾಮಗಾರಿ ಹೆಸರು : {workName} {financialYear}
                 </div>
               </div>
 
               {/* Row 4 - Empty with 3 columns */}
               <div className="flex border border-gray-400">
-                <div className="flex-1 border-r border-gray-400 p-2 bg-red-100"></div>
-                <div className="flex-1 border-r border-gray-400 p-2 bg-red-100"></div>
-                <div className="flex-1 p-2 bg-red-100"></div>
+                <div className="flex-1 border-r border-gray-400 p-2  bg-[#E9D7D0]"></div>
+                <div className="flex-1 border-r border-gray-400 p-2  bg-[#E9D7D0]"></div>
+                <div className="flex-1 p-2  bg-[#E9D7D0]"></div>
               </div>
             </div>
 
             {/* Measurement Book Detail */}
-            <div className="mb-2">
-              <div className="text-[10px]  mb-1">Measurement Book Detail</div>
-              <div className="flex text-[9px] ">
-                <div className="border border-gray-400 p-1 bg-gray-100">
-                  MB NO. {mbNo}
+            <div className="mb-2 border  bg-[#E9D7D0] border-gray-500 text-center">
+              <div className="border-b border-black">
+                <div className="text-[13px]  text-white tracking-wide border bg-[#3E749F]">
+                  Measurement Book Detail
                 </div>
-                <div className="border border-gray-400 border-l-0 p-1 bg-gray-100 ml-8">
-                  Page NO. {pageNo}
+              </div>
+
+              <div className="flex text-[12px] py-0.5  bg-[#E9D7D0] font-semibold justify-center">
+                <div className="">
+                  MB NO. <span className="font-normal">{mbNo}</span>
+                </div>
+                <div className="ml-7">
+                  Page NO. <span className="font-normal">{pageNo}</span>
                 </div>
               </div>
             </div>
 
             {/* Note */}
-            <div className="mb-2 text-[8px] ">
-              NOTE: Rows Highlighted By Yellow Color indicates attendance has
-              been taken from Mobile Devices
-            </div>
+            <div className=" bg-gray-300 px-0.5">
+              <div className=" tracking-wide text-[12px] py-1 font-semibold text-[#FF0000] border text-center bg-gray-300">
+                NOTE: Rows Highlighted By Yellow Color indicates attendance has
+                been taken from Mobile Devices
+              </div>
 
-            {/* Mustroll Detail */}
-            <div className="mb-1 text-[9px] ">Mustroll Detail</div>
+              {/* Mustroll Detail */}
+              <div className="mb-1 py-0.5 tracking-wide text-[12px] bg-[#3E749F] text-white  text-center">
+                Mustroll Detail
+              </div>
+            </div>
           </>
         )}
 
         {/* Main Table */}
-        <div className="w-full">
+        <div className="w-full bg-gray-400 border-red-500">
           <table
-            className="w-full border-collapse border border-black text-[7px]"
+            className="w-full border-collapse border border-[#3E749F] text-[9px]"
             style={{ tableLayout: "fixed" }}
           >
             <thead>
-              <tr className="bg-gray-200">
+              <tr className="bg-[#6898B5]">
                 <th
-                  className="border border-black px-1 py-1 text-center font-bold"
+                  className="border border-[#3E749F] px-1 py-1 text-center font-bold"
                   style={{ width: "20px" }}
                 >
                   ಕ್ರ.ಸಂ.
                 </th>
                 <th
-                  className="border border-black px-1 py-1 text-center font-bold"
-                  style={{ width: "80px" }}
+                  className="border border-[#3E749F] px-1 py-1 text-center font-bold"
+                  style={{ width: "50px" }}
                 >
                   ಹೆಸರು / ನೋಂದಣಿ ಸಂಖ್ಯೆ
                 </th>
                 <th
-                  className="border border-black px-1 py-1 text-center font-bold"
+                  className="border border-[#3E749F] px-1 py-1 text-center font-bold"
                   style={{ width: "30px" }}
                 >
                   ಜಾತಿ
                 </th>
                 <th
-                  className="border border-black px-1 py-1 text-center font-bold"
+                  className="border border-[#3E749F] px-1 py-1 text-center font-bold"
                   style={{ width: "30px" }}
                 >
                   ಹಳ್ಳಿ
                 </th>
                 <th
-                  className="border border-black px-1 py-1 text-center font-bold"
+                  className="border border-[#3E749F] px-1 py-1 text-center font-bold"
                   style={{ width: "15px" }}
                 >
                   1
                 </th>
                 <th
-                  className="border border-black px-1 py-1 text-center font-bold"
+                  className="border border-[#3E749F] px-1 py-1 text-center font-bold"
                   style={{ width: "25px" }}
                 >
                   ಒಟ್ಟು ಹಾಜರಾತಿ
                 </th>
                 <th
-                  className="border border-black px-1 py-1 text-center font-bold"
+                  className="border border-[#3E749F] px-1 py-1 text-center font-bold"
                   style={{ width: "25px" }}
                 >
                   ಒಂದು ದಿನದ ವೇತನ
                 </th>
                 <th
-                  className="border border-black px-1 py-1 text-center font-bold"
+                  className="border border-[#3E749F] px-1 py-1 text-center font-bold"
                   style={{ width: "30px" }}
                 >
                   ಹಾಜರಾತಿ ತಕ್ಕಂತೆ ಬಾಕಿ ಹಣ
                 </th>
                 <th
-                  className="border border-black px-1 py-1 text-center font-bold"
+                  className="border border-[#3E749F] px-1 py-1 text-center font-bold"
                   style={{ width: "25px" }}
                 >
                   ಪ್ರಯಾಣ ವೆಚ್ಚ
                 </th>
                 <th
-                  className="border border-black px-1 py-1 text-center font-bold"
+                  className="border border-[#3E749F] px-1 py-1 text-center font-bold"
                   style={{ width: "30px" }}
                 >
                   Implements / Sharpening Charge
                 </th>
                 <th
-                  className="border border-black px-1 py-1 text-center font-bold"
+                  className="border border-[#3E749F] px-1 py-1 text-center font-bold"
                   style={{ width: "25px" }}
                 >
                   ಒಟ್ಟು ನಗದು ಪಾವತಿ
                 </th>
                 <th
-                  className="border border-black px-1 py-1 text-center font-bold"
+                  className="border border-[#3E749F] px-1 py-1 text-center font-bold"
                   style={{ width: "40px" }}
                 >
                   Postoffice/ Bank Name
                 </th>
                 <th
-                  className="border border-black px-1 py-1 text-center font-bold"
+                  className="border border-[#3E749F] px-1 py-1 text-center font-bold"
                   style={{ width: "35px" }}
                 >
                   Postoffice Code/ Branch name
                 </th>
                 <th
-                  className="border border-black px-1 py-1 text-center font-bold"
-                  style={{ width: "35px" }}
+                  className="border border-[#3E749F] px-1 py-1 text-center font-bold"
+                  style={{ width: "38px" }}
                 >
                   Postoffice address/ Branch code
                 </th>
                 <th
-                  className="border border-black px-1 py-1 text-center font-bold"
-                  style={{ width: "40px" }}
+                  className="border border-[#3E749F] px-1 py-1 text-center font-bold"
+                  style={{ width: "58px" }}
                 >
                   Wagelist No.
                 </th>
                 <th
-                  className="border border-black px-1 py-1 text-center font-bold"
+                  className="border border-[#3E749F] px-1 py-1 text-center font-bold"
                   style={{ width: "25px" }}
                 >
                   Status
                 </th>
                 <th
-                  className="border border-black px-1 py-1 text-center font-bold"
+                  className="border border-[#3E749F] px-1 py-1 text-center font-bold"
                   style={{ width: "30px" }}
                 >
                   A/c Credited Date
                 </th>
                 <th
-                  className="border border-black px-1 py-1 text-center font-bold"
+                  className="border border-[#3E749F] px-1 py-1 text-center font-bold"
                   style={{ width: "30px" }}
                 >
                   ಸಹಿ / ಹೆಬ್ಬೆರಳು ಗುರುತು
                 </th>
                 <th
-                  className="border border-black px-1 py-1 text-center font-bold"
+                  className="border border-[#3E749F] px-1 py-1 text-center font-bold"
                   style={{ width: "30px" }}
                 >
                   Attendance By
@@ -344,64 +352,64 @@ const WageListPDF = ({
             </thead>
             <tbody>
               {pageData.map((worker, index) => (
-                <tr key={startIndex + index} className="bg-yellow-50">
-                  <td className="border border-black px-1 py-1 text-center">
+                <tr key={startIndex + index} className="bg-yellow-100">
+                  <td className="border border-[#3E749F] px-1 py-1 text-center">
                     {worker.slNo}
                   </td>
-                  <td className="border border-black px-1 py-1 text-[6px] break-all">
+                  <td className="border-t border-[#3E749F] flex flex-col px-1 py-1 text-[9px] break-all">
                     {worker.name}
                     <br />
-                    {worker.jobCardNo}
+                    <span className="pt-0.5">{worker.jobCardNo}</span>
                   </td>
-                  <td className="border border-black px-1 py-1 text-center">
+                  <td className="border border-[#3E749F] text-[9px] px-1 py-1 text-center">
                     {worker.caste}
                   </td>
-                  <td className="border border-black px-1 py-1 text-center">
+                  <td className="border border-[#3E749F] text-[9px] px-1 py-1 text-center">
                     {worker.village}
                   </td>
-                  <td className="border border-black px-1 py-1 text-center">
+                  <td className="border border-[#3E749F] text-[9px] px-1 py-1 text-center">
                     {worker.day1}
                   </td>
-                  <td className="border border-black px-1 py-1 text-center">
+                  <td className="border border-[#3E749F] text-[9px] px-1 py-1 text-center">
                     {worker.totalAttendance}
                   </td>
-                  <td className="border border-black px-1 py-1 text-center">
+                  <td className="border border-[#3E749F] text-[9px] px-1 py-1 text-center">
                     {worker.oneDayWage}
                   </td>
-                  <td className="border border-black px-1 py-1 text-center">
+                  <td className="border border-[#3E749F] text-[9px] px-1 py-1 text-center">
                     {worker.pendingAmountByAttendance}
                   </td>
-                  <td className="border border-black px-1 py-1 text-center">
+                  <td className="border border-[#3E749F] text-[9px] px-1 py-1 text-center">
                     {worker.travelExpense}
                   </td>
-                  <td className="border border-black px-1 py-1 text-center">
+                  <td className="border border-[#3E749F] text-[9px] px-1 py-1 text-center">
                     {worker.implementsCharge}
                   </td>
-                  <td className="border border-black px-1 py-1 text-center">
+                  <td className="border border-[#3E749F] text-[9px] px-1 py-1 text-center">
                     {worker.totalCashPayment}
                   </td>
-                  <td className="border border-black px-1 py-1 text-[6px] break-all">
+                  <td className="border border-[#3E749F] text-[9px] px-1 py-1 break-all">
                     {worker.bankName}
                   </td>
-                  <td className="border border-black px-1 py-1 text-[6px] break-all">
+                  <td className="border border-[#3E749F] text-center text-[9px] px-1 py-1 break-all">
                     {worker.branchName}
                   </td>
-                  <td className="border border-black px-1 py-1 text-[6px] break-all">
+                  <td className="border border-[#3E749F] text-[9px] px-1 py-1  break-all">
                     {worker.branchCode}
                   </td>
-                  <td className="border border-black px-1 py-1 text-[6px] break-all">
+                  <td className="border border-[#3E749F] text-[9px] px-1 py-1  break-all">
                     {worker.wagelistNo}
                   </td>
-                  <td className="border border-black px-1 py-1 text-center">
+                  <td className="border border-[#3E749F] text-[9px] px-1 py-1 text-center">
                     {worker.status}
                   </td>
-                  <td className="border border-black px-1 py-1 text-center text-[6px]">
+                  <td className="border border-[#3E749F] text-[9px] px-1 py-1 text-center ">
                     {worker.creditedDate}
                   </td>
-                  <td className="border border-black px-1 py-1 text-center">
+                  <td className="border border-[#3E749F] text-[9px] px-1 py-1 text-center">
                     {worker.signature}
                   </td>
-                  <td className="border border-black px-1 py-1 text-center">
+                  <td className="border border-[#3E749F] text-[9px] px-1 py-1 text-center">
                     {worker.attendanceBy}
                   </td>
                 </tr>
@@ -412,30 +420,51 @@ const WageListPDF = ({
 
         {/* Footer - Only on last page */}
         {isLastPage && (
-          <div className="mt-2">
-            <div className="flex justify-between text-[8px]">
-              <div>
-                <div className="mb-1">ಸಂಖ್ಯಾಪರ ಸೋಮೇ</div>
-                <div className="mb-1">
-                  ಕಾರ್ಮಿಕರ ಸಂಖ್ಯೆ : {workersData.length}
+          <div className="mt-2 border border-black">
+            <div className="grid grid-cols-4  place-items-center text-[12px]">
+              <div className="border-r border-black w-full h-full px-5 pb-3 pt-4">
+                <div className="border border-black p">
+                  <div className="mb-1 border-b border-black px-1">
+                    ವೇತನ ವಿತರಣೆ ಸಂಬಂಧಿತ ಹಣ(In Rs.)
+                  </div>
+                  <div className="mb-1 border-b border-black px-1  flex ">
+                    <span className="w-[70%]">ವಿತರಿಸಿದ ಹಣ ಪ್ರ. </span>{" "}
+                    <span className="w-[30%] ">0</span>
+                  </div>
+                  <div className="mb-1 border-b border-black px-1  flex ">
+                    <span className="w-[70%]">ವಿತರಿಸಿದ ಹಣ ಪ್ರ. </span>{" "}
+                    <span className="w-[30%] ">0</span>
+                  </div>
+                  <div className=" border-black px-1  flex ">
+                    <span className="w-[70%]">ವಿತರಿಸಿದ ಹಣ ಇತರೆ </span>{" "}
+                    <span className="w-[30%] "> {totalWage}</span>
+                  </div>
                 </div>
               </div>
-              <div>
-                <div className="mb-1">ವೇತನ ವಿತರಣೆ ಸಂಬಂಧಿತ ಹಣ(In Rs.)</div>
-                <div className="mb-1">ವಿತರಿಸಿದ ಹಣ ಪ್ರ. : 0</div>
-                <div className="mb-1">ವಿತರಿಸಿದ ಹಣ ಪ್ರ. : 0</div>
-                <div className="mb-1">ವಿತರಿಸಿದ ಹಣ ಇತರೆ : {totalWage}</div>
-              </div>
-              <div>
-                <div className="mb-1">ಹಾಜರ ಪಡೆದವರ ಸಹಿ (ಸಹಿ)</div>
+
+              <div className="h-full w-full border-r  border-black flex flex-col justify-between">
+                <div className="mb-1 pt-8">ಹಾಜರ ಪಡೆದವರ ಸಹಿ (ಸಹಿ)</div>
                 <div className="mb-1">ಪರಿಶೀಲನೆ ಮಾಡಿದವರ ಸಹಿ</div>
               </div>
-            </div>
-            <div className="mt-2 text-[8px]">
-              <div className="mb-1">ಒಟ್ಟು ನಗದು ಪಾವತಿ (In Rs.)</div>
-              <div className="mb-1">ನಗದು : {totalWage}</div>
-              <div className="mb-1">ಸರಾಸರಿ ಕೂಲಿ ಸಂಸ್ಥೆ : {wage}</div>
-              <div>ಒಟ್ಟು ಕಾರ್ಮಿಕರ ನಗದು : {workersData.length}</div>
+              <div className="w-full h-full flex py-6 px-4 border-r border-black">
+                <div className="border border-black w-full">
+                  <div className="border-b p-0.5 border-black">
+                    ಒಟ್ಟು ನಗದು ಪಾವತಿ (In Rs.)
+                  </div>
+
+                  <div className="border-b p-0.5 border-black px-1  flex ">
+                    <span className="w-[70%]">ನಗದು </span>{" "}
+                    <span className="w-[30%] "> {totalWage}</span>
+                  </div>
+                  <div className=" p-0.5  px-1  flex ">
+                    <span className="w-[70%]">ಸರಾಸರಿ ಕೂಲಿ ಸಂಸ್ಥೆ </span>{" "}
+                    <span className="w-[30%] "> {wage}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="w-full h-full flex flex-col border  justify-center">
+                <div>ಒಟ್ಟು ಕಾರ್ಮಿಕರ ನಗದು : {workersData.length}</div>
+              </div>
             </div>
           </div>
         )}
