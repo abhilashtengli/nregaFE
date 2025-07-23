@@ -6,15 +6,14 @@ type WorkerData = {
   oneDayWage: number; // totalAmount / totalAttendance
   pendingAmountByAttendance: number; //totalAttendance x oneDaywage
   totalCashPayment: number; //totalAttendance x oneDaywage
-  bankName: string;
-  wagelistNo: string;
+  bankName: string; //11
+  wagelistNo: string; //11
   creditedDate: string; // 8
   signature: string; // ""
   attendanceBy: string; // ""
 };
 
-type FilledENmrData = {
-  state?: string; //1
+type FilledENmrProp = {
   district?: string; //1
   taluka?: string; //1
   panchayat?: string; //1
@@ -27,46 +26,33 @@ type FilledENmrData = {
   workCode?: string; //1
   workName?: string; //1
   financialYear?: string; //1
-  mbNo?: string; //""
-  pageNo?: string; //""
   totalWage?: number; // totalAttendanceCount x onedayWage
   wage?: number; // oneDayWage
-  workersData?: WorkerData[];
+  workersData: WorkerData[];
 };
 
-const FilledENmr = ({
-  state = "KARNATAKA",
-  district = "KALABURAGI",
-  taluka = "YADRAMI",
-  panchayat = "KACHAPUR",
-  totalAttendaceCount = 10, // sum of allTotalAttendace
-  musterRollNo = "33159",
-  fromDate = "05/12/2023",
-  toDate = "05/12/2023",
-  approvalNo = "1515006038/2023-2024/468814/AS",
-  approvalDate = "02/12/2023",
-  workCode = "1515006038/WC/GIS/1009331",
-  workName = 'ಬಿಲ್ವಾಡ.ಬಿ "ವಿಠ್ಠಲ ಬಂಡಗಾರ ಹೊಲಯಿಂದ ಮಾರುತಿ ಹೋಲದವರಿಗೆ ಮುರಮ್ಮ ರಸ್ತೆ ಕಾಮಗಾರಿ"',
-  financialYear = "2023-24", //1
-  totalWage = 3160, // totalAttendanceCount x onedayWage
-  wage = 316, //
-  workersData = [
-    {
-      slNo: 1,
-      name: "ಸಂತಮ್ಮ ಸೋಮಣ್ಣ ಸಂಬರ(Self)",
-      jobCardNo: "KN-15-006-023-002/3150",
-      totalAttendance: 1,
-      oneDayWage: 316,
-      pendingAmountByAttendance: 316, //totalAttendance x oneDaywage
-      totalCashPayment: 316, //totalAttendance x oneDaywage
-      bankName: "PRAGATHI KRISHNA GRAMIN BANK",
-      wagelistNo: "1515006038WL038158",
-      creditedDate: "01/03/2024",
-      signature: "",
-      attendanceBy: ""
-    }
-  ]
-}: FilledENmrData) => {
+type FilledNmrData = {
+  filledNmrData: FilledENmrProp;
+};
+const FilledENmr = ({ filledNmrData }: FilledNmrData) => {
+  const {
+    district,
+    taluka,
+    panchayat,
+    musterRollNo,
+    fromDate,
+    toDate,
+    totalAttendaceCount, // sum of allTotalAttendace
+    approvalNo,
+    approvalDate,
+    workCode,
+    workName,
+    financialYear,
+    totalWage, // totalAttendanceCount x onedayWage
+    wage, // oneDayWage
+    workersData
+  } = filledNmrData;
+  const state = "KARNATAKA";
   const status = "";
   const branchCode = "";
   const branchName = "";
@@ -82,7 +68,7 @@ const FilledENmr = ({
   const subsequentPageRows = 15;
   const totalPages =
     Math.ceil(
-      Math.max(0, workersData.length - firstPageRows) / subsequentPageRows
+      Math.max(0, workersData?.length - firstPageRows) / subsequentPageRows
     ) + (workersData.length > 0 ? 1 : 1);
 
   const renderPage = (pageNumber: number) => {
