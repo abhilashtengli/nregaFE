@@ -1,51 +1,45 @@
 type WorkerData = {
-  slNo: number;
-  name: string;
-  jobCardNo: string;
-  caste: string;
-  village: string;
-  day1: string;
-  totalAttendance: number;
-  oneDayWage: number;
-  pendingAmountByAttendance: number;
-  travelExpense: number;
-  implementsCharge: number;
-  totalCashPayment: number;
+  slNo: number; // 8
+  name: string; // 8
+  jobCardNo: string; //8
+  totalAttendance: number; //8
+  oneDayWage: number; // totalAmount / totalAttendance
+  pendingAmountByAttendance: number; //totalAttendance x oneDaywage
+  totalCashPayment: number; //totalAttendance x oneDaywage
   bankName: string;
-  branchName: string;
-  branchCode: string;
   wagelistNo: string;
-  status: string;
-  creditedDate: string;
-  signature: string;
-  attendanceBy: string;
+  creditedDate: string; // 8
+  signature: string; // ""
+  attendanceBy: string; // ""
 };
 
-type WageListData = {
-  state?: string;
-  district?: string;
-  taluka?: string;
-  panchayat?: string;
-  musterRollNo?: string;
-  fromDate?: string;
-  toDate?: string;
-  approvalNo?: string;
-  approvalDate?: string;
-  workCode?: string;
-  workName?: string;
-  financialYear?: string;
-  mbNo?: string;
-  pageNo?: string;
-  totalWage?: number;
-  wage?: number;
+type FilledENmrData = {
+  state?: string; //1
+  district?: string; //1
+  taluka?: string; //1
+  panchayat?: string; //1
+  musterRollNo?: string; //8
+  fromDate?: string; //8
+  toDate?: string; //8
+  totalAttendaceCount: number; // sum of allTotalAttendace
+  approvalNo?: string; //4
+  approvalDate?: string; //4
+  workCode?: string; //1
+  workName?: string; //1
+  financialYear?: string; //1
+  mbNo?: string; //""
+  pageNo?: string; //""
+  totalWage?: number; // totalAttendanceCount x onedayWage
+  wage?: number; // oneDayWage
   workersData?: WorkerData[];
 };
 
-const WageListPDF = ({
+const FilledENmr = ({
   state = "KARNATAKA",
   district = "KALABURAGI",
   taluka = "YADRAMI",
   panchayat = "KACHAPUR",
+  totalAttendaceCount = 10, // sum of allTotalAttendace
   musterRollNo = "33159",
   fromDate = "05/12/2023",
   toDate = "05/12/2023",
@@ -53,58 +47,37 @@ const WageListPDF = ({
   approvalDate = "02/12/2023",
   workCode = "1515006038/WC/GIS/1009331",
   workName = 'ಬಿಲ್ವಾಡ.ಬಿ "ವಿಠ್ಠಲ ಬಂಡಗಾರ ಹೊಲಯಿಂದ ಮಾರುತಿ ಹೋಲದವರಿಗೆ ಮುರಮ್ಮ ರಸ್ತೆ ಕಾಮಗಾರಿ"',
-  financialYear = "2023-24",
-  mbNo = "02",
-  pageNo = "50",
-  totalWage = 3160,
-  wage = 316,
+  financialYear = "2023-24", //1
+  totalWage = 3160, // totalAttendanceCount x onedayWage
+  wage = 316, //
   workersData = [
     {
       slNo: 1,
       name: "ಸಂತಮ್ಮ ಸೋಮಣ್ಣ ಸಂಬರ(Self)",
       jobCardNo: "KN-15-006-023-002/3150",
-      caste: "OTHER",
-      village: "ಕಚಪುರ",
-      day1: "P",
       totalAttendance: 1,
       oneDayWage: 316,
-      pendingAmountByAttendance: 316,
-      travelExpense: 0,
-      implementsCharge: 0,
-      totalCashPayment: 316,
+      pendingAmountByAttendance: 316, //totalAttendance x oneDaywage
+      totalCashPayment: 316, //totalAttendance x oneDaywage
       bankName: "PRAGATHI KRISHNA GRAMIN BANK",
-      branchName: "MALLI",
-      branchCode: "PKGB0011048",
       wagelistNo: "1515006038WL038158",
-      status: "Credited",
-      creditedDate: "01/03/2024",
-      signature: "",
-      attendanceBy: ""
-    },
-    {
-      slNo: 2,
-      name: "ಲಕ್ಷ್ಮೀ ಅಮೃತಪ್ಪ(Self)",
-      jobCardNo: "KN-15-006-023-002/3170",
-      caste: "OTHER",
-      village: "ಕಚಪುರ",
-      day1: "P",
-      totalAttendance: 1,
-      oneDayWage: 316,
-      pendingAmountByAttendance: 316,
-      travelExpense: 0,
-      implementsCharge: 0,
-      totalCashPayment: 316,
-      bankName: "PRAGATHI KRISHNA GRAMIN BANK",
-      branchName: "MALLI",
-      branchCode: "PKGB0011048",
-      wagelistNo: "1515006038WL038158",
-      status: "Credited",
       creditedDate: "01/03/2024",
       signature: "",
       attendanceBy: ""
     }
   ]
-}: WageListData) => {
+}: FilledENmrData) => {
+  const status = "";
+  const branchCode = "";
+  const branchName = "";
+  const mbNo = "";
+  const pageNo = "";
+  const caste = "";
+  const village = "";
+  const day1 = "P";
+
+  const travelExpense = 0;
+  const implementsCharge = 0;
   const firstPageRows = 12;
   const subsequentPageRows = 15;
   const totalPages =
@@ -362,13 +335,13 @@ const WageListPDF = ({
                     <span className="pt-0.5">{worker.jobCardNo}</span>
                   </td>
                   <td className="border border-[#3E749F] text-[9px] px-1 py-1 text-center">
-                    {worker.caste}
+                    {caste}
                   </td>
                   <td className="border border-[#3E749F] text-[9px] px-1 py-1 text-center">
-                    {worker.village}
+                    {village}
                   </td>
                   <td className="border border-[#3E749F] text-[9px] px-1 py-1 text-center">
-                    {worker.day1}
+                    {day1}
                   </td>
                   <td className="border border-[#3E749F] text-[9px] px-1 py-1 text-center">
                     {worker.totalAttendance}
@@ -380,30 +353,30 @@ const WageListPDF = ({
                     {worker.pendingAmountByAttendance}
                   </td>
                   <td className="border border-[#3E749F] text-[9px] px-1 py-1 text-center">
-                    {worker.travelExpense}
+                    {travelExpense}
                   </td>
                   <td className="border border-[#3E749F] text-[9px] px-1 py-1 text-center">
-                    {worker.implementsCharge}
+                    {implementsCharge}
                   </td>
                   <td className="border border-[#3E749F] text-[9px] px-1 py-1 text-center">
                     {worker.totalCashPayment}
                   </td>
-                  <td className="border border-[#3E749F] text-[9px] px-1 py-1 break-all">
+                  <td className="border border-[#3E749F] text-[9px] px-1 py-1  break-all">
                     {worker.bankName}
                   </td>
                   <td className="border border-[#3E749F] text-center text-[9px] px-1 py-1 break-all">
-                    {worker.branchName}
+                    {branchName}
                   </td>
-                  <td className="border border-[#3E749F] text-[9px] px-1 py-1  break-all">
-                    {worker.branchCode}
+                  <td className="border border-[#3E749F] text-[9px] px-1 py-1 break-all">
+                    {branchCode}
                   </td>
-                  <td className="border border-[#3E749F] text-[9px] px-1 py-1  break-all">
+                  <td className="border border-[#3E749F] text-[9px] px-1 py-1 break-all">
                     {worker.wagelistNo}
                   </td>
                   <td className="border border-[#3E749F] text-[9px] px-1 py-1 text-center">
-                    {worker.status}
+                    {status}
                   </td>
-                  <td className="border border-[#3E749F] text-[9px] px-1 py-1 text-center ">
+                  <td className="border border-[#3E749F] text-[9px] px-1 py-1 text-center">
                     {worker.creditedDate}
                   </td>
                   <td className="border border-[#3E749F] text-[9px] px-1 py-1 text-center">
@@ -414,6 +387,32 @@ const WageListPDF = ({
                   </td>
                 </tr>
               ))}
+              {/* Total Attendance Row - Always at the end */}
+              <tr className="bg-[#3E749F]  font-bold ">
+                <td className="border border-[#3E749F] px-1 py-1 text-center"></td>
+                <td className="border border-[#3E749F] px-1 py-1 text-[11px] ml-24 text-center">
+                  ದಿನವಹಿ ಹಾಜರಾತಿ
+                </td>
+                <td className="border border-[#3E749F] px-1 py-1 text-center"></td>
+                <td className="border border-[#3E749F] px-1 py-1 text-center"></td>
+                <td className="border border-[#3E749F] px-1 py-1 text-center text-[14px] text-white font-bold">
+                  {totalAttendaceCount}
+                </td>
+                <td className="border border-[#3E749F] px-1 py-1 text-center"></td>
+                <td className="border border-[#3E749F] px-1 py-1 text-center"></td>
+                <td className="border border-[#3E749F] px-1 py-1 text-center"></td>
+                <td className="border border-[#3E749F] px-1 py-1 text-center"></td>
+                <td className="border border-[#3E749F] px-1 py-1 text-center"></td>
+                <td className="border border-[#3E749F] px-1 py-1 text-center"></td>
+                <td className="border border-[#3E749F] px-1 py-1 text-center"></td>
+                <td className="border border-[#3E749F] px-1 py-1 text-center"></td>
+                <td className="border border-[#3E749F] px-1 py-1 text-center"></td>
+                <td className="border border-[#3E749F] px-1 py-1 text-center"></td>
+                <td className="border border-[#3E749F] px-1 py-1 text-center"></td>
+                <td className="border border-[#3E749F] px-1 py-1 text-center"></td>
+                <td className="border border-[#3E749F] px-1 py-1 text-center"></td>
+                <td className="border border-[#3E749F] px-1 py-1 text-center"></td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -479,4 +478,4 @@ const WageListPDF = ({
   );
 };
 
-export default WageListPDF;
+export default FilledENmr;
