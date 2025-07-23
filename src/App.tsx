@@ -1,7 +1,13 @@
+import { Toaster } from "sonner";
+import SimpleTestComponent from "./TestingPage";
+
 function App() {
   return (
     <>
-      <div className="text-red-500">Hello </div>
+      <Toaster position="top-right" richColors closeButton duration={3000} />
+      <div className="">
+        <SimpleTestComponent />
+      </div>
     </>
   );
 }

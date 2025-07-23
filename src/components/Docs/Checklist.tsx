@@ -1,4 +1,3 @@
-
 // COMPLETED
 type WorkData = {
   id: string;
