@@ -1,5 +1,6 @@
 // src/services/administrativeSanction/fetchAdministrativeSanction.ts
 
+import { Base_Url } from "@/lib/constant";
 import type { ServiceResponse } from "@/types/types";
 import axios from "axios";
 
@@ -22,14 +23,14 @@ export const fetchAdministrativeSanction = async (
   id: string
 ): Promise<ServiceResponse<AdministrativeSanctionData>> => {
   try {
-    const response = await axios.get(`http://localhost:3000/get-ts-copy/${id}`);
+    const response = await axios.get(`${Base_Url}/get-ts-copy/${id}`);
 
     const apiData = response.data?.data;
 
     if (!apiData) {
       return {
         success: false,
-        message: "No data found for the provided ID",
+        message: "No data found for the provided ID"
       };
     }
 
@@ -45,12 +46,12 @@ export const fetchAdministrativeSanction = async (
       technicalSanctionNo: apiData.technicalSanctionNo,
       unskilledLabourCharges: apiData.unskilledLabourCharges,
       estimateMaterialCost: apiData.estimateMaterialCost,
-      estimatePersonDays: apiData.estimatePersonDays,
+      estimatePersonDays: apiData.estimatePersonDays
     };
 
     return {
       success: true,
-      data: formattedData,
+      data: formattedData
     };
   } catch (error: unknown) {
     let message = "Failed to fetch administrative sanction data.";
@@ -61,7 +62,7 @@ export const fetchAdministrativeSanction = async (
 
     return {
       success: false,
-      message,
+      message
     };
   }
 };
