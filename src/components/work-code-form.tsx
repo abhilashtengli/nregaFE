@@ -257,6 +257,9 @@ export default function WorkCodeForm({
   // Handle form submission with direct API call
   const handleSubmitWorkCode = async () => {
     // Clear previous work data before new submission
+    if (workDetail) {
+      handleClearData(workDetail.id);
+    }
     clearWork();
     hasNotifiedParent.current = false;
 
