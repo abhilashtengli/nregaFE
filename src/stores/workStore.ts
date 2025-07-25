@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 type WorkDetail = {
+  id: string; // Added id field
+  workDocumentId: string; // Added workDocumentId field
   workCode: string;
   district: string;
   block: string;
@@ -24,13 +26,13 @@ type WorkStoreType = {
   vendorName: string | null;
   vendorGstNo: string | null;
   workDetail: WorkDetail | null;
-
-  setWork: (data: {
-    vendorName: string;
-    vendorGstNo: string;
-    workDetail: WorkDetail;
-  }) => void;
-
+  setWork: (
+    data: {
+      vendorName: string;
+      vendorGstNo: string;
+      workDetail: WorkDetail;
+    }
+  ) => void;
   clearWork: () => void;
 };
 
@@ -40,8 +42,7 @@ export const useWorkStore = create<WorkStoreType>()(
       vendorName: null,
       vendorGstNo: null,
       workDetail: null,
-
-      setWork: (data) => {
+      setWork: data => {
         if (get().workDetail) {
           console.warn("A work task is already active. Please clear it first.");
           return;
@@ -52,7 +53,6 @@ export const useWorkStore = create<WorkStoreType>()(
           workDetail: data.workDetail
         });
       },
-
       clearWork: () =>
         set({
           vendorName: null,
@@ -62,7 +62,7 @@ export const useWorkStore = create<WorkStoreType>()(
     }),
     {
       name: "work-store",
-      partialize: (state) => ({
+      partialize: state => ({
         vendorName: state.vendorName,
         vendorGstNo: state.vendorGstNo,
         workDetail: state.workDetail

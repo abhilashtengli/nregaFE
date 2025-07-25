@@ -80,6 +80,8 @@ interface WorkData {
   vendorName: string;
   vendorGstNo: string;
   workDetail: {
+    id: string; // Added id field
+    workDocumentId: string; // Added workDocumentId field
     workCode: string;
     district: string;
     block: string;
@@ -141,6 +143,7 @@ export default function WorkCodeForm({
   const [financialYearError, setFinancialYearError] = useState<string | null>(
     null
   );
+  const [clearData, setClearData] = useState(false);
 
   // Zustand store
   const { vendorName, vendorGstNo, workDetail, setWork, clearWork } =
@@ -229,6 +232,8 @@ export default function WorkCodeForm({
       vendorName: metadata.vendorName || "",
       vendorGstNo: metadata.vendorGstNo || "",
       workDetail: {
+        id: metadata.id, // Include id from metadata
+        workDocumentId: metadata.workDocumentId, // Include workDocumentId from metadata
         workCode: metadata.data.workDetail.workCode,
         district: metadata.data.workDetail.district,
         block: metadata.data.workDetail.block,
@@ -357,18 +362,53 @@ export default function WorkCodeForm({
   };
 
   // Handle clear/reset
-  const handleClearData = () => {
-    clearWork();
-    setWorkCode("");
-    setFinancialYear("");
-    setWorkCodeError(null);
-    setFinancialYearError(null);
-    hasNotifiedParent.current = false;
+  const handleClearData = async (id: string) => {
+    try {
+      setClearData(true);
+      if (!id) {
+        toast.error("Invalid request", {
+          description: "Missing work ID for deletion.",
+          duration: 3000
+        });
+        return;
+      }
 
-    toast.info("Work data cleared", {
-      description: "You can now enter new work details",
-      duration: 3000
-    });
+      const response = await axios.delete(`${Base_Url}/work/${id}`);
+
+      if (response.status === 200 && response.data.success) {
+        clearWork();
+        setWorkCode("");
+        setFinancialYear("");
+        setWorkCodeError(null);
+        setFinancialYearError(null);
+        hasNotifiedParent.current = false;
+        toast.success("Work data cleared", {
+          description: "You can now enter new work details.",
+          duration: 3000
+        });
+      } else {
+        toast.error("Failed to delete work", {
+          description: response.data?.error || "Something went wrong.",
+          duration: 3000
+        });
+      }
+    } catch (error: unknown) {
+      let message = "Failed to delete work";
+      if (axios.isAxiosError(error)) {
+        message = error.response?.data?.error || error.message;
+      } else if (error instanceof Error) {
+        message = error.message;
+      }
+
+      console.error("Error deleting work:", error);
+
+      toast.error("Server error", {
+        description: message,
+        duration: 4000
+      });
+    } finally {
+      setClearData(false);
+    }
   };
 
   // Check if form is valid
@@ -475,12 +515,12 @@ export default function WorkCodeForm({
               {workDetail && (
                 <Button
                   variant="outline"
-                  onClick={handleClearData}
+                  onClick={() => handleClearData(workDetail.id)}
                   disabled={isSubmitting}
-                  className="px-6 py-2 bg-transparent"
+                  className="px-6 py-2 bg-transparent cursor-pointer"
                 >
                   <RefreshCw className="w-4 h-4 mr-2" />
-                  Clear Data
+                  {clearData ? "Clearing Data.." : "Clear Data"}
                 </Button>
               )}
             </div>
@@ -561,7 +601,7 @@ export default function WorkCodeForm({
 
               <div className="space-y-4">
                 <div>
-                  <Label className="text-sm font-medium text-gray-600">
+                  <Label className="text-xs font-medium text-gray-600">
                     Work Name
                   </Label>
                   <p className="text-lg">{workDetail.workName}</p>
