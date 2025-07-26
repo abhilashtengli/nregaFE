@@ -1,4 +1,6 @@
-import { useState } from "react";
+"use client";
+
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,49 +13,50 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus } from "lucide-react";
-import { Combobox } from "./combobox";
+import { Plus, Loader2, Calendar } from "lucide-react";
+import { Combobox } from "@/components/combobox";
 import { toast } from "sonner";
+import axios from "axios";
+import { useWorkStore } from "@/stores/workStore";
+import { Base_Url } from "@/lib/constant";
 
-// Sample vendor data
-const vendorData = [
-  { id: 1, name: "ABC Corporation Ltd", gst: "27AAAAA0000A1Z5" },
-  { id: 2, name: "XYZ Industries Pvt Ltd", gst: "19BBBBB1111B2Y6" },
-  { id: 3, name: "Tech Solutions Inc", gst: "29CCCCC2222C3X7" },
-  { id: 4, name: "Global Enterprises", gst: "24DDDDD3333D4W8" },
-  { id: 5, name: "Prime Contractors", gst: "36EEEEE4444E5V9" }
-];
+// API Response Types
+interface MaterialData {
+  slNo: number;
+  materialName: string;
+  quantity: string;
+  unit: string;
+  rate: string;
+  contractor1Rate: string;
+  contractor2Rate: string;
+  contractor3Rate: string;
+}
 
-// Sample material data
-const materialData = [
-  { id: 1, name: "Cement (50kg bags)", unit: "bags" },
-  { id: 2, name: "Steel Rods (12mm)", unit: "kg" },
-  { id: 3, name: "Bricks (Red Clay)", unit: "pieces" },
-  { id: 4, name: "Sand (River Sand)", unit: "cubic feet" },
-  { id: 5, name: "Gravel (20mm)", unit: "cubic feet" },
-  { id: 6, name: "Paint (Exterior)", unit: "liters" },
-  { id: 7, name: "Tiles (Ceramic)", unit: "sq ft" },
-  { id: 8, name: "Electrical Wire", unit: "meters" },
-  { id: 9, name: "PVC Pipes", unit: "meters" },
-  { id: 10, name: "Labor (Skilled)", unit: "days" }
-];
+interface VendorData {
+  vendorName: string;
+  gstNo: string;
+}
 
-// Backend vendor quoted data structure
-const backendVendorPrices = {
-  1: { vendor1: "450", vendor2: "420", vendor3: "480" },
-  2: { vendor1: "65", vendor2: "62", vendor3: "68" },
-  3: { vendor1: "8", vendor2: "7.5", vendor3: "9" },
-  4: { vendor1: "25", vendor2: "22", vendor3: "28" },
-  5: { vendor1: "30", vendor2: "28", vendor3: "35" },
-  6: { vendor1: "120", vendor2: "110", vendor3: "140" },
-  7: { vendor1: "45", vendor2: "40", vendor3: "55" },
-  8: { vendor1: "15", vendor2: "12", vendor3: "18" },
-  9: { vendor1: "35", vendor2: "32", vendor3: "40" },
-  10: { vendor1: "800", vendor2: "750", vendor3: "900" }
-};
+interface MaterialApiResponse {
+  success: boolean;
+  data: MaterialData[];
+  message: string;
+}
 
+interface VendorApiResponse {
+  success: boolean;
+  data: VendorData[];
+  count: number;
+}
+
+// Component interfaces
 interface MaterialQuotedData {
   price: string;
+}
+
+interface SelectedVendor {
+  vendorName: string;
+  gstNo: string;
 }
 
 export default function VendorInformation() {
@@ -62,54 +65,140 @@ export default function VendorInformation() {
     new Set()
   );
   const [selectAll, setSelectAll] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Vendor inputs are empty initially
+  // Date inputs
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+
+  // Dynamic data from APIs
+  const [materialData, setMaterialData] = useState<MaterialData[]>([]);
+  const [vendorOptions, setVendorOptions] = useState<VendorData[]>([]);
+
+  // Selected vendors (now storing full vendor objects)
   const [selectedVendors, setSelectedVendors] = useState({
-    vendor1: null as number | null,
-    vendor2: null as number | null,
-    vendor3: null as number | null
+    vendor1: null as SelectedVendor | null,
+    vendor2: null as SelectedVendor | null,
+    vendor3: null as SelectedVendor | null
   });
 
-  // Add state for units
+  // Material units (editable)
   const [materialUnits, setMaterialUnits] = useState<{
     [materialId: number]: string;
-  }>(() => {
-    const initialUnits: { [materialId: number]: string } = {};
-    materialData.forEach((material) => {
-      initialUnits[material.id] = material.unit;
-    });
-    return initialUnits;
-  });
+  }>({});
 
-  // Pre-load all price data from backend
+  // Only vendor1 prices are editable, others are calculated
   const [editableQuotedData, setEditableQuotedData] = useState<{
     [materialId: number]: {
       vendor1: MaterialQuotedData;
       vendor2: MaterialQuotedData;
       vendor3: MaterialQuotedData;
     };
-  }>(() => {
-    const initialData: {
-      [materialId: number]: {
-        vendor1: MaterialQuotedData;
-        vendor2: MaterialQuotedData;
-        vendor3: MaterialQuotedData;
-      };
-    } = {};
-    materialData.forEach((material) => {
-      initialData[material.id] = {
-        vendor1: { price: backendVendorPrices[material.id]?.vendor1 || "" },
-        vendor2: { price: backendVendorPrices[material.id]?.vendor2 || "" },
-        vendor3: { price: backendVendorPrices[material.id]?.vendor3 || "" }
-      };
-    });
-    return initialData;
-  });
+  }>({});
+
+  // Get work data from store
+  const { workDetail } = useWorkStore();
+
+  // Fetch material data when modal opens
+  const fetchMaterialData = async () => {
+    if (!workDetail?.id) {
+      toast.error("Work ID not found", {
+        description: "Please submit work code first"
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await axios.get<MaterialApiResponse>(
+        `${Base_Url}/material-vendor-data/${workDetail.id}`
+      );
+
+      if (response.data.success) {
+        setMaterialData(response.data.data);
+
+        // Initialize units and prices
+        const initialUnits: { [materialId: number]: string } = {};
+        const initialPrices: {
+          [materialId: number]: {
+            vendor1: MaterialQuotedData;
+            vendor2: MaterialQuotedData;
+            vendor3: MaterialQuotedData;
+          };
+        } = {};
+
+        response.data.data.forEach((material) => {
+          initialUnits[material.slNo] = material.unit;
+          initialPrices[material.slNo] = {
+            vendor1: { price: material.contractor1Rate },
+            vendor2: { price: material.contractor2Rate },
+            vendor3: { price: material.contractor3Rate }
+          };
+        });
+
+        setMaterialUnits(initialUnits);
+        setEditableQuotedData(initialPrices);
+
+        toast.success("Material data loaded successfully");
+      } else {
+        throw new Error("Failed to fetch material data");
+      }
+    } catch (error) {
+      console.error("Error fetching material data:", error);
+      toast.error("Failed to load material data", {
+        description: "Please try again or contact support"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Fetch vendor options
+  const fetchVendorOptions = async () => {
+    try {
+      const response = await axios.get<VendorApiResponse>(
+        `${Base_Url}/vendors/kalaburagi`
+      );
+
+      if (response.data.success) {
+        setVendorOptions(response.data.data);
+      } else {
+        throw new Error("Failed to fetch vendor data");
+      }
+    } catch (error) {
+      console.error("Error fetching vendor data:", error);
+      toast.error("Failed to load vendor options", {
+        description: "Using default vendor list"
+      });
+    }
+  };
+
+  // Load data when modal opens
+  useEffect(() => {
+    if (isModalOpen) {
+      fetchMaterialData();
+      fetchVendorOptions();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isModalOpen, workDetail?.id]);
+
+  // Calculate vendor2 and vendor3 prices when vendor1 price changes
+  const calculateDependentPrices = (vendor1Price: string) => {
+    const price = Number.parseFloat(vendor1Price) || 0;
+    const vendor2Price = (price * 1.02).toFixed(2);
+    const vendor3Price = (price * 1.025).toFixed(2);
+
+    return {
+      vendor2: vendor2Price,
+      vendor3: vendor3Price
+    };
+  };
 
   const handleSelectAll = (checked: boolean) => {
     setSelectAll(checked);
     if (checked) {
-      setSelectedMaterials(new Set(materialData.map((m) => m.id)));
+      setSelectedMaterials(new Set(materialData.map((m) => m.slNo)));
     } else {
       setSelectedMaterials(new Set());
     }
@@ -135,63 +224,166 @@ export default function VendorInformation() {
 
   const handleVendorSelect = (
     vendorColumn: "vendor1" | "vendor2" | "vendor3",
-    vendorId: number | null
+    vendorData: VendorData | null
   ) => {
+    const selectedVendor = vendorData
+      ? {
+          vendorName: vendorData.vendorName,
+          gstNo: vendorData.gstNo
+        }
+      : null;
+
     setSelectedVendors((prev) => ({
       ...prev,
-      [vendorColumn]: vendorId
+      [vendorColumn]: selectedVendor
     }));
   };
 
-  const handleQuotedDataChange = (
-    materialId: number,
-    vendorColumn: "vendor1" | "vendor2" | "vendor3",
-    value: string
-  ) => {
+  // Only vendor1 prices can be edited
+  const handleVendor1PriceChange = (materialId: number, value: string) => {
+    const calculatedPrices = calculateDependentPrices(value);
+
     setEditableQuotedData((prev) => ({
       ...prev,
       [materialId]: {
-        ...prev[materialId],
-        [vendorColumn]: {
-          price: value
-        }
+        vendor1: { price: value },
+        vendor2: { price: calculatedPrices.vendor2 },
+        vendor3: { price: calculatedPrices.vendor3 }
       }
     }));
   };
 
-  const handleSubmitMaterials = () => {
-    const selectedMaterialsData = materialData
-      .filter((material) => selectedMaterials.has(material.id))
-      .map((material) => ({
-        material,
-        unit: materialUnits[material.id],
+  const handleSubmitMaterials = async () => {
+    // Validation
+    if (!fromDate || !toDate) {
+      toast.error("Please select both from and to dates");
+      return;
+    }
+
+    if (selectedMaterials.size === 0) {
+      toast.error("Please select at least one material");
+      return;
+    }
+
+    if (
+      !selectedVendors.vendor1 ||
+      !selectedVendors.vendor2 ||
+      !selectedVendors.vendor3
+    ) {
+      toast.error("Please select all three vendors");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Prepare the data to send to backend
+      const selectedMaterialsData = materialData
+        .filter((material) => selectedMaterials.has(material.slNo))
+        .map((material) => ({
+          slNo: material.slNo,
+          materialName: material.materialName,
+          quantity: material.quantity,
+          unit: materialUnits[material.slNo],
+          vendor1Rate: editableQuotedData[material.slNo]?.vendor1?.price || "0"
+        }));
+
+      const submitData = {
+        workId: workDetail?.id,
+        workDocumentId: workDetail?.workDocumentId,
+        fromDate,
+        toDate,
         vendors: {
-          vendor1: {
-            assignedVendorId: selectedVendors.vendor1,
-            priceData: editableQuotedData[material.id]?.vendor1
-          },
-          vendor2: {
-            assignedVendorId: selectedVendors.vendor2,
-            priceData: editableQuotedData[material.id]?.vendor2
-          },
-          vendor3: {
-            assignedVendorId: selectedVendors.vendor3,
-            priceData: editableQuotedData[material.id]?.vendor3
-          }
+          vendor1: selectedVendors.vendor1,
+          vendor2: selectedVendors.vendor2,
+          vendor3: selectedVendors.vendor3
+        },
+        materials: selectedMaterialsData
+      };
+
+      console.log("Submitting data:", submitData);
+
+      // Frontend API call with proper error handling
+      try {
+        const response = await axios.post(
+          `${Base_Url}/update-vendor-material-data`,
+          submitData
+        );
+
+        if (response.data.success) {
+          toast.success("Materials Submitted Successfully", {
+            description: `${selectedMaterials.size} materials submitted with vendor information.`
+          });
+        } else {
+          toast.error("Submission Failed", {
+            description: response.data.message || "Failed to submit materials"
+          });
         }
-      }));
+      } catch (error: unknown) {
+        console.error("API Error:", error);
 
-    console.log("Selected materials with vendors:", selectedMaterialsData);
+        // Type guard for axios error
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 400) {
+            // Validation errors
+            const errorData = error.response.data;
+            const errorMessage =
+              errorData?.errors?.join(", ") || "Please check your input data";
+            toast.error("Invalid Data", {
+              description: errorMessage
+            });
+          } else if (error.response?.status === 404) {
+            // Not found errors
+            toast.error("Record Not Found", {
+              description: "The requested work record was not found"
+            });
+          } else if (error.response?.status === 500) {
+            // Server errors
+            toast.error("Server Error", {
+              description:
+                "An unexpected error occurred. Please try again later."
+            });
+          } else {
+            // Other HTTP errors
+            toast.error("Request Failed", {
+              description: `Server returned status: ${
+                error.response?.status || "unknown"
+              }`
+            });
+          }
+        } else {
+          // Network or other errors
+          toast.error("Connection Error", {
+            description:
+              "Unable to connect to server. Please check your internet connection."
+          });
+        }
+      }
 
-    toast.success("Materials Submitted", {
-      description: `${selectedMaterials.size} materials submitted with vendor information.`
-    });
-
-    setIsModalOpen(false);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error submitting materials:", error);
+      toast.error("Failed to submit materials", {
+        description: "Please try again or contact support"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
+  // Format vendor options for combobox
+  const formatVendorOptions = (vendors: VendorData[]) => {
+    return vendors.map((vendor, index) => ({
+      value: index,
+      label: `${vendor.vendorName} (${vendor.gstNo})`,
+      data: vendor
+    }));
+  };
+
+  const vendorComboboxOptions = formatVendorOptions(vendorOptions);
+
   return (
-    <Card className="border border-red-600">
+    <Card className="">
       <CardHeader>
         <CardTitle>Vendor Information</CardTitle>
         <p className="text-sm text-gray-600">
@@ -201,217 +393,317 @@ export default function VendorInformation() {
       <CardContent>
         <div className="flex justify-center">
           <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-            <DialogTrigger className="" asChild>
-              <Button className="px-8 py-3">
+            <DialogTrigger asChild>
+              <Button className="px-8 py-3" disabled={!workDetail?.id}>
                 <Plus className="w-4 h-4 mr-2" />
                 Manage Vendor Materials
               </Button>
             </DialogTrigger>
-            <DialogContent className="w-[95vw]  max-w-none max-h-[90vh] overflow-y-auto">
+            <DialogContent className="w-[95vw] max-w-none max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Material & Vendor Management</DialogTitle>
               </DialogHeader>
 
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2 ">
-                  <Checkbox
-                    id="selectAll"
-                    checked={selectAll}
-                    onCheckedChange={handleSelectAll}
-                    className="cursor-pointer"
-                  />
-                  <Label
-                    htmlFor="selectAll"
-                    className="font-medium cursor-pointer hover:text-green-800 tracking-wide"
-                  >
-                    Select All Materials
-                  </Label>
+              {isLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-8 h-8 animate-spin mr-2" />
+                  <span>Loading material data...</span>
                 </div>
+              ) : (
+                <div className="space-y-4">
+                  {/* Date Range Inputs */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="fromDate"
+                        className="flex items-center gap-2"
+                      >
+                        <Calendar className="w-4 h-4" />
+                        From Date *
+                      </Label>
+                      <Input
+                        id="fromDate"
+                        type="date"
+                        value={fromDate}
+                        onChange={(e) => setFromDate(e.target.value)}
+                        className="w-full"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="toDate"
+                        className="flex items-center gap-2"
+                      >
+                        <Calendar className="w-4 h-4" />
+                        To Date *
+                      </Label>
+                      <Input
+                        id="toDate"
+                        type="date"
+                        value={toDate}
+                        onChange={(e) => setToDate(e.target.value)}
+                        className="w-full"
+                        required
+                      />
+                    </div>
+                  </div>
 
-                <div className="border rounded-lg overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full table-fixed">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="w-16 px-3 py-3 text-left text-sm font-medium text-gray-900">
-                            Select
-                          </th>
-                          <th className="w-48 px-3 py-3 text-left text-sm font-medium text-gray-900">
-                            Material
-                          </th>
-                          <th className="w-32 px-3 py-3 text-left text-sm font-medium text-gray-900">
-                            Units
-                          </th>
-                          <th className="w-48 px-3 py-3 text-left text-sm font-medium text-gray-900">
-                            <div className="space-y-2">
-                              <div>Select Vendor</div>
-                              <Combobox
-                                options={vendorData.map((v) => ({
-                                  value: v.id,
-                                  label: v.name
-                                }))}
-                                value={selectedVendors.vendor1}
-                                onValueChange={(value) =>
-                                  handleVendorSelect("vendor1", value)
-                                }
-                                placeholder="Search vendors..."
-                                emptyText="No vendor found."
-                              />
-                              <div className="mt-2">
-                                <Label className="text-xs text-gray-600">
-                                  Price
-                                </Label>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="selectAll"
+                      checked={selectAll}
+                      onCheckedChange={handleSelectAll}
+                      className="cursor-pointer"
+                    />
+                    <Label
+                      htmlFor="selectAll"
+                      className="font-medium cursor-pointer hover:text-green-800 tracking-wide"
+                    >
+                      Select All Materials ({materialData.length})
+                    </Label>
+                  </div>
+
+                  <div className="border rounded-lg overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full table-fixed">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="w-16 px-3 py-3 text-left text-sm font-medium text-gray-900">
+                              Select
+                            </th>
+                            <th className="w-64 px-3 py-3 text-left text-sm font-medium text-gray-900">
+                              Material
+                            </th>
+                            <th className="w-24 px-3 py-3 text-left text-sm font-medium text-gray-900">
+                              Quantity
+                            </th>
+                            <th className="w-32 px-3 py-3 text-left text-sm font-medium text-gray-900">
+                              Units
+                            </th>
+                            <th className="w-48 px-3 py-3 text-left text-sm font-medium text-gray-900">
+                              <div className="space-y-2">
+                                <div>Vendor 1 (Editable)</div>
+                                <div className="w-full">
+                                  <Combobox
+                                    options={vendorComboboxOptions}
+                                    value={
+                                      selectedVendors.vendor1
+                                        ? vendorOptions.findIndex(
+                                            (v) =>
+                                              v.vendorName ===
+                                                selectedVendors.vendor1
+                                                  ?.vendorName &&
+                                              v.gstNo ===
+                                                selectedVendors.vendor1?.gstNo
+                                          )
+                                        : null
+                                    }
+                                    onValueChange={(value) =>
+                                      handleVendorSelect(
+                                        "vendor1",
+                                        value !== null
+                                          ? vendorOptions[value]
+                                          : null
+                                      )
+                                    }
+                                    placeholder="Search vendors..."
+                                    emptyText="No vendor found."
+                                  />
+                                </div>
+                                <div className="mt-2">
+                                  <Label className="text-xs text-gray-600">
+                                    Price (Editable)
+                                  </Label>
+                                </div>
                               </div>
-                            </div>
-                          </th>
-                          <th className="w-48 px-3 py-3 text-left text-sm font-medium text-gray-900">
-                            <div className="space-y-2">
-                              <div>Vendor Input</div>
-                              <Combobox
-                                options={vendorData.map((v) => ({
-                                  value: v.id,
-                                  label: v.name
-                                }))}
-                                value={selectedVendors.vendor2}
-                                onValueChange={(value) =>
-                                  handleVendorSelect("vendor2", value)
-                                }
-                                placeholder="Search vendors..."
-                                emptyText="No vendor found."
-                              />
-                              <div className="mt-2">
-                                <Label className="text-xs text-gray-600">
-                                  Price
-                                </Label>
+                            </th>
+                            <th className="w-48 px-3 py-3 text-left text-sm font-medium text-gray-900">
+                              <div className="space-y-2">
+                                <div>Vendor 2 (Auto: +2%)</div>
+                                <div className="w-full">
+                                  <Combobox
+                                    options={vendorComboboxOptions}
+                                    value={
+                                      selectedVendors.vendor2
+                                        ? vendorOptions.findIndex(
+                                            (v) =>
+                                              v.vendorName ===
+                                                selectedVendors.vendor2
+                                                  ?.vendorName &&
+                                              v.gstNo ===
+                                                selectedVendors.vendor2?.gstNo
+                                          )
+                                        : null
+                                    }
+                                    onValueChange={(value) =>
+                                      handleVendorSelect(
+                                        "vendor2",
+                                        value !== null
+                                          ? vendorOptions[value]
+                                          : null
+                                      )
+                                    }
+                                    placeholder="Search vendors..."
+                                    emptyText="No vendor found."
+                                  />
+                                </div>
+                                <div className="mt-2">
+                                  <Label className="text-xs text-gray-600">
+                                    Price (Auto)
+                                  </Label>
+                                </div>
                               </div>
-                            </div>
-                          </th>
-                          <th className="w-48 px-3 py-3 text-left text-sm font-medium text-gray-900">
-                            <div className="space-y-2">
-                              <div>Vendor Input</div>
-                              <Combobox
-                                options={vendorData.map((v) => ({
-                                  value: v.id,
-                                  label: v.name
-                                }))}
-                                value={selectedVendors.vendor3}
-                                onValueChange={(value) =>
-                                  handleVendorSelect("vendor3", value)
-                                }
-                                placeholder="Search vendors..."
-                                emptyText="No vendor found."
-                              />
-                              <div className="mt-2">
-                                <Label className="text-xs text-gray-600">
-                                  Price
-                                </Label>
+                            </th>
+                            <th className="w-48 px-3 py-3 text-left text-sm font-medium text-gray-900">
+                              <div className="space-y-2">
+                                <div>Vendor 3 (Auto: +2.5%)</div>
+                                <div className="w-full">
+                                  <Combobox
+                                    options={vendorComboboxOptions}
+                                    value={
+                                      selectedVendors.vendor3
+                                        ? vendorOptions.findIndex(
+                                            (v) =>
+                                              v.vendorName ===
+                                                selectedVendors.vendor3
+                                                  ?.vendorName &&
+                                              v.gstNo ===
+                                                selectedVendors.vendor3?.gstNo
+                                          )
+                                        : null
+                                    }
+                                    onValueChange={(value) =>
+                                      handleVendorSelect(
+                                        "vendor3",
+                                        value !== null
+                                          ? vendorOptions[value]
+                                          : null
+                                      )
+                                    }
+                                    placeholder="Search vendors..."
+                                    emptyText="No vendor found."
+                                  />
+                                </div>
+                                <div className="mt-2">
+                                  <Label className="text-xs text-gray-600">
+                                    Price (Auto)
+                                  </Label>
+                                </div>
                               </div>
-                            </div>
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200">
-                        {materialData.map((material) => (
-                          <tr
-                            key={material.id}
-                            className="hover:bg-gray-50 h-16"
-                          >
-                            <td className="w-16 px-3 py-3">
-                              <Checkbox
-                                checked={selectedMaterials.has(material.id)}
-                                onCheckedChange={(checked) =>
-                                  handleMaterialSelect(
-                                    material.id,
-                                    checked as boolean
-                                  )
-                                }
-                              />
-                            </td>
-                            <td className="w-48 px-3 py-3">
-                              <div>
-                                <p className="font-medium text-gray-900 text-sm truncate">
-                                  {material.name}
-                                </p>
-                              </div>
-                            </td>
-                            <td className="w-32 px-3 py-3">
-                              <Input
-                                value={materialUnits[material.id] || ""}
-                                onChange={(e) =>
-                                  handleUnitChange(material.id, e.target.value)
-                                }
-                                className="text-sm h-8 w-full"
-                                placeholder="Enter unit"
-                              />
-                            </td>
-                            <td className="w-48 px-3 py-3">
-                              <Input
-                                value={
-                                  editableQuotedData[material.id]?.vendor1
-                                    ?.price || ""
-                                }
-                                onChange={(e) =>
-                                  handleQuotedDataChange(
-                                    material.id,
-                                    "vendor1",
-                                    e.target.value
-                                  )
-                                }
-                                className="text-sm h-8 w-full"
-                                placeholder="Enter price"
-                              />
-                            </td>
-                            <td className="w-48 px-3 py-3">
-                              <Input
-                                value={
-                                  editableQuotedData[material.id]?.vendor2
-                                    ?.price || ""
-                                }
-                                onChange={(e) =>
-                                  handleQuotedDataChange(
-                                    material.id,
-                                    "vendor2",
-                                    e.target.value
-                                  )
-                                }
-                                className="text-sm h-8 w-full"
-                                placeholder="Enter price"
-                              />
-                            </td>
-                            <td className="w-48 px-3 py-3">
-                              <Input
-                                value={
-                                  editableQuotedData[material.id]?.vendor3
-                                    ?.price || ""
-                                }
-                                onChange={(e) =>
-                                  handleQuotedDataChange(
-                                    material.id,
-                                    "vendor3",
-                                    e.target.value
-                                  )
-                                }
-                                className="text-sm h-8 w-full"
-                                placeholder="Enter price"
-                              />
-                            </td>
+                            </th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                          {materialData.map((material) => (
+                            <tr
+                              key={material.slNo}
+                              className="hover:bg-gray-50 h-16"
+                            >
+                              <td className="w-16 px-3 py-3">
+                                <Checkbox
+                                  checked={selectedMaterials.has(material.slNo)}
+                                  onCheckedChange={(checked) =>
+                                    handleMaterialSelect(
+                                      material.slNo,
+                                      checked as boolean
+                                    )
+                                  }
+                                />
+                              </td>
+                              <td className="w-64 px-3 py-3">
+                                <div>
+                                  <p
+                                    className="font-medium text-gray-900 text-sm"
+                                    title={material.materialName}
+                                  >
+                                    {material.materialName}
+                                  </p>
+                                </div>
+                              </td>
+                              <td className="w-24 px-3 py-3">
+                                <span className="text-sm text-gray-600">
+                                  {material.quantity}
+                                </span>
+                              </td>
+                              <td className="w-32 px-3 py-3">
+                                <Input
+                                  value={materialUnits[material.slNo] || ""}
+                                  onChange={(e) =>
+                                    handleUnitChange(
+                                      material.slNo,
+                                      e.target.value
+                                    )
+                                  }
+                                  className="text-sm h-8 w-full"
+                                  placeholder="Enter unit"
+                                />
+                              </td>
+                              <td className="w-48 px-3 py-3">
+                                <Input
+                                  value={
+                                    editableQuotedData[material.slNo]?.vendor1
+                                      ?.price || ""
+                                  }
+                                  onChange={(e) =>
+                                    handleVendor1PriceChange(
+                                      material.slNo,
+                                      e.target.value
+                                    )
+                                  }
+                                  className="text-sm h-8 w-full border-blue-300 focus:border-blue-500"
+                                  placeholder="Enter price"
+                                  type="number"
+                                  step="0.01"
+                                />
+                              </td>
+                              <td className="w-48 px-3 py-3">
+                                <Input
+                                  value={
+                                    editableQuotedData[material.slNo]?.vendor2
+                                      ?.price || ""
+                                  }
+                                  className="text-sm h-8 w-full bg-gray-100"
+                                  placeholder="Auto calculated"
+                                  disabled
+                                />
+                              </td>
+                              <td className="w-48 px-3 py-3">
+                                <Input
+                                  value={
+                                    editableQuotedData[material.slNo]?.vendor3
+                                      ?.price || ""
+                                  }
+                                  className="text-sm h-8 w-full bg-gray-100"
+                                  placeholder="Auto calculated"
+                                  disabled
+                                />
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-center pt-4">
+                    <Button
+                      onClick={handleSubmitMaterials}
+                      disabled={selectedMaterials.size === 0 || isSubmitting}
+                      className="px-8 py-2"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Submitting...
+                        </>
+                      ) : (
+                        `Submit Selected Materials (${selectedMaterials.size})`
+                      )}
+                    </Button>
                   </div>
                 </div>
-
-                <div className="flex justify-center pt-4">
-                  <Button
-                    onClick={handleSubmitMaterials}
-                    disabled={selectedMaterials.size === 0}
-                    className="px-8 py-2"
-                  >
-                    Submit Selected Materials ({selectedMaterials.size})
-                  </Button>
-                </div>
-              </div>
+              )}
             </DialogContent>
           </Dialog>
         </div>
