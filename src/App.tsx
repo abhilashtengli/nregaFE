@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster } from "sonner";
 import Body from "./pages/Body";
 import Home from "./pages/Home";
+import SimpleTestComponent from "./TestingPage";
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Body />}>
             <Route path="/" element={<Home />} />
+            <Route path="/test" element={<SimpleTestComponent />} />
           </Route>
         </Routes>
       </BrowserRouter>

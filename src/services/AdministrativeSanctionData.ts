@@ -1,8 +1,10 @@
 // src/services/administrativeSanction/fetchAdministrativeSanction.ts
 
 import { Base_Url } from "@/lib/constant";
+import { useWorkStore } from "@/stores/workStore";
 import type { ServiceResponse } from "@/types/types";
 import axios from "axios";
+import { toast } from "sonner";
 
 export type AdministrativeSanctionData = {
   administrativeSanctionDate: string;
@@ -19,7 +21,7 @@ export type AdministrativeSanctionData = {
   estimatePersonDays: string;
 };
 
-export const fetchAdministrativeSanction = async (
+const fetchAdministrativeSanction = async (
   id: string
 ): Promise<ServiceResponse<AdministrativeSanctionData>> => {
   try {
@@ -65,4 +67,30 @@ export const fetchAdministrativeSanction = async (
       message
     };
   }
+};
+
+export const useFetchASCopyData = () => {
+  const { workDetail } = useWorkStore();
+
+  const fetch = async (): Promise<AdministrativeSanctionData | null> => {
+    const id = workDetail?.id;
+
+    if (!id) {
+      toast.error("No work Id", {
+        description: "Please refresh"
+      });
+      return null;
+    }
+
+    const res = await fetchAdministrativeSanction(id);
+
+    if (!res?.success) {
+      toast.error(res?.message || "Failed to fetch data");
+      return null;
+    }
+
+    return res.data ?? null;
+  };
+
+  return fetch;
 };

@@ -5,40 +5,38 @@ import { pdf } from "@react-pdf/renderer";
 import AdministrativeSanctionPDF from "./components/PDFs/AsCopyPdf";
 import PDFPreviewer from "./components/PdfViewer";
 import {
-  fetchAdministrativeSanction,
+  useFetchASCopyData,
   type AdministrativeSanctionData
 } from "./services/AdministrativeSanctionData";
 import { toast } from "sonner";
 
 const SimpleTestComponent = () => {
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewError, setPreviewError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [pdfData, setPdfData] = useState<AdministrativeSanctionData | null>(
+  const [asPdfData, setAsPdfData] = useState<AdministrativeSanctionData | null>(
     null
   );
-  const [showPreview, setShowPreview] = useState(false);
 
-  const fetchData = async (): Promise<AdministrativeSanctionData | null> => {
-    const id = "688c424a-dfb9-436c-8d37-3e35a404cd21";
-    const res = await fetchAdministrativeSanction(id);
+  const fetchASCopyData = useFetchASCopyData();
 
-    if (!res.success) {
-      toast.error(res.message || "Failed to fetch data");
-      return null;
-    }
-
-    setPdfData(res.data!);
-    return res.data!;
-  };
-
-  const handleDownload = async () => {
+  const handleDownloadAsCopy = async () => {
     setLoading(true);
+    console.log("Starting download...");
+
     try {
-      const data = await fetchData();
-      if (!data) return;
+      const data = await fetchASCopyData();
+      if (!data) {
+        toast.error("No data found for download.");
+        return;
+      }
+
+      console.log("Data fetched:", data);
 
       const blob = await pdf(
         <AdministrativeSanctionPDF asData={data} />
       ).toBlob();
+
       saveAs(blob, "administrative-sanction.pdf");
       toast.success("Download started!");
     } catch (error) {
@@ -49,42 +47,133 @@ const SimpleTestComponent = () => {
     }
   };
 
-  const handleView = async () => {
+  const handleViewAsCopy = async () => {
     setLoading(true);
+    setPreviewError(null);
+
     try {
-      const data = await fetchData();
-      if (!data) return;
+      const data = await fetchASCopyData();
+      console.log("Data for preview:", data);
+
+      if (!data) {
+        toast.error("No data found for preview.");
+        return;
+      }
+
+      // Validate data structure
+      const requiredFields = [
+        "workCode",
+        "workName",
+        "gramPanchayat",
+        "sanctionedAmount",
+        "technicalSanctionNo"
+      ];
+
+      const missingFields = requiredFields.filter(
+        (field) => !data[field as keyof AdministrativeSanctionData]
+      );
+
+      if (missingFields.length > 0) {
+        console.warn("Missing required fields:", missingFields);
+        toast.warning(
+          `Some data fields are missing: ${missingFields.join(", ")}`
+        );
+      }
+
+      setAsPdfData(data);
       setShowPreview(true);
+      toast.success("Preview loaded!");
     } catch (error) {
       console.error("View Error:", error);
-      toast.error("Failed to load preview!");
+      setPreviewError(
+        error instanceof Error ? error.message : "Failed to load preview"
+      );
+      toast.error("Preview failed to load!");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleClosePreview = () => {
+    setShowPreview(false);
+    setAsPdfData(null);
+    setPreviewError(null);
+  };
+
   return (
     <div>
-      <button
-        onClick={handleDownload}
-        disabled={loading}
-        style={{ padding: "10px 20px", fontSize: "16px", marginRight: "10px" }}
-      >
-        {loading ? "Downloading..." : "Download PDF"}
-      </button>
+      <div style={{ marginBottom: "20px" }}>
+        <button
+          onClick={handleDownloadAsCopy}
+          disabled={loading}
+          style={{
+            padding: "10px 20px",
+            fontSize: "16px",
+            marginRight: "10px",
+            backgroundColor: loading ? "#ccc" : "#007bff",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: loading ? "not-allowed" : "pointer"
+          }}
+        >
+          {loading ? "Downloading..." : "Download PDF"}
+        </button>
 
-      <button
-        onClick={handleView}
-        disabled={loading}
-        style={{ padding: "10px 20px", fontSize: "16px" }}
-      >
-        {loading ? "Loading..." : "View PDF"}
-      </button>
+        <button
+          onClick={handleViewAsCopy}
+          disabled={loading}
+          style={{
+            padding: "10px 20px",
+            fontSize: "16px",
+            backgroundColor: loading ? "#ccc" : "#28a745",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: loading ? "not-allowed" : "pointer"
+          }}
+        >
+          {loading ? "Loading..." : "View PDF"}
+        </button>
+      </div>
 
-      {showPreview && pdfData && (
-        <PDFPreviewer
-          document={<AdministrativeSanctionPDF asData={pdfData} />}
-        />
+      {previewError && (
+        <div
+          style={{
+            padding: "15px",
+            backgroundColor: "#f8d7da",
+            border: "1px solid #f5c6cb",
+            borderRadius: "4px",
+            color: "#721c24",
+            marginBottom: "20px"
+          }}
+        >
+          <strong>Preview Error:</strong> {previewError}
+          <button
+            onClick={() => setPreviewError(null)}
+            style={{ marginLeft: "10px", padding: "2px 8px" }}
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      {showPreview && asPdfData && (
+        <div>
+          <h3>PDF Preview</h3>
+          <PDFPreviewer
+            document={<AdministrativeSanctionPDF asData={asPdfData} />}
+            onClose={handleClosePreview}
+          />
+        </div>
+      )}
+
+      {/* Debug Info */}
+      {process.env.NODE_ENV === "development" && asPdfData && (
+        <details style={{ marginTop: "20px", fontSize: "12px" }}>
+          <summary>Debug: PDF Data</summary>
+          <pre>{JSON.stringify(asPdfData, null, 2)}</pre>
+        </details>
       )}
     </div>
   );
