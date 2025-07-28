@@ -3,28 +3,24 @@ import { saveAs } from "file-saver";
 import { pdf } from "@react-pdf/renderer";
 import PDFPreviewer from "./components/PdfViewer";
 import { toast } from "sonner";
-
-import {
-  useFetchWorkOrderData,
-  type WorkOrderData
-} from "./services/WorkOrderService";
-import WorkOrderPDF from "./components/PDFs/WorkOrderPdf";
+import { useFetchTSCopyData, type TSCopyData } from "./services/TsCopyService";
+import TechnicalSanctionPDF from "./components/PDFs/TsCopy";
 
 const SimpleTestComponent = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [pdfData, setPdfData] = useState<WorkOrderData | null>(null);
+  const [pdfData, setPdfData] = useState<TSCopyData | null>(null);
 
   // const fetchASCopyData = useFetchASCopyData();
-  const fetchWorkOrderData = useFetchWorkOrderData();
+  const fetchTsCopyData = useFetchTSCopyData();
 
   const handleDownload = async () => {
     setLoading(true);
     console.log("Starting download...");
 
     try {
-      const data = await fetchWorkOrderData();
+      const data = await fetchTsCopyData();
       if (!data) {
         toast.error("No data found for download.");
         return;
@@ -32,9 +28,9 @@ const SimpleTestComponent = () => {
 
       console.log("Data fetched:", data);
 
-      const blob = await pdf(<WorkOrderPDF workOrderData={data} />).toBlob();
+      const blob = await pdf(<TechnicalSanctionPDF tsData={data} />).toBlob();
 
-      saveAs(blob, "Workorder.pdf");
+      saveAs(blob, "TsCopy.pdf");
       toast.success("Download started!");
     } catch (error) {
       console.error("Download Error:", error);
@@ -49,7 +45,7 @@ const SimpleTestComponent = () => {
     setPreviewError(null);
 
     try {
-      const data = await fetchWorkOrderData(); // data is FrontPageData | null
+      const data = await fetchTsCopyData(); // data is FrontPageData | null
       console.log("Data for preview:", data);
 
       if (!data) {
@@ -57,12 +53,14 @@ const SimpleTestComponent = () => {
         return;
       }
 
-      const requiredFields: (keyof WorkOrderData)[] = [
+      const requiredFields: (keyof TSCopyData)[] = [
         "workName",
         "workCode",
-        "panchayat",
-        "estimatedCost",
-        "date"
+        "technicalSanctionNo",
+        "unskilledLabourCharges",
+        "estimateMaterialCost",
+        "sanctionedAmount",
+        "sanctionedAmountInWords"
       ];
 
       const missingFields = requiredFields.filter((field) => !data[field]);
@@ -154,7 +152,7 @@ const SimpleTestComponent = () => {
         <div>
           <h3>PDF Preview</h3>
           <PDFPreviewer
-            document={<WorkOrderPDF workOrderData={pdfData} />}
+            document={<TechnicalSanctionPDF tsData={pdfData} />}
             onClose={handleClosePreview}
           />
         </div>

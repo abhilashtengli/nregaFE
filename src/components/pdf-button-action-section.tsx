@@ -17,6 +17,8 @@ import { useFetchGPAbstractData } from "@/services/GpAbstractService";
 import GPAbstractPDF from "./PDFs/GpAbstractPdf";
 import { useFetchWorkOrderData } from "@/services/WorkOrderService";
 import WorkOrderPDF from "./PDFs/WorkOrderPdf";
+import TechnicalSanctionPDF from "./PDFs/TsCopy";
+import { useFetchTSCopyData } from "@/services/TsCopyService";
 
 // PDF Action buttons data
 const pdfButtons = [
@@ -83,6 +85,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
   const fetchFrontPageData = useFetchFrontPageData();
   const fetchGpAbstractData = useFetchGPAbstractData();
   const fetchWorkOrderData = useFetchWorkOrderData();
+  const fetchTsCopyData = useFetchTSCopyData();
 
   // Check if any button is currently processing
   const isAnyButtonLoading = currentDownloading !== null || isDownloading;
@@ -184,8 +187,17 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
   const handleTsCopy = async () => {
     setCurrentDownloading("tsCopy");
     try {
-      // Add your TS copy PDF generation logic here
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
+      const data = await fetchTsCopyData();
+      if (!data) {
+        toast.error("No data found for download.");
+        return;
+      }
+
+      console.log("Data fetched:", data);
+
+      const blob = await pdf(<TechnicalSanctionPDF tsData={data} />).toBlob();
+
+      saveAs(blob, "TsCopy.pdf"); // Simulate API call
       toast.success("TS Copy PDF downloaded successfully!");
     } catch (error) {
       console.error("TS Copy Error:", error);
