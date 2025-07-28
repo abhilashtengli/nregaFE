@@ -3,24 +3,24 @@ import { saveAs } from "file-saver";
 import { pdf } from "@react-pdf/renderer";
 import PDFPreviewer from "./components/PdfViewer";
 import { toast } from "sonner";
-import { useFetchForm8Data, type Form8Data } from "./services/Form8Service";
-import Form8PDF from "./components/PDFs/Form8Pdf";
+import { useFetchForm9Data } from "./services/Form9Service";
+import type { Form9Data } from "./components/PDFs/Form9Pdf";
+import Form9PDF from "./components/PDFs/Form9Pdf";
 
 const SimpleTestComponent = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [pdfData, setPdfData] = useState<Form8Data | null>(null);
+  const [pdfData, setPdfData] = useState<Form9Data | null>(null);
 
-  // const fetchASCopyData = useFetchASCopyData();
-  const fetchForm8Data = useFetchForm8Data();
+  const fetchForm9Data = useFetchForm9Data();
 
   const handleDownload = async () => {
     setLoading(true);
     console.log("Starting download...");
 
     try {
-      const data = await fetchForm8Data();
+      const data = await fetchForm9Data();
       if (!data) {
         toast.error("No data found for download.");
         return;
@@ -28,9 +28,9 @@ const SimpleTestComponent = () => {
 
       console.log("Data fetched:", data);
 
-      const blob = await pdf(<Form8PDF form8Data={data.form8Data} />).toBlob();
+      const blob = await pdf(<Form9PDF form9Data={data.form9Data} />).toBlob();
 
-      saveAs(blob, "form8.pdf");
+      saveAs(blob, "Form9.pdf");
       toast.success("Download started!");
     } catch (error) {
       console.error("Download Error:", error);
@@ -45,7 +45,7 @@ const SimpleTestComponent = () => {
     setPreviewError(null);
 
     try {
-      const data = await fetchForm8Data(); // data is FrontPageData | null
+      const data = await fetchForm9Data(); // data is FrontPageData | null
       console.log("Data for preview:", data);
 
       if (!data) {
@@ -149,7 +149,7 @@ const SimpleTestComponent = () => {
         <div>
           <h3>PDF Preview</h3>
           <PDFPreviewer
-            document={<Form8PDF form8Data={pdfData.form8Data} />}
+            document={<Form9PDF form9Data={pdfData.form9Data} />}
             onClose={handleClosePreview}
           />
         </div>

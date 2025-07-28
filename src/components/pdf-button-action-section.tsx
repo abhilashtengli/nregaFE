@@ -23,6 +23,8 @@ import { useFetchForm6Data } from "@/services/Form6Service";
 import Form6PDF from "./PDFs/Form6Pdf";
 import { useFetchForm8Data } from "@/services/Form8Service";
 import Form8PDF from "./PDFs/Form8Pdf";
+import { useFetchForm9Data } from "@/services/Form9Service";
+import Form9PDF from "./PDFs/Form9Pdf";
 
 // PDF Action buttons data
 const pdfButtons = [
@@ -92,6 +94,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
   const fetchTsCopyData = useFetchTSCopyData();
   const fetchForm6Data = useFetchForm6Data();
   const fetchForm8Data = useFetchForm8Data();
+  const fetchForm9Data = useFetchForm9Data();
 
   // Check if any button is currently processing
   const isAnyButtonLoading = currentDownloading !== null || isDownloading;
@@ -284,8 +287,17 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
   const handleForm9 = async () => {
     setCurrentDownloading("form9");
     try {
-      // Add your Form 9 PDF generation logic here
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
+      const data = await fetchForm9Data();
+      if (!data) {
+        toast.error("No data found for download.");
+        return;
+      }
+
+      console.log("Data fetched:", data);
+
+      const blob = await pdf(<Form9PDF form9Data={data.form9Data} />).toBlob();
+
+      saveAs(blob, "Form9.pdf"); // Simulate API call
       toast.success("Form 9 PDF downloaded successfully!");
     } catch (error) {
       console.error("Form 9 Error:", error);
