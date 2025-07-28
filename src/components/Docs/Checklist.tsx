@@ -1,11 +1,10 @@
 // COMPLETED
 type WorkData = {
-  id: string;
   workCode: string;
   workName: string;
   sanctionYear: string;
-  panchayat: string;
-  block: string;
+  panchayat: string; //kannada
+  block: string; //kannnada
 };
 type GramPanchayatChecklistProps = {
   workData: WorkData;

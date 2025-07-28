@@ -1,11 +1,12 @@
 // src/services/checklist/fetchWorkData.ts
 
 import { Base_Url } from "@/lib/constant";
+import { useWorkStore } from "@/stores/workStore";
 import type { ServiceResponse } from "@/types/types";
 import axios from "axios";
+import { toast } from "sonner";
 
-export type WorkData = {
-  id: string;
+export type ChecklistWorkData = {
   workCode: string;
   workName: string;
   sanctionYear: string;
@@ -13,11 +14,11 @@ export type WorkData = {
   block: string;
 };
 
-export const fetchWorkData = async (
+export const fetchCheckListData = async (
   id: string
-): Promise<ServiceResponse<WorkData>> => {
+): Promise<ServiceResponse<ChecklistWorkData>> => {
   try {
-    const response = await axios.get(`${Base_Url}/get-ts-copy/${id}`);
+    const response = await axios.get(`${Base_Url}/get-checklist/${id}`);
     const apiData = response.data?.data;
 
     if (!apiData) {
@@ -27,13 +28,12 @@ export const fetchWorkData = async (
       };
     }
 
-    const formattedData: WorkData = {
-      id: id,
+    const formattedData: ChecklistWorkData = {
       workCode: apiData.workCode || "",
       workName: apiData.workName || "",
-      sanctionYear: apiData.financialYear || "",
-      panchayat: apiData.gramPanchayat || "",
-      block: apiData.blockPanchayat || ""
+      sanctionYear: apiData.sanctionYear || "",
+      panchayat: apiData.panchayat || "",
+      block: apiData.block || ""
     };
 
     return {
@@ -52,4 +52,30 @@ export const fetchWorkData = async (
       message
     };
   }
+};
+
+export const useFetchCheckListData = () => {
+  const { workDetail } = useWorkStore();
+
+  const fetch = async (): Promise<ChecklistWorkData | null> => {
+    const id = workDetail?.id;
+
+    if (!id) {
+      toast.error("No work Id", {
+        description: "Please refresh"
+      });
+      return null;
+    }
+
+    const res = await fetchCheckListData(id);
+
+    if (!res?.success) {
+      toast.error(res?.message || "Failed to fetch data");
+      return null;
+    }
+
+    return res.data ?? null;
+  };
+
+  return fetch;
 };

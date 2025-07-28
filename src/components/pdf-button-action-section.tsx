@@ -9,6 +9,8 @@ import { pdf } from "@react-pdf/renderer";
 import { toast } from "sonner";
 import { useFetchASCopyData } from "@/services/AdministrativeSanctionData";
 import AdministrativeSanctionPDF from "./PDFs/AsCopyPdf";
+import { useFetchCheckListData } from "@/services/ChecklistData";
+import ChecklistPDF from "./PDFs/ChecklistPdf";
 
 // PDF Action buttons data
 const pdfButtons = [
@@ -71,6 +73,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
   //   );
 
   const fetchASCopyData = useFetchASCopyData();
+  const fetchCheckListDataData = useFetchCheckListData();
 
   // Check if any button is currently processing
   const isAnyButtonLoading = currentDownloading !== null || isDownloading;
@@ -80,7 +83,14 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
     setCurrentDownloading("checklist");
     try {
       // Add your checklist PDF generation logic here
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
+      const data = await fetchCheckListDataData();
+      if (!data) {
+        toast.error("No data found for download.");
+        return;
+      }
+
+      const blob = await pdf(<ChecklistPDF checklistData={data} />).toBlob();
+      saveAs(blob, "checklist.pdf");
       toast.success("Checklist PDF downloaded successfully!");
     } catch (error) {
       console.error("Checklist Error:", error);
@@ -425,7 +435,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
                   buttonHandlers[button.id as keyof typeof buttonHandlers]()
                 }
                 disabled={!workData || isAnyButtonLoading}
-                className="h-auto py-3 px-2 text-xs font-medium text-center whitespace-normal"
+                className="h-auto cursor-pointer py-3 px-2 text-xs font-medium text-center whitespace-normal"
               >
                 {currentDownloading === button.id ? (
                   <Loader2 className="w-3 h-3 animate-spin" />

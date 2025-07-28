@@ -1,31 +1,29 @@
 import { useState } from "react";
 import { saveAs } from "file-saver";
 import { pdf } from "@react-pdf/renderer";
-
-import AdministrativeSanctionPDF from "./components/PDFs/AsCopyPdf";
 import PDFPreviewer from "./components/PdfViewer";
-import {
-  useFetchASCopyData,
-  type AdministrativeSanctionData
-} from "./services/AdministrativeSanctionData";
 import { toast } from "sonner";
+import {
+  useFetchCheckListData,
+  type ChecklistWorkData
+} from "./services/ChecklistData";
+import ChecklistPDF from "./components/PDFs/ChecklistPdf";
 
 const SimpleTestComponent = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [asPdfData, setAsPdfData] = useState<AdministrativeSanctionData | null>(
-    null
-  );
+  const [pdfData, setPdfData] = useState<ChecklistWorkData | null>(null);
 
-  const fetchASCopyData = useFetchASCopyData();
+  // const fetchASCopyData = useFetchASCopyData();
+  const fetchCheckListDataData = useFetchCheckListData();
 
-  const handleDownloadAsCopy = async () => {
+  const handleDownload = async () => {
     setLoading(true);
     console.log("Starting download...");
 
     try {
-      const data = await fetchASCopyData();
+      const data = await fetchCheckListDataData();
       if (!data) {
         toast.error("No data found for download.");
         return;
@@ -33,11 +31,9 @@ const SimpleTestComponent = () => {
 
       console.log("Data fetched:", data);
 
-      const blob = await pdf(
-        <AdministrativeSanctionPDF asData={data} />
-      ).toBlob();
+      const blob = await pdf(<ChecklistPDF checklistData={data} />).toBlob();
 
-      saveAs(blob, "administrative-sanction.pdf");
+      saveAs(blob, "checklist.pdf");
       toast.success("Download started!");
     } catch (error) {
       console.error("Download Error:", error);
@@ -47,12 +43,12 @@ const SimpleTestComponent = () => {
     }
   };
 
-  const handleViewAsCopy = async () => {
+  const handleView = async () => {
     setLoading(true);
     setPreviewError(null);
 
     try {
-      const data = await fetchASCopyData();
+      const data = await fetchCheckListDataData();
       console.log("Data for preview:", data);
 
       if (!data) {
@@ -60,18 +56,15 @@ const SimpleTestComponent = () => {
         return;
       }
 
-      // Validate data structure
-      const requiredFields = [
+      const requiredFields: (keyof ChecklistWorkData)[] = [
         "workCode",
         "workName",
-        "gramPanchayat",
-        "sanctionedAmount",
-        "technicalSanctionNo"
+        "sanctionYear",
+        "panchayat",
+        "block"
       ];
 
-      const missingFields = requiredFields.filter(
-        (field) => !data[field as keyof AdministrativeSanctionData]
-      );
+      const missingFields = requiredFields.filter((field) => !data[field]);
 
       if (missingFields.length > 0) {
         console.warn("Missing required fields:", missingFields);
@@ -80,7 +73,7 @@ const SimpleTestComponent = () => {
         );
       }
 
-      setAsPdfData(data);
+      setPdfData(data);
       setShowPreview(true);
       toast.success("Preview loaded!");
     } catch (error) {
@@ -96,7 +89,7 @@ const SimpleTestComponent = () => {
 
   const handleClosePreview = () => {
     setShowPreview(false);
-    setAsPdfData(null);
+    setPdfData(null);
     setPreviewError(null);
   };
 
@@ -104,7 +97,7 @@ const SimpleTestComponent = () => {
     <div>
       <div style={{ marginBottom: "20px" }}>
         <button
-          onClick={handleDownloadAsCopy}
+          onClick={handleDownload}
           disabled={loading}
           style={{
             padding: "10px 20px",
@@ -121,7 +114,7 @@ const SimpleTestComponent = () => {
         </button>
 
         <button
-          onClick={handleViewAsCopy}
+          onClick={handleView}
           disabled={loading}
           style={{
             padding: "10px 20px",
@@ -158,21 +151,21 @@ const SimpleTestComponent = () => {
         </div>
       )}
 
-      {showPreview && asPdfData && (
+      {showPreview && pdfData && (
         <div>
           <h3>PDF Preview</h3>
           <PDFPreviewer
-            document={<AdministrativeSanctionPDF asData={asPdfData} />}
+            document={<ChecklistPDF checklistData={pdfData} />}
             onClose={handleClosePreview}
           />
         </div>
       )}
 
       {/* Debug Info */}
-      {process.env.NODE_ENV === "development" && asPdfData && (
+      {process.env.NODE_ENV === "development" && pdfData && (
         <details style={{ marginTop: "20px", fontSize: "12px" }}>
           <summary>Debug: PDF Data</summary>
-          <pre>{JSON.stringify(asPdfData, null, 2)}</pre>
+          <pre>{JSON.stringify(pdfData, null, 2)}</pre>
         </details>
       )}
     </div>

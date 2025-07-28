@@ -7,7 +7,7 @@ import {
   Font
 } from "@react-pdf/renderer";
 
-// Register Kannada fonts
+// Register fonts
 Font.register({
   family: "NotoSansKannada",
   src: "/fonts/NotoSansKannada-Regular.ttf",
@@ -17,151 +17,157 @@ Font.register({
 Font.register({
   family: "NotoSansKannada",
   src: "/fonts/NotoSansKannada-Bold.ttf",
-  fontWeight: "bold"
+  fontWeight: "normal"
 });
 
 // Type definitions
-type WorkData = {
-  id: string;
+type checklistData = {
   workCode: string;
   workName: string;
   sanctionYear: string;
-  panchayat: string;
-  block: string;
+  panchayat: string; // kannada
+  block: string; // kannada
 };
 
-type GramPanchayatChecklistProps = {
-  workData: WorkData;
+type ChecklistPDFProps = {
+  checklistData: checklistData;
 };
 
-// Styles - Exact match to your original layout
+// Styles
 const styles = StyleSheet.create({
   page: {
-    fontFamily: "NotoSansKannada",
-    fontSize: 11,
-    lineHeight: 1.2,
-    padding: 30,
+    fontFamily: "Helvetica",
+    fontSize: 8,
+    lineHeight: 1.1,
+    padding: 20,
     backgroundColor: "white"
   },
   container: {
-    maxWidth: "100%",
+    border: "2px solid black",
+    padding: 8,
+    paddingLeft: 16,
+    paddingRight: 16,
     backgroundColor: "white"
   },
-  // Header with decorative border
-  headerContainer: {
-    border: "4px solid black",
-    borderStyle: "solid", // PDF doesn't support double border, using solid
-    padding: 16,
-    marginBottom: 24
+  header: {
+    textAlign: "center",
+    marginBottom: 8
   },
   headerTitle: {
-    textAlign: "center",
-    marginBottom: 16
-  },
-  mainTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 8,
+    fontSize: 12,
+    fontWeight: "normal",
+    marginBottom: 12,
     fontFamily: "NotoSansKannada"
   },
-  subTitle: {
-    fontSize: 14,
-    marginBottom: 8,
-    fontFamily: "NotoSansKannada"
-  },
-  // Document Header Info
-  infoSection: {
-    marginBottom: 16
-  },
-  infoItem: {
+  headerSubtitle: {
+    fontSize: 12,
     marginBottom: 4,
     fontFamily: "NotoSansKannada"
   },
-  bold: {
-    fontWeight: "bold",
-    fontFamily: "NotoSansKannada"
+  documentInfo: {
+    marginBottom: 8,
+    marginLeft: 20
   },
-  // Table styles using flexbox
-  table: {
-    width: "100%",
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderColor: "black"
-  },
-  tableRow: {
+  infoRow: {
+    marginBottom: 10,
     flexDirection: "row"
   },
-  tableHeaderRow: {
-    flexDirection: "row",
-    backgroundColor: "#f3f4f6" // bg-gray-100 equivalent
-  },
-  // Table cells
-  tableCell: {
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderColor: "black",
-    padding: 8,
-    fontSize: 10,
-    fontFamily: "NotoSansKannada",
-    borderLeftWidth: 0, // Remove left border to avoid double borders
-    borderTopWidth: 0 // Remove top border to avoid double borders
-  },
-  tableCellCenter: {
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderColor: "black",
-    padding: 8,
-    textAlign: "center",
-    fontSize: 10,
-    fontFamily: "NotoSansKannada",
-    borderLeftWidth: 0, // Remove left border to avoid double borders
-    borderTopWidth: 0, // Remove top border to avoid double borders
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  // Column widths using flex
-  slNoCell: {
-    width: "8%",
-    minWidth: "8%",
-    maxWidth: "8%"
-  },
-  contentCell: {
-    width: "64%",
-    minWidth: "64%",
-    maxWidth: "64%"
-  },
-  requiredCell: {
-    width: "14%",
-    minWidth: "14%",
-    maxWidth: "14%"
-  },
-  pagesCell: {
-    width: "14%",
-    minWidth: "14%",
-    maxWidth: "14%"
-  },
-  // Content within cells
-  cellContent: {
+  infoLabel: {
+    fontWeight: "normal",
+    fontSize: 9,
     fontFamily: "NotoSansKannada"
   },
+  infoValue: {
+    fontSize: 9,
+    fontFamily: "NotoSansKannada"
+  },
+  table: {
+    width: "100%"
+  },
+  tableHeader: {
+    flexDirection: "row",
+    borderTop: "1px solid black",
+    borderLeft: "1px solid black",
+    borderRight: "1px solid black",
+    borderBottom: "1px solid black"
+  },
+  tableRow: {
+    flexDirection: "row",
+    borderLeft: "1px solid black",
+    borderRight: "1px solid black",
+    borderBottom: "1px solid black",
+    minHeight: 20
+  },
+  serialCell: {
+    width: "8%",
+    padding: 3,
+    borderRight: "1px solid black",
+    textAlign: "center",
+    justifyContent: "center"
+  },
+  checklistCell: {
+    width: "60%",
+    padding: 3,
+    borderRight: "1px solid black"
+  },
+  requiredCell: {
+    width: "16%",
+    padding: 3,
+    borderRight: "1px solid black",
+    textAlign: "center",
+    justifyContent: "center"
+  },
+  pagesCell: {
+    width: "16%",
+    padding: 3,
+    textAlign: "center",
+    justifyContent: "center"
+  },
+  headerText: {
+    fontWeight: "normal",
+    textAlign: "center",
+    fontSize: 6,
+    paddingTop: 8,
+    fontFamily: "NotoSansKannada"
+  },
+  serialText: {
+    fontWeight: "normal",
+    textAlign: "center",
+    fontSize: 6
+  },
   kannadaText: {
-    fontWeight: "500",
-    fontFamily: "NotoSansKannada",
-    marginBottom: 4
+    fontWeight: "normal",
+    marginBottom: 1,
+    fontSize: 6,
+    fontFamily: "NotoSansKannada"
   },
   englishText: {
-    fontSize: 9,
-    color: "#4b5563", // text-gray-600 equivalent
-    fontStyle: "italic",
-    fontFamily: "Helvetica"
+    fontSize: 6
+  },
+  centeredText: {
+    textAlign: "center",
+    fontSize: 6,
+    fontFamily: "NotoSansKannada"
+  },
+  emptyRow: {
+    minHeight: 15
+  },
+  signatureSection: {
+    marginTop: 18,
+    alignItems: "flex-end"
+  },
+  signatureText: {
+    fontSize: 7,
+    fontFamily: "NotoSansKannada",
+    fontWeight: "normal"
   }
 });
 
-const ChecklistPDF = ({ workData }: GramPanchayatChecklistProps) => {
-  const gramPanchayat = workData?.panchayat || "";
-  const workName = workData?.workName || "";
-  const workCode = workData?.workCode || "";
-  const sanctionedYear = workData?.sanctionYear || "";
+const ChecklistPDF = ({ checklistData }: ChecklistPDFProps) => {
+  const gramPanchayat = checklistData?.panchayat || "";
+  const workName = checklistData?.workName || "";
+  const workCode = checklistData?.workCode || "";
+  const sanctionedYear = checklistData?.sanctionYear || "";
 
   const checklistItems = [
     {
@@ -322,99 +328,98 @@ const ChecklistPDF = ({ workData }: GramPanchayatChecklistProps) => {
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.container}>
-          {/* Header with decorative border */}
-          <View style={styles.headerContainer}>
-            <View style={styles.headerTitle}>
-              <Text style={styles.mainTitle}>
-                ಗ್ರಾಮ ಪಂಚಾಯಿತಿ: {gramPanchayat}
-              </Text>
-              <Text style={styles.subTitle}>
-                ಅನುಬಂಧ - II:ಪ್ರಮಾಣ ಪತ್ರದ ಜೊತೆ ಲೇಖೆ
-              </Text>
-            </View>
+          {/* Header */}
+          <View style={styles.header}>
+            <Text style={styles.headerTitle}>
+              ಗ್ರಾಮ ಪಂಚಾಯಿತಿ: {gramPanchayat}
+            </Text>
+            <Text style={styles.headerSubtitle}>
+              ಅನುಬಂಧ - II: ಕಾಮಗಾರಿ ಕಡತದ ಚಿಕ್ ಲಿಸ್ಟ
+            </Text>
+          </View>
 
-            {/* Document Header Info */}
-            <View style={styles.infoSection}>
-              <View style={styles.infoItem}>
-                <Text style={styles.cellContent}>
-                  <Text style={styles.bold}>ಕಾರ್ಯಗಳ ಹೆಸರು:</Text> {workName}
+          {/* Document Info */}
+          <View style={styles.documentInfo}>
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>ಕಾಮಗಾರಿ ಹೆಸರು: </Text>
+              <Text style={styles.infoValue}>{workName}</Text>
+            </View>
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>ಕಾಮಗಾರಿ ಸಂಖ್ಯೆ ಸಂಬಂಧ: </Text>
+              <Text style={styles.infoValue}>{workCode}</Text>
+            </View>
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>ಕಾಮಗಾರಿಮಂಜೂರಾದ ವರ್ಷ: </Text>
+              <Text style={styles.infoValue}>{sanctionedYear}</Text>
+            </View>
+          </View>
+
+          {/* Table */}
+          <View style={styles.table}>
+            {/* Table Header */}
+            <View style={styles.tableHeader}>
+              <View style={styles.serialCell}>
+                <Text style={styles.headerText}>ಕ್ರ.ಸಂ</Text>
+              </View>
+              <View style={styles.checklistCell}>
+                <Text style={styles.headerText}> ಚಿಕ್ ಲಿಸ್ಟ</Text>
+              </View>
+              <View style={styles.requiredCell}>
+                <Text style={styles.headerText}>
+                  ಅಗತ್ಯವಿರುವ ಗಿಲ್ಲಟ್ಟಿ (ಇಲ್ಲ/ಹೌದು)
                 </Text>
               </View>
-              <View style={styles.infoItem}>
-                <Text style={styles.cellContent}>
-                  <Text style={styles.bold}>ಕಾರ್ಯಗಳ ಸಂಖ್ಯೆ ಸಂಬಂಧ:</Text>{" "}
-                  {workCode}
-                </Text>
-              </View>
-              <View style={styles.infoItem}>
-                <Text style={styles.cellContent}>
-                  <Text style={styles.bold}>ಕಾರ್ಯಗಳ ಅನುಮೋದನ ವರ್ಷ:</Text>{" "}
-                  {sanctionedYear}
-                </Text>
+              <View style={styles.pagesCell}>
+                <Text style={styles.headerText}>ಪುಟಗಳ ಸಂಖ್ಯೆ ಪ್ರತಿ ಸಂಖ್ಯೆ</Text>
               </View>
             </View>
 
-            {/* Checklist Table */}
-            <View style={styles.table}>
-              {/* Table Header */}
-              <View style={styles.tableHeaderRow}>
-                <View style={[styles.tableCellCenter, styles.slNoCell]}>
-                  <Text style={styles.cellContent}>ಕ್ರ.ಸಂ</Text>
+            {/* Table Rows */}
+            {checklistItems.map((item, index) => (
+              <View key={index} style={styles.tableRow}>
+                <View style={styles.serialCell}>
+                  <Text style={styles.serialText}>{item.sl}</Text>
                 </View>
-                <View style={[styles.tableCellCenter, styles.contentCell]}>
-                  <Text style={styles.cellContent}>ಲೇಖೆ ಲಿಸ್ಟ್</Text>
+                <View style={styles.checklistCell}>
+                  <Text style={styles.kannadaText}>{item.kannada}</Text>
+                  <Text style={styles.englishText}>{item.english}</Text>
                 </View>
-                <View style={[styles.tableCellCenter, styles.requiredCell]}>
-                  <Text style={styles.cellContent}>
-                    ಅಗತ್ಯವಿರುವ ಗಿಲ್ಲಟ್ಟಿ (ಇಲ್ಲ/ಹೌದು)
-                  </Text>
+                <View style={styles.requiredCell}>
+                  <Text style={styles.centeredText}>{item.required}</Text>
                 </View>
-                <View style={[styles.tableCellCenter, styles.pagesCell]}>
-                  <Text style={styles.cellContent}>
-                    ಪುಟಗಳ ಸಂಖ್ಯೆ ಪ್ರತಿ ಸಂಖ್ಯೆ
-                  </Text>
+                <View style={styles.pagesCell}>
+                  <Text style={styles.centeredText}>{item.pages}</Text>
                 </View>
               </View>
+            ))}
 
-              {/* Table Body */}
-              {checklistItems.map((item, index) => (
-                <View key={index} style={styles.tableRow}>
-                  <View style={[styles.tableCellCenter, styles.slNoCell]}>
-                    <Text style={[styles.cellContent, styles.bold]}>
-                      {item.sl}
-                    </Text>
-                  </View>
-                  <View style={[styles.tableCell, styles.contentCell]}>
-                    <Text style={styles.kannadaText}>{item.kannada}</Text>
-                    <Text style={styles.englishText}>{item.english}</Text>
-                  </View>
-                  <View style={[styles.tableCellCenter, styles.requiredCell]}>
-                    <Text style={styles.cellContent}>{item.required}</Text>
-                  </View>
-                  <View style={[styles.tableCellCenter, styles.pagesCell]}>
-                    <Text style={styles.cellContent}>{item.pages}</Text>
-                  </View>
+            {/* Empty rows */}
+            {[...Array(2)].map((_, index) => (
+              <View
+                key={`empty-${index}`}
+                style={[styles.tableRow, styles.emptyRow]}
+              >
+                <View style={styles.serialCell}>
+                  <Text></Text>
                 </View>
-              ))}
+                <View style={styles.checklistCell}>
+                  <Text></Text>
+                </View>
+                <View style={styles.requiredCell}>
+                  <Text></Text>
+                </View>
+                <View style={styles.pagesCell}>
+                  <Text></Text>
+                </View>
+              </View>
+            ))}
+          </View>
 
-              {/* Empty rows for additional items */}
-              {[...Array(3)].map((_, index) => (
-                <View key={`empty-${index}`} style={styles.tableRow}>
-                  <View style={[styles.tableCellCenter, styles.slNoCell]}>
-                    <Text style={styles.cellContent}></Text>
-                  </View>
-                  <View style={[styles.tableCell, styles.contentCell]}>
-                    <Text style={styles.cellContent}></Text>
-                  </View>
-                  <View style={[styles.tableCellCenter, styles.requiredCell]}>
-                    <Text style={styles.cellContent}></Text>
-                  </View>
-                  <View style={[styles.tableCellCenter, styles.pagesCell]}>
-                    <Text style={styles.cellContent}></Text>
-                  </View>
-                </View>
-              ))}
-            </View>
+          {/* Bottom Right Signature */}
+          <View style={styles.signatureSection}>
+            <Text style={styles.signatureText}>
+              ಪಂಚಾಯತ ಅಭಿವೃದ್ಧಿ ಅಧಿಕಾರಿಗಳು
+            </Text>
           </View>
         </View>
       </Page>
@@ -423,4 +428,4 @@ const ChecklistPDF = ({ workData }: GramPanchayatChecklistProps) => {
 };
 
 export default ChecklistPDF;
-export type { WorkData, GramPanchayatChecklistProps };
+export type { ChecklistPDFProps, checklistData };
