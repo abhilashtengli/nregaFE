@@ -3,24 +3,24 @@ import { saveAs } from "file-saver";
 import { pdf } from "@react-pdf/renderer";
 import PDFPreviewer from "./components/PdfViewer";
 import { toast } from "sonner";
-import { useFetchTSCopyData, type TSCopyData } from "./services/TsCopyService";
-import TechnicalSanctionPDF from "./components/PDFs/TsCopy";
+import { useFetchForm6Data, type Form6Data } from "./services/Form6Service";
+import Form6PDF from "./components/PDFs/Form6Pdf";
 
 const SimpleTestComponent = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [pdfData, setPdfData] = useState<TSCopyData | null>(null);
+  const [pdfData, setPdfData] = useState<Form6Data | null>(null);
 
   // const fetchASCopyData = useFetchASCopyData();
-  const fetchTsCopyData = useFetchTSCopyData();
+  const fetchForm6Data = useFetchForm6Data();
 
   const handleDownload = async () => {
     setLoading(true);
     console.log("Starting download...");
 
     try {
-      const data = await fetchTsCopyData();
+      const data = await fetchForm6Data();
       if (!data) {
         toast.error("No data found for download.");
         return;
@@ -28,9 +28,9 @@ const SimpleTestComponent = () => {
 
       console.log("Data fetched:", data);
 
-      const blob = await pdf(<TechnicalSanctionPDF tsData={data} />).toBlob();
+      const blob = await pdf(<Form6PDF form6Data={data} />).toBlob();
 
-      saveAs(blob, "TsCopy.pdf");
+      saveAs(blob, "form6.pdf");
       toast.success("Download started!");
     } catch (error) {
       console.error("Download Error:", error);
@@ -45,7 +45,7 @@ const SimpleTestComponent = () => {
     setPreviewError(null);
 
     try {
-      const data = await fetchTsCopyData(); // data is FrontPageData | null
+      const data = await fetchForm6Data(); // data is FrontPageData | null
       console.log("Data for preview:", data);
 
       if (!data) {
@@ -53,14 +53,11 @@ const SimpleTestComponent = () => {
         return;
       }
 
-      const requiredFields: (keyof TSCopyData)[] = [
+      const requiredFields: (keyof Form6Data)[] = [
         "workName",
         "workCode",
-        "technicalSanctionNo",
-        "unskilledLabourCharges",
-        "estimateMaterialCost",
-        "sanctionedAmount",
-        "sanctionedAmountInWords"
+        "applicantsData",
+        "applicationNumber"
       ];
 
       const missingFields = requiredFields.filter((field) => !data[field]);
@@ -152,7 +149,7 @@ const SimpleTestComponent = () => {
         <div>
           <h3>PDF Preview</h3>
           <PDFPreviewer
-            document={<TechnicalSanctionPDF tsData={pdfData} />}
+            document={<Form6PDF form6Data={pdfData} />}
             onClose={handleClosePreview}
           />
         </div>
