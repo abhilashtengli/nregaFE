@@ -11,6 +11,8 @@ import { useFetchASCopyData } from "@/services/AdministrativeSanctionData";
 import AdministrativeSanctionPDF from "./PDFs/AsCopyPdf";
 import { useFetchCheckListData } from "@/services/ChecklistService";
 import ChecklistPDF from "./PDFs/ChecklistPdf";
+import { useFetchFrontPageData } from "@/services/FrontPageService";
+import FrontPagePDF from "./PDFs/FrontPagePdf";
 
 // PDF Action buttons data
 const pdfButtons = [
@@ -74,6 +76,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
 
   const fetchASCopyData = useFetchASCopyData();
   const fetchCheckListDataData = useFetchCheckListData();
+  const fetchFrontPageData = useFetchFrontPageData();
 
   // Check if any button is currently processing
   const isAnyButtonLoading = currentDownloading !== null || isDownloading;
@@ -104,7 +107,17 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
     setCurrentDownloading("frontPage");
     try {
       // Add your front page PDF generation logic here
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
+      const data = await fetchFrontPageData();
+      if (!data) {
+        toast.error("No data found for download.");
+        return;
+      }
+
+      console.log("Data fetched:", data);
+
+      const blob = await pdf(<FrontPagePDF frontPageData={data} />).toBlob();
+
+      saveAs(blob, "Frontpage.pdf");
       toast.success("Front Page PDF downloaded successfully!");
     } catch (error) {
       console.error("Front Page Error:", error);

@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
   }
 });
 
-const MGNREGAFrontPagePDF: React.FC<MGNREGAFrontPagePDFProps> = ({
+const FrontPagePDF: React.FC<MGNREGAFrontPagePDFProps> = ({
   frontPageData
 }) => {
   const {
@@ -571,5 +571,5 @@ const MGNREGAFrontPagePDF: React.FC<MGNREGAFrontPagePDFProps> = ({
   );
 };
 
-export default MGNREGAFrontPagePDF;
+export default FrontPagePDF;
 export type { MGNREGAFrontPagePDFProps, MGNREGAData };
