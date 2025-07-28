@@ -9,7 +9,7 @@ import { pdf } from "@react-pdf/renderer";
 import { toast } from "sonner";
 import { useFetchASCopyData } from "@/services/AdministrativeSanctionData";
 import AdministrativeSanctionPDF from "./PDFs/AsCopyPdf";
-import { useFetchCheckListData } from "@/services/ChecklistData";
+import { useFetchCheckListData } from "@/services/ChecklistService";
 import ChecklistPDF from "./PDFs/ChecklistPdf";
 
 // PDF Action buttons data

@@ -3,27 +3,28 @@ import { saveAs } from "file-saver";
 import { pdf } from "@react-pdf/renderer";
 import PDFPreviewer from "./components/PdfViewer";
 import { toast } from "sonner";
+
 import {
-  useFetchCheckListData,
-  type ChecklistWorkData
-} from "./services/ChecklistData";
-import ChecklistPDF from "./components/PDFs/ChecklistPdf";
+  useFetchFrontPageData,
+  type FrontPageData
+} from "./services/FrontPageService";
+import FrontPagePDF from "./components/PDFs/FrontPagePdf";
 
 const SimpleTestComponent = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [pdfData, setPdfData] = useState<ChecklistWorkData | null>(null);
+  const [pdfData, setPdfData] = useState<FrontPageData | null>(null);
 
   // const fetchASCopyData = useFetchASCopyData();
-  const fetchCheckListDataData = useFetchCheckListData();
+  const fetchFrontPageData = useFetchFrontPageData();
 
   const handleDownload = async () => {
     setLoading(true);
     console.log("Starting download...");
 
     try {
-      const data = await fetchCheckListDataData();
+      const data = await fetchFrontPageData();
       if (!data) {
         toast.error("No data found for download.");
         return;
@@ -31,9 +32,9 @@ const SimpleTestComponent = () => {
 
       console.log("Data fetched:", data);
 
-      const blob = await pdf(<ChecklistPDF checklistData={data} />).toBlob();
+      const blob = await pdf(<FrontPagePDF frontPageData={data} />).toBlob();
 
-      saveAs(blob, "checklist.pdf");
+      saveAs(blob, "Frontpage.pdf");
       toast.success("Download started!");
     } catch (error) {
       console.error("Download Error:", error);
@@ -48,7 +49,7 @@ const SimpleTestComponent = () => {
     setPreviewError(null);
 
     try {
-      const data = await fetchCheckListDataData();
+      const data = await fetchFrontPageData(); // data is FrontPageData | null
       console.log("Data for preview:", data);
 
       if (!data) {
@@ -56,21 +57,19 @@ const SimpleTestComponent = () => {
         return;
       }
 
-      const requiredFields: (keyof ChecklistWorkData)[] = [
+      const requiredFields: (keyof FrontPageData)[] = [
         "workCode",
-        "workName",
-        "sanctionYear",
-        "panchayat",
-        "block"
+        "projectLocation",
+        "sanctionedYear",
+        "gramPanchayat",
+        "taluka"
       ];
 
       const missingFields = requiredFields.filter((field) => !data[field]);
 
       if (missingFields.length > 0) {
         console.warn("Missing required fields:", missingFields);
-        toast.warning(
-          `Some data fields are missing: ${missingFields.join(", ")}`
-        );
+        toast.warning(`Missing fields: ${missingFields.join(", ")}`);
       }
 
       setPdfData(data);
@@ -155,7 +154,7 @@ const SimpleTestComponent = () => {
         <div>
           <h3>PDF Preview</h3>
           <PDFPreviewer
-            document={<ChecklistPDF checklistData={pdfData} />}
+            document={<FrontPagePDF frontPageData={pdfData} />}
             onClose={handleClosePreview}
           />
         </div>
