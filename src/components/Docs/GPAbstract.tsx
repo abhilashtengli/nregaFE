@@ -1,4 +1,3 @@
-
 type GPAbstractProps = {
   workName: string;
   workStatus: string;
@@ -54,7 +53,7 @@ const GPAbstract = ({ GpAbstractData }: GPAbstractData) => {
     employmentGenerated,
     musterRollDetails,
     beforeWorkPhoto,
-    duringWorkPhoto,
+    duringWorkPhoto
   } = GpAbstractData;
   const estimatedCompletionTime = "0.6";
   const natureOfWork = "";

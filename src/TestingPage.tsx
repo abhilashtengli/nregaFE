@@ -5,19 +5,19 @@ import PDFPreviewer from "./components/PdfViewer";
 import { toast } from "sonner";
 
 import {
-  useFetchFrontPageData,
-  type FrontPageData
-} from "./services/FrontPageService";
-import FrontPagePDF from "./components/PDFs/FrontPagePdf";
+  useFetchGPAbstractData,
+  type GPAbstractData
+} from "./services/GpAbstractService";
+import GPAbstractPDF from "./components/PDFs/GpAbstractPdf";
 
 const SimpleTestComponent = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [pdfData, setPdfData] = useState<FrontPageData | null>(null);
+  const [pdfData, setPdfData] = useState<GPAbstractData | null>(null);
 
   // const fetchASCopyData = useFetchASCopyData();
-  const fetchFrontPageData = useFetchFrontPageData();
+  const fetchFrontPageData = useFetchGPAbstractData();
 
   const handleDownload = async () => {
     setLoading(true);
@@ -32,9 +32,9 @@ const SimpleTestComponent = () => {
 
       console.log("Data fetched:", data);
 
-      const blob = await pdf(<FrontPagePDF frontPageData={data} />).toBlob();
+      const blob = await pdf(<GPAbstractPDF GpAbstractData={data} />).toBlob();
 
-      saveAs(blob, "Frontpage.pdf");
+      saveAs(blob, "GpAbstract.pdf");
       toast.success("Download started!");
     } catch (error) {
       console.error("Download Error:", error);
@@ -57,12 +57,12 @@ const SimpleTestComponent = () => {
         return;
       }
 
-      const requiredFields: (keyof FrontPageData)[] = [
-        "workCode",
-        "projectLocation",
-        "sanctionedYear",
-        "gramPanchayat",
-        "taluka"
+      const requiredFields: (keyof GPAbstractData)[] = [
+        "workName",
+        "workPurposeStatus",
+        "sanctionNoAndDate",
+        "expenditureIncurred",
+        "musterRollDetails"
       ];
 
       const missingFields = requiredFields.filter((field) => !data[field]);
@@ -154,7 +154,7 @@ const SimpleTestComponent = () => {
         <div>
           <h3>PDF Preview</h3>
           <PDFPreviewer
-            document={<FrontPagePDF frontPageData={pdfData} />}
+            document={<GPAbstractPDF GpAbstractData={pdfData} />}
             onClose={handleClosePreview}
           />
         </div>
