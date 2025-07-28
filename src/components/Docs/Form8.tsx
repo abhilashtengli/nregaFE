@@ -24,35 +24,8 @@ type Form8PropsData = {
 type Form8Data = {
   form6Data: Form8PropsData;
 };
-// {
-//   ((gramPanchayat = "ಕಾಳಗ"), //1
-//     (taluka = "ಮುದೆ್ೕಬಹಾಳ"), //1
-//     (district = " ವಿಜಯಪುರ"), //1
-//     (date = "06/08/2021"), //6
-//     (workDate = "09/08/2021"), // workFrom 6
-//     (workCode = "1507004008/AV/93393042892262348"), //1
-//     (workName = "ಕಾಳಗ ಗಾ್ಮ ಪಂಚಾಯತಯ ಘನತಾ್ಜ್ ವಲೇವಾರ ಘಟಕ ನಮಾರಣ"), //1
-//     (workLocation = "ಕಾಳಗ"), //1
-//     (workingDays = "ದಿನಾಂಕ  : 09/08/2021 ರಂದ 15/08/2021ವರೆಗೆ"),
-//     (labourData = [
-//       {
-//         slNo: 1,
-//         name: "ಸಂಗಪ್ ಬಸಪ್ ಕುಂಬಾರ",
-//         jobCardNo: "KN-07-004-008-002/276"
-//       },
-//       {
-//         slNo: 2,
-//         name: "ಸುಜಾತಾ",
-//         jobCardNo: "KN-07-004-008-002/276"
-//       },
-//       {
-//         slNo: 3,
-//         name: "ಶಾಹೀನ ಮೈಬೂಸಾ ವಾಲಕಾರ",
-//         jobCardNo: "KN-07-004-008-002/244"
-//       }
-//     ]));
-// }
-const Form6PDF = ({ form6Data }: Form8Data) => {
+
+const Form8PDF = ({ form6Data }: Form8Data) => {
   const {
     gramPanchayat,
     workCode,
@@ -365,4 +338,4 @@ const Form6PDF = ({ form6Data }: Form8Data) => {
   );
 };
 
-export default Form6PDF;
+export default Form8PDF;
