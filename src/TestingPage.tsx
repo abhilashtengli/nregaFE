@@ -5,26 +5,26 @@ import PDFPreviewer from "./components/PdfViewer";
 import { toast } from "sonner";
 
 import {
-  useFetchGPAbstractData,
-  type GPAbstractData
-} from "./services/GpAbstractService";
-import GPAbstractPDF from "./components/PDFs/GpAbstractPdf";
+  useFetchWorkOrderData,
+  type WorkOrderData
+} from "./services/WorkOrderService";
+import WorkOrderPDF from "./components/PDFs/WorkOrderPdf";
 
 const SimpleTestComponent = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [pdfData, setPdfData] = useState<GPAbstractData | null>(null);
+  const [pdfData, setPdfData] = useState<WorkOrderData | null>(null);
 
   // const fetchASCopyData = useFetchASCopyData();
-  const fetchFrontPageData = useFetchGPAbstractData();
+  const fetchWorkOrderData = useFetchWorkOrderData();
 
   const handleDownload = async () => {
     setLoading(true);
     console.log("Starting download...");
 
     try {
-      const data = await fetchFrontPageData();
+      const data = await fetchWorkOrderData();
       if (!data) {
         toast.error("No data found for download.");
         return;
@@ -32,9 +32,9 @@ const SimpleTestComponent = () => {
 
       console.log("Data fetched:", data);
 
-      const blob = await pdf(<GPAbstractPDF GpAbstractData={data} />).toBlob();
+      const blob = await pdf(<WorkOrderPDF workOrderData={data} />).toBlob();
 
-      saveAs(blob, "GpAbstract.pdf");
+      saveAs(blob, "Workorder.pdf");
       toast.success("Download started!");
     } catch (error) {
       console.error("Download Error:", error);
@@ -49,7 +49,7 @@ const SimpleTestComponent = () => {
     setPreviewError(null);
 
     try {
-      const data = await fetchFrontPageData(); // data is FrontPageData | null
+      const data = await fetchWorkOrderData(); // data is FrontPageData | null
       console.log("Data for preview:", data);
 
       if (!data) {
@@ -57,12 +57,12 @@ const SimpleTestComponent = () => {
         return;
       }
 
-      const requiredFields: (keyof GPAbstractData)[] = [
+      const requiredFields: (keyof WorkOrderData)[] = [
         "workName",
-        "workPurposeStatus",
-        "sanctionNoAndDate",
-        "expenditureIncurred",
-        "musterRollDetails"
+        "workCode",
+        "panchayat",
+        "estimatedCost",
+        "date"
       ];
 
       const missingFields = requiredFields.filter((field) => !data[field]);
@@ -154,7 +154,7 @@ const SimpleTestComponent = () => {
         <div>
           <h3>PDF Preview</h3>
           <PDFPreviewer
-            document={<GPAbstractPDF GpAbstractData={pdfData} />}
+            document={<WorkOrderPDF workOrderData={pdfData} />}
             onClose={handleClosePreview}
           />
         </div>

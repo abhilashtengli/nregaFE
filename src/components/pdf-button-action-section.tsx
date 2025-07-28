@@ -15,6 +15,8 @@ import { useFetchFrontPageData } from "@/services/FrontPageService";
 import FrontPagePDF from "./PDFs/FrontPagePdf";
 import { useFetchGPAbstractData } from "@/services/GpAbstractService";
 import GPAbstractPDF from "./PDFs/GpAbstractPdf";
+import { useFetchWorkOrderData } from "@/services/WorkOrderService";
+import WorkOrderPDF from "./PDFs/WorkOrderPdf";
 
 // PDF Action buttons data
 const pdfButtons = [
@@ -80,6 +82,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
   const fetchCheckListDataData = useFetchCheckListData();
   const fetchFrontPageData = useFetchFrontPageData();
   const fetchGpAbstractData = useFetchGPAbstractData();
+  const fetchWorkOrderData = useFetchWorkOrderData();
 
   // Check if any button is currently processing
   const isAnyButtonLoading = currentDownloading !== null || isDownloading;
@@ -158,7 +161,17 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
     setCurrentDownloading("workOrder");
     try {
       // Add your work order PDF generation logic here
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
+      const data = await fetchWorkOrderData();
+      if (!data) {
+        toast.error("No data found for download.");
+        return;
+      }
+
+      console.log("Data fetched:", data);
+
+      const blob = await pdf(<WorkOrderPDF workOrderData={data} />).toBlob();
+
+      saveAs(blob, "Workorder.pdf"); // Simulate API call
       toast.success("Work Order PDF downloaded successfully!");
     } catch (error) {
       console.error("Work Order Error:", error);
