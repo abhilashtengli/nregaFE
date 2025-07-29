@@ -3,26 +3,27 @@ import { saveAs } from "file-saver";
 import { pdf } from "@react-pdf/renderer";
 import PDFPreviewer from "./components/PdfViewer";
 import { toast } from "sonner";
-import WorkCompletionPDF from "./components/PDFs/WorkCompletionPdf";
+
 import {
-  useFetchWorkCompletion,
-  type WorkCompletion
-} from "./services/WorkCompletionService";
+  useFetchPaperNotification,
+  type PaperNotificationData
+} from "./services/PaperNotificationService";
+import PaperNotificationPDF from "./components/PDFs/PaperNotificationPdf";
 
 const SimpleTestComponent = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [pdfData, setPdfData] = useState<WorkCompletion | null>(null);
+  const [pdfData, setPdfData] = useState<PaperNotificationData | null>(null);
 
-  const fetchWorkCompletionData = useFetchWorkCompletion();
+  const fetchPaperNotificationData = useFetchPaperNotification();
 
   const handleDownload = async () => {
     setLoading(true);
     console.log("Starting download...");
 
     try {
-      const data = await fetchWorkCompletionData();
+      const data = await fetchPaperNotificationData();
       if (!data) {
         toast.error("No data found for download.");
         return;
@@ -31,10 +32,10 @@ const SimpleTestComponent = () => {
       console.log("Data fetched:", data);
 
       const blob = await pdf(
-        <WorkCompletionPDF workCompletionData={data} />
+        <PaperNotificationPDF paperNotificationData={data} />
       ).toBlob();
 
-      saveAs(blob, "Work-completion.pdf");
+      saveAs(blob, "Paper-Notification.pdf");
       toast.success("Download started!");
     } catch (error) {
       console.error("Download Error:", error);
@@ -49,7 +50,7 @@ const SimpleTestComponent = () => {
     setPreviewError(null);
 
     try {
-      const data = await fetchWorkCompletionData(); // data is FrontPageData | null
+      const data = await fetchPaperNotificationData(); // data is FrontPageData | null
       console.log("Data for preview:", data);
 
       if (!data) {
@@ -139,7 +140,7 @@ const SimpleTestComponent = () => {
         <div>
           <h3>PDF Preview</h3>
           <PDFPreviewer
-            document={<WorkCompletionPDF workCompletionData={pdfData} />}
+            document={<PaperNotificationPDF paperNotificationData={pdfData} />}
             onClose={handleClosePreview}
           />
         </div>

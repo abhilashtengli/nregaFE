@@ -35,6 +35,8 @@ import { useFetchMaterialMIS } from "@/services/MaterialMisService";
 import MaterialMisPDF from "./PDFs/MaterialMisPdf";
 import { useFetchWorkCompletion } from "@/services/WorkCompletionService";
 import WorkCompletionPDF from "./PDFs/WorkCompletionPdf";
+import { useFetchPaperNotification } from "@/services/PaperNotificationService";
+import PaperNotificationPDF from "./PDFs/PaperNotificationPdf";
 
 // PDF Action buttons data
 const pdfButtons = [
@@ -110,6 +112,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
   const fetchForm32Data = useFetchForm32Data();
   const fetchMaterialMisData = useFetchMaterialMIS();
   const fetchWorkCompletionData = useFetchWorkCompletion();
+  const fetchPaperNotificationData = useFetchPaperNotification();
 
   // Check if any button is currently processing
   const isAnyButtonLoading = currentDownloading !== null || isDownloading;
@@ -488,8 +491,19 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
   const handlePaperNotification = async () => {
     setCurrentDownloading("paperNotification");
     try {
-      // Add your Paper Notification PDF generation logic here
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
+      const data = await fetchPaperNotificationData();
+      if (!data) {
+        toast.error("No data found for download.");
+        return;
+      }
+
+      console.log("Data fetched:", data);
+
+      const blob = await pdf(
+        <PaperNotificationPDF paperNotificationData={data} />
+      ).toBlob();
+
+      saveAs(blob, "Paper-Notification.pdf");
       toast.success("Paper Notification PDF downloaded successfully!");
     } catch (error) {
       console.error("Paper Notification Error:", error);

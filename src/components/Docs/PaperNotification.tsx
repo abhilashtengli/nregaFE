@@ -1,4 +1,3 @@
-
 type PaperNotificationProps = {
   district?: string; //1
   taluka?: string; //1
