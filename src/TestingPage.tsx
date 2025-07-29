@@ -3,23 +3,26 @@ import { saveAs } from "file-saver";
 import { pdf } from "@react-pdf/renderer";
 import PDFPreviewer from "./components/PdfViewer";
 import { toast } from "sonner";
-import { useFetchForm32Data, type Form32Data } from "./services/Form32Service";
-import Form32PDF from "./components/PDFs/Form32Pdf";
+import {
+  useFetchMaterialMIS,
+  type MaterialMisData
+} from "./services/MaterialMisService";
+import MaterialMisPDF from "./components/PDFs/MaterialMisPdf";
 
 const SimpleTestComponent = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [pdfData, setPdfData] = useState<Form32Data | null>(null);
+  const [pdfData, setPdfData] = useState<MaterialMisData | null>(null);
 
-  const fetchForm32Data = useFetchForm32Data();
+  const fetchMaterialMisData = useFetchMaterialMIS();
 
   const handleDownload = async () => {
     setLoading(true);
     console.log("Starting download...");
 
     try {
-      const data = await fetchForm32Data();
+      const data = await fetchMaterialMisData();
       if (!data) {
         toast.error("No data found for download.");
         return;
@@ -27,9 +30,9 @@ const SimpleTestComponent = () => {
 
       console.log("Data fetched:", data);
 
-      const blob = await pdf(<Form32PDF form32Data={data} />).toBlob();
+      const blob = await pdf(<MaterialMisPDF data={data} />).toBlob();
 
-      saveAs(blob, "Form32.pdf");
+      saveAs(blob, "MaterialMis.pdf");
       toast.success("Download started!");
     } catch (error) {
       console.error("Download Error:", error);
@@ -44,7 +47,7 @@ const SimpleTestComponent = () => {
     setPreviewError(null);
 
     try {
-      const data = await fetchForm32Data(); // data is FrontPageData | null
+      const data = await fetchMaterialMisData(); // data is FrontPageData | null
       console.log("Data for preview:", data);
 
       if (!data) {
@@ -52,7 +55,7 @@ const SimpleTestComponent = () => {
         return;
       }
 
-      setPdfData({ form32Data: data });
+      setPdfData(data);
       setShowPreview(true);
       toast.success("Preview loaded!");
     } catch (error) {
@@ -134,7 +137,7 @@ const SimpleTestComponent = () => {
         <div>
           <h3>PDF Preview</h3>
           <PDFPreviewer
-            document={<Form32PDF form32Data={pdfData.form32Data} />}
+            document={<MaterialMisPDF data={pdfData} />}
             onClose={handleClosePreview}
           />
         </div>
