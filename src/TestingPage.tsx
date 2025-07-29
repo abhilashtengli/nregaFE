@@ -3,27 +3,26 @@ import { saveAs } from "file-saver";
 import { pdf } from "@react-pdf/renderer";
 import PDFPreviewer from "./components/PdfViewer";
 import { toast } from "sonner";
-
 import {
-  useFetchPaperNotification,
-  type PaperNotificationData
-} from "./services/PaperNotificationService";
-import PaperNotificationPDF from "./components/PDFs/PaperNotificationPdf";
+  useFetchStagewiseGeoTagging,
+  type StagewiseGeoTaggingData
+} from "./services/StageWiseGeotaggingService";
+import StageWisePhotosPDF from "./components/PDFs/StageWiseGeoTaggingPdf";
 
 const SimpleTestComponent = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [pdfData, setPdfData] = useState<PaperNotificationData | null>(null);
+  const [pdfData, setPdfData] = useState<StagewiseGeoTaggingData | null>(null);
 
-  const fetchPaperNotificationData = useFetchPaperNotification();
+  const fetchSwgData = useFetchStagewiseGeoTagging();
 
   const handleDownload = async () => {
     setLoading(true);
     console.log("Starting download...");
 
     try {
-      const data = await fetchPaperNotificationData();
+      const data = await fetchSwgData();
       if (!data) {
         toast.error("No data found for download.");
         return;
@@ -31,11 +30,9 @@ const SimpleTestComponent = () => {
 
       console.log("Data fetched:", data);
 
-      const blob = await pdf(
-        <PaperNotificationPDF paperNotificationData={data} />
-      ).toBlob();
+      const blob = await pdf(<StageWisePhotosPDF sWGTData={data} />).toBlob();
 
-      saveAs(blob, "Paper-Notification.pdf");
+      saveAs(blob, "Stage-wise-geo-tagging.pdf");
       toast.success("Download started!");
     } catch (error) {
       console.error("Download Error:", error);
@@ -50,7 +47,7 @@ const SimpleTestComponent = () => {
     setPreviewError(null);
 
     try {
-      const data = await fetchPaperNotificationData(); // data is FrontPageData | null
+      const data = await fetchSwgData(); // data is FrontPageData | null
       console.log("Data for preview:", data);
 
       if (!data) {
@@ -140,7 +137,7 @@ const SimpleTestComponent = () => {
         <div>
           <h3>PDF Preview</h3>
           <PDFPreviewer
-            document={<PaperNotificationPDF paperNotificationData={pdfData} />}
+            document={<StageWisePhotosPDF sWGTData={pdfData} />}
             onClose={handleClosePreview}
           />
         </div>

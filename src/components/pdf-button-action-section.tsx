@@ -37,6 +37,8 @@ import { useFetchWorkCompletion } from "@/services/WorkCompletionService";
 import WorkCompletionPDF from "./PDFs/WorkCompletionPdf";
 import { useFetchPaperNotification } from "@/services/PaperNotificationService";
 import PaperNotificationPDF from "./PDFs/PaperNotificationPdf";
+import { useFetchStagewiseGeoTagging } from "@/services/StageWiseGeotaggingService";
+import StageWisePhotosPDF from "./PDFs/StageWiseGeoTaggingPdf";
 
 // PDF Action buttons data
 const pdfButtons = [
@@ -113,6 +115,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
   const fetchMaterialMisData = useFetchMaterialMIS();
   const fetchWorkCompletionData = useFetchWorkCompletion();
   const fetchPaperNotificationData = useFetchPaperNotification();
+  const fetchSwgData = useFetchStagewiseGeoTagging();
 
   // Check if any button is currently processing
   const isAnyButtonLoading = currentDownloading !== null || isDownloading;
@@ -530,8 +533,17 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
   const handleStageWiseGeoTagging = async () => {
     setCurrentDownloading("stageWiseGeoTagging");
     try {
-      // Add your Stage wise Geo tagging PDF generation logic here
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
+      const data = await fetchSwgData();
+      if (!data) {
+        toast.error("No data found for download.");
+        return;
+      }
+
+      console.log("Data fetched:", data);
+
+      const blob = await pdf(<StageWisePhotosPDF sWGTData={data} />).toBlob();
+
+      saveAs(blob, "Stage-wise-geo-tagging.pdf");
       toast.success("Stage wise Geo tagging PDF downloaded successfully!");
     } catch (error) {
       console.error("Stage wise Geo tagging Error:", error);
