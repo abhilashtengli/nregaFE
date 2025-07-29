@@ -29,6 +29,8 @@ import MovementSlipPDF from "./PDFs/MovementSlipPdf";
 import { useFetchMovementSlip } from "@/services/MovementSlipService";
 import { useFetchWLFTOData } from "@/services/WlFtoService";
 import WLFTOPdf from "./PDFs/WlFtoPdf";
+import Form32PDF from "./PDFs/Form32Pdf";
+import { useFetchForm32Data } from "@/services/Form32Service";
 
 // PDF Action buttons data
 const pdfButtons = [
@@ -100,7 +102,8 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
   const fetchForm8Data = useFetchForm8Data();
   const fetchForm9Data = useFetchForm9Data();
   const fetchMovementSlipData = useFetchMovementSlip();
-    const fetchWlFtoData = useFetchWLFTOData();
+  const fetchWlFtoData = useFetchWLFTOData();
+    const fetchForm32Data = useFetchForm32Data();
   
 
   // Check if any button is currently processing
@@ -381,7 +384,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
 
       const blob = await pdf(<WLFTOPdf wlfto={data} />).toBlob();
 
-      saveAs(blob, "Wl-Fto.pdf");// Simulate API call
+      saveAs(blob, "Wl-Fto.pdf"); // Simulate API call
       toast.success("WL/Fto's PDF downloaded successfully!");
     } catch (error) {
       console.error("WL/Fto's Error:", error);
@@ -395,7 +398,17 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
     setCurrentDownloading("form32");
     try {
       // Add your Form 32 PDF generation logic here
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
+      const data = await fetchForm32Data();
+      if (!data) {
+        toast.error("No data found for download.");
+        return;
+      }
+
+      console.log("Data fetched:", data);
+
+      const blob = await pdf(<Form32PDF form32Data={data} />).toBlob();
+
+      saveAs(blob, "Form32.pdf");
       toast.success("Form 32 PDF downloaded successfully!");
     } catch (error) {
       console.error("Form 32 Error:", error);

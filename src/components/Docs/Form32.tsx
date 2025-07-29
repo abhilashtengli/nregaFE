@@ -1,10 +1,10 @@
-
 type Form32Props = {
   vendorName?: string;
   district?: string;
   taluka?: string;
   materialData?: {
     material: string;
+    unitPrice: string;
     quantity: string;
     amount: string;
   }[];
@@ -234,7 +234,10 @@ const Form32PDF = ({ form32Data }: Form32Data) => {
                   {item.quantity}
                 </td>
                 <td className="border border-black px-1 py-1 text-center text-[7px]">
-                  {item.amount}
+                  {(
+                    Number.parseFloat(item.amount) /
+                    Number.parseFloat(item.quantity)
+                  ).toFixed(2)}
                 </td>
                 <td className="border border-black px-1 py-1 text-center text-[7px]">
                   {item.amount}

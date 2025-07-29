@@ -3,23 +3,23 @@ import { saveAs } from "file-saver";
 import { pdf } from "@react-pdf/renderer";
 import PDFPreviewer from "./components/PdfViewer";
 import { toast } from "sonner";
-import { useFetchWLFTOData, type WLFTODetail } from "./services/WlFtoService";
-import WLFTOPdf from "./components/PDFs/WlFtoPdf";
+import { useFetchForm32Data, type Form32Data } from "./services/Form32Service";
+import Form32PDF from "./components/PDFs/Form32Pdf";
 
 const SimpleTestComponent = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [pdfData, setPdfData] = useState<WLFTODetail | null>(null);
+  const [pdfData, setPdfData] = useState<Form32Data | null>(null);
 
-  const fetchWlFtoData = useFetchWLFTOData();
+  const fetchForm32Data = useFetchForm32Data();
 
   const handleDownload = async () => {
     setLoading(true);
     console.log("Starting download...");
 
     try {
-      const data = await fetchWlFtoData();
+      const data = await fetchForm32Data();
       if (!data) {
         toast.error("No data found for download.");
         return;
@@ -27,9 +27,9 @@ const SimpleTestComponent = () => {
 
       console.log("Data fetched:", data);
 
-      const blob = await pdf(<WLFTOPdf wlfto={data} />).toBlob();
+      const blob = await pdf(<Form32PDF form32Data={data} />).toBlob();
 
-      saveAs(blob, "Wl-Fto.pdf");
+      saveAs(blob, "Form32.pdf");
       toast.success("Download started!");
     } catch (error) {
       console.error("Download Error:", error);
@@ -44,7 +44,7 @@ const SimpleTestComponent = () => {
     setPreviewError(null);
 
     try {
-      const data = await fetchWlFtoData(); // data is FrontPageData | null
+      const data = await fetchForm32Data(); // data is FrontPageData | null
       console.log("Data for preview:", data);
 
       if (!data) {
@@ -52,21 +52,7 @@ const SimpleTestComponent = () => {
         return;
       }
 
-      // const requiredFields: (keyof Form8Data)[] = [
-      //   "workName",
-      //   "workCode",
-      //   "applicantsData",
-      //   "applicationNumber"
-      // ];
-
-      // const missingFields = requiredFields.filter((field) => !data[field]);
-
-      // if (missingFields.length > 0) {
-      //   console.warn("Missing required fields:", missingFields);
-      //   toast.warning(`Missing fields: ${missingFields.join(", ")}`);
-      // }
-
-      setPdfData(data);
+      setPdfData({ form32Data: data });
       setShowPreview(true);
       toast.success("Preview loaded!");
     } catch (error) {
@@ -148,7 +134,7 @@ const SimpleTestComponent = () => {
         <div>
           <h3>PDF Preview</h3>
           <PDFPreviewer
-            document={<WLFTOPdf wlfto={pdfData} />}
+            document={<Form32PDF form32Data={pdfData.form32Data} />}
             onClose={handleClosePreview}
           />
         </div>
