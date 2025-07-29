@@ -3,24 +3,27 @@ import { saveAs } from "file-saver";
 import { pdf } from "@react-pdf/renderer";
 import PDFPreviewer from "./components/PdfViewer";
 import { toast } from "sonner";
-import { useFetchForm9Data } from "./services/Form9Service";
-import type { Form9Data } from "./components/PDFs/Form9Pdf";
-import Form9PDF from "./components/PDFs/Form9Pdf";
+
+import {
+  useFetchMovementSlip,
+  type MovementSlipData
+} from "./services/MovementSlipService";
+import MovementSlipPDF from "./components/PDFs/MovementSlipPdf";
 
 const SimpleTestComponent = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [pdfData, setPdfData] = useState<Form9Data | null>(null);
+  const [pdfData, setPdfData] = useState<MovementSlipData | null>(null);
 
-  const fetchForm9Data = useFetchForm9Data();
+  const fetchMovementSlipData = useFetchMovementSlip();
 
   const handleDownload = async () => {
     setLoading(true);
     console.log("Starting download...");
 
     try {
-      const data = await fetchForm9Data();
+      const data = await fetchMovementSlipData();
       if (!data) {
         toast.error("No data found for download.");
         return;
@@ -28,9 +31,11 @@ const SimpleTestComponent = () => {
 
       console.log("Data fetched:", data);
 
-      const blob = await pdf(<Form9PDF form9Data={data.form9Data} />).toBlob();
+      const blob = await pdf(
+        <MovementSlipPDF movementSlipData={data} />
+      ).toBlob();
 
-      saveAs(blob, "Form9.pdf");
+      saveAs(blob, "Movementslip.pdf");
       toast.success("Download started!");
     } catch (error) {
       console.error("Download Error:", error);
@@ -45,7 +50,7 @@ const SimpleTestComponent = () => {
     setPreviewError(null);
 
     try {
-      const data = await fetchForm9Data(); // data is FrontPageData | null
+      const data = await fetchMovementSlipData(); // data is FrontPageData | null
       console.log("Data for preview:", data);
 
       if (!data) {
@@ -149,7 +154,7 @@ const SimpleTestComponent = () => {
         <div>
           <h3>PDF Preview</h3>
           <PDFPreviewer
-            document={<Form9PDF form9Data={pdfData.form9Data} />}
+            document={<MovementSlipPDF movementSlipData={pdfData} />}
             onClose={handleClosePreview}
           />
         </div>

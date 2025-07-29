@@ -1,15 +1,33 @@
-
-// PENDING
-const MovementSlipPDF = ({
-  workCode = "1507004008/AV/93393042892262348",
-  workName = "ಕಾಳಗಿ ಗ್ರಾಮ ಪಂಚಾಯಿತಿಯ ಘನತ್ಯಾಜ್ಯ ವಿಲೇವಾರಿ ಘಟಕ ನಿರ್ಮಾಣ",
-  grama = "ಕಾಳಗಿ",
-  gramPanchayat = "ಕಾಳಗಿ",
-  taluka = "ಮುದ್ದೇಬಿಹಾಳ",
-  district = "ವಿಜಯಪುರ",
-  date = "" // blank
-  //ಇ-ಹಾಜರಾತಿ  mustroll // from link 8
-}) => {
+type MustrollData = {
+  mustrollNo: string;
+  data: {
+    fromDate: string;
+    toDate: string;
+    attendanceUpdateMIS: string;
+    workMeasure: string;
+    misEntryMeasurement: string;
+    ftoDate1: string;
+    ftoDate2: string;
+  };
+};
+type ResponseMovementSlipType = {
+  workCode: string;
+  workName: string;
+  gramPanchayat: string;
+  taluka: string;
+  district: string;
+  mustrollData: MustrollData[];
+};
+type MovementSlipData = {
+  movementSlipData: ResponseMovementSlipType;
+};
+// Completed Mustroll no | from date | to date |  to date | to date | to date | Payment date - 1 | Payment date ( get by mustroll no )
+//Pending is the mustrollData we need to integrate in the tabele
+const MovementSlipPDF = ({ movementSlipData }: MovementSlipData) => {
+  const { workCode, workName, gramPanchayat, taluka, district,  } =
+    movementSlipData;
+  const grama = gramPanchayat;
+  const date = ""; // blank
   return (
     <div
       className="w-full max-w-4xl mx-auto bg-white border-2 border-black"
@@ -107,28 +125,28 @@ const MovementSlipPDF = ({
                 ಕ್ರ ಸಂ
               </th>
               <th className="border text-[10px] border-black px-2 py-2 text-center font-semibold w-20">
-                ಇ-ಹಾಜರಾತಿ // mustroll
+                ಇ-ಹಾಜರಾತಿ // mustrollNo
               </th>
               <th className="border text-[10px] border-black px-2 py-2 text-center font-semibold w-24">
-                ಇ-ಎನ್‌ಎಮ್‌ಆರ್ ವಿತರಣೆ // from date
+                ಇ-ಎನ್‌ಎಮ್‌ಆರ್ ವಿತರಣೆ // fromDate
               </th>
               <th className="border text-[10px] border-black px-2 py-2 text-center font-semibold w-24">
-                ಇ-ಎನ್‌ಎಮ್‌ಆರ್ ಮುಕ್ತಾಯ // to date
+                ಇ-ಎನ್‌ಎಮ್‌ಆರ್ ಮುಕ್ತಾಯ // toDate
               </th>
               <th className="border text-[10px] border-black px-2 py-2 text-center font-semibold w-32">
-                ಎಮ್‌ಐಎಸ್‌ನಲ್ಲಿ ಹಾಜರಾತಿ ಇಂದೀಕರಿಸುವಿಕೆ // to date + 1
+                ಎಮ್‌ಐಎಸ್‌ನಲ್ಲಿ ಹಾಜರಾತಿ ಇಂದೀಕರಿಸುವಿಕೆ //attendanceUpdateMIS
               </th>
               <th className="border text-[10px] border-black px-2 py-2 text-center font-semibold w-16">
-                ಕೆಲಸದ ಅಳತೆ // to date + 2
+                ಕೆಲಸದ ಅಳತೆ //workMeasure
               </th>
               <th className="border text-[10px] border-black px-2 py-2 text-center font-semibold w-32">
-                ಎಮ್‌ಐಎಸ್‌ನಲ್ಲಿ ದಾಖಲಿಸಿದ ಅಳತೆ to date + 2
+                ಎಮ್‌ಐಎಸ್‌ನಲ್ಲಿ ದಾಖಲಿಸಿದ ಅಳತೆ //misEntryMeasurement
               </th>
               <th className="border text-[10px] border-black px-2 py-2 text-center font-semibold w-20">
-                ಎಫ್‌ಟಿಒ 1ನೇ ಸಹಿ // payment date - 1 from link 8
+                ಎಫ್‌ಟಿಒ 1ನೇ ಸಹಿ // ftoDate1
               </th>
               <th className="border text-[10px] border-black px-2 py-2 text-center font-semibold w-20">
-                ಎಫ್‌ಟಿಒ 2ನೇ ಸಹಿ // payment date
+                ಎಫ್‌ಟಿಒ 2ನೇ ಸಹಿ // ftoDate2
               </th>
             </tr>
           </thead>
