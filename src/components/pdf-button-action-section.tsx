@@ -27,6 +27,8 @@ import { useFetchForm9Data } from "@/services/Form9Service";
 import Form9PDF from "./PDFs/Form9Pdf";
 import MovementSlipPDF from "./PDFs/MovementSlipPdf";
 import { useFetchMovementSlip } from "@/services/MovementSlipService";
+import { useFetchWLFTOData } from "@/services/WlFtoService";
+import WLFTOPdf from "./PDFs/WlFtoPdf";
 
 // PDF Action buttons data
 const pdfButtons = [
@@ -98,6 +100,8 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
   const fetchForm8Data = useFetchForm8Data();
   const fetchForm9Data = useFetchForm9Data();
   const fetchMovementSlipData = useFetchMovementSlip();
+    const fetchWlFtoData = useFetchWLFTOData();
+  
 
   // Check if any button is currently processing
   const isAnyButtonLoading = currentDownloading !== null || isDownloading;
@@ -367,8 +371,17 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
   const handleWlFtos = async () => {
     setCurrentDownloading("wlFtos");
     try {
-      // Add your WL/Fto's PDF generation logic here
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
+      const data = await fetchWlFtoData();
+      if (!data) {
+        toast.error("No data found for download.");
+        return;
+      }
+
+      console.log("Data fetched:", data);
+
+      const blob = await pdf(<WLFTOPdf wlfto={data} />).toBlob();
+
+      saveAs(blob, "Wl-Fto.pdf");// Simulate API call
       toast.success("WL/Fto's PDF downloaded successfully!");
     } catch (error) {
       console.error("WL/Fto's Error:", error);

@@ -3,27 +3,23 @@ import { saveAs } from "file-saver";
 import { pdf } from "@react-pdf/renderer";
 import PDFPreviewer from "./components/PdfViewer";
 import { toast } from "sonner";
-
-import {
-  useFetchMovementSlip,
-  type MovementSlipData
-} from "./services/MovementSlipService";
-import MovementSlipPDF from "./components/PDFs/MovementSlipPdf";
+import { useFetchWLFTOData, type WLFTODetail } from "./services/WlFtoService";
+import WLFTOPdf from "./components/PDFs/WlFtoPdf";
 
 const SimpleTestComponent = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [pdfData, setPdfData] = useState<MovementSlipData | null>(null);
+  const [pdfData, setPdfData] = useState<WLFTODetail | null>(null);
 
-  const fetchMovementSlipData = useFetchMovementSlip();
+  const fetchWlFtoData = useFetchWLFTOData();
 
   const handleDownload = async () => {
     setLoading(true);
     console.log("Starting download...");
 
     try {
-      const data = await fetchMovementSlipData();
+      const data = await fetchWlFtoData();
       if (!data) {
         toast.error("No data found for download.");
         return;
@@ -31,11 +27,9 @@ const SimpleTestComponent = () => {
 
       console.log("Data fetched:", data);
 
-      const blob = await pdf(
-        <MovementSlipPDF movementSlipData={data} />
-      ).toBlob();
+      const blob = await pdf(<WLFTOPdf wlfto={data} />).toBlob();
 
-      saveAs(blob, "Movementslip.pdf");
+      saveAs(blob, "Wl-Fto.pdf");
       toast.success("Download started!");
     } catch (error) {
       console.error("Download Error:", error);
@@ -50,7 +44,7 @@ const SimpleTestComponent = () => {
     setPreviewError(null);
 
     try {
-      const data = await fetchMovementSlipData(); // data is FrontPageData | null
+      const data = await fetchWlFtoData(); // data is FrontPageData | null
       console.log("Data for preview:", data);
 
       if (!data) {
@@ -154,7 +148,7 @@ const SimpleTestComponent = () => {
         <div>
           <h3>PDF Preview</h3>
           <PDFPreviewer
-            document={<MovementSlipPDF movementSlipData={pdfData} />}
+            document={<WLFTOPdf wlfto={pdfData} />}
             onClose={handleClosePreview}
           />
         </div>
