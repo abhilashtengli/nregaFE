@@ -3,26 +3,26 @@ import { saveAs } from "file-saver";
 import { pdf } from "@react-pdf/renderer";
 import PDFPreviewer from "./components/PdfViewer";
 import { toast } from "sonner";
+import WorkCompletionPDF from "./components/PDFs/WorkCompletionPdf";
 import {
-  useFetchMaterialMIS,
-  type MaterialMisData
-} from "./services/MaterialMisService";
-import MaterialMisPDF from "./components/PDFs/MaterialMisPdf";
+  useFetchWorkCompletion,
+  type WorkCompletion
+} from "./services/WorkCompletionService";
 
 const SimpleTestComponent = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [pdfData, setPdfData] = useState<MaterialMisData | null>(null);
+  const [pdfData, setPdfData] = useState<WorkCompletion | null>(null);
 
-  const fetchMaterialMisData = useFetchMaterialMIS();
+  const fetchWorkCompletionData = useFetchWorkCompletion();
 
   const handleDownload = async () => {
     setLoading(true);
     console.log("Starting download...");
 
     try {
-      const data = await fetchMaterialMisData();
+      const data = await fetchWorkCompletionData();
       if (!data) {
         toast.error("No data found for download.");
         return;
@@ -30,9 +30,11 @@ const SimpleTestComponent = () => {
 
       console.log("Data fetched:", data);
 
-      const blob = await pdf(<MaterialMisPDF data={data} />).toBlob();
+      const blob = await pdf(
+        <WorkCompletionPDF workCompletionData={data} />
+      ).toBlob();
 
-      saveAs(blob, "MaterialMis.pdf");
+      saveAs(blob, "Work-completion.pdf");
       toast.success("Download started!");
     } catch (error) {
       console.error("Download Error:", error);
@@ -47,7 +49,7 @@ const SimpleTestComponent = () => {
     setPreviewError(null);
 
     try {
-      const data = await fetchMaterialMisData(); // data is FrontPageData | null
+      const data = await fetchWorkCompletionData(); // data is FrontPageData | null
       console.log("Data for preview:", data);
 
       if (!data) {
@@ -137,7 +139,7 @@ const SimpleTestComponent = () => {
         <div>
           <h3>PDF Preview</h3>
           <PDFPreviewer
-            document={<MaterialMisPDF data={pdfData} />}
+            document={<WorkCompletionPDF workCompletionData={pdfData} />}
             onClose={handleClosePreview}
           />
         </div>

@@ -33,6 +33,8 @@ import Form32PDF from "./PDFs/Form32Pdf";
 import { useFetchForm32Data } from "@/services/Form32Service";
 import { useFetchMaterialMIS } from "@/services/MaterialMisService";
 import MaterialMisPDF from "./PDFs/MaterialMisPdf";
+import { useFetchWorkCompletion } from "@/services/WorkCompletionService";
+import WorkCompletionPDF from "./PDFs/WorkCompletionPdf";
 
 // PDF Action buttons data
 const pdfButtons = [
@@ -107,6 +109,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
   const fetchWlFtoData = useFetchWLFTOData();
   const fetchForm32Data = useFetchForm32Data();
   const fetchMaterialMisData = useFetchMaterialMIS();
+  const fetchWorkCompletionData = useFetchWorkCompletion();
 
   // Check if any button is currently processing
   const isAnyButtonLoading = currentDownloading !== null || isDownloading;
@@ -446,8 +449,19 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
   const handleWorkCompletion = async () => {
     setCurrentDownloading("workCompletion");
     try {
-      // Add your Work Completion PDF generation logic here
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
+      const data = await fetchWorkCompletionData();
+      if (!data) {
+        toast.error("No data found for download.");
+        return;
+      }
+
+      console.log("Data fetched:", data);
+
+      const blob = await pdf(
+        <WorkCompletionPDF workCompletionData={data} />
+      ).toBlob();
+
+      saveAs(blob, "Work-completion.pdf");
       toast.success("Work Completion PDF downloaded successfully!");
     } catch (error) {
       console.error("Work Completion Error:", error);
