@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -31,6 +30,7 @@ interface MaterialData {
   contractor2Rate: string;
   contractor3Rate: string;
 }
+
 interface VendorDataProp {
   vendorNameOne: string;
   vendorNameTwo: string;
@@ -51,7 +51,7 @@ interface MaterialApiResponse {
   success: boolean;
   data: {
     vendorWithVendorQuotationData: MaterialData[];
-    vendorData: VendorDataProp;
+    vendorData?: VendorDataProp; // Made optional since it might not exist on first call
   };
   message: string;
 }
@@ -113,6 +113,25 @@ export default function VendorInformation() {
   // Get work data from store
   const { workDetail } = useWorkStore();
 
+  // Helper function to format date for input field
+  const formatDateForInput = (dateString: string) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toISOString().split("T")[0];
+  };
+
+  // Helper function to find vendor in options by name and GST
+  const findVendorInOptions = (
+    vendorName: string,
+    gstNo: string
+  ): VendorData | null => {
+    return (
+      vendorOptions.find(
+        (vendor) => vendor.vendorName === vendorName && vendor.gstNo === gstNo
+      ) || null
+    );
+  };
+
   // Fetch material data when modal opens
   const fetchMaterialData = async () => {
     if (!workDetail?.id) {
@@ -154,6 +173,18 @@ export default function VendorInformation() {
         setMaterialUnits(initialUnits);
         setEditableQuotedData(initialPrices);
 
+        // Handle vendor data if it exists (second time opening)
+        if (response.data.data.vendorData) {
+          const vendorData = response.data.data.vendorData;
+
+          // Set dates
+          setFromDate(formatDateForInput(vendorData.fromDate));
+          setToDate(formatDateForInput(vendorData.toDate));
+
+          // Wait for vendor options to be loaded before setting selected vendors
+          // This will be handled in the useEffect that watches vendorOptions
+        }
+
         toast.success("Material data loaded successfully");
       } else {
         throw new Error("Failed to fetch material data");
@@ -174,7 +205,6 @@ export default function VendorInformation() {
       const response = await axios.get<VendorApiResponse>(
         `${Base_Url}/vendors/kalaburagi`
       );
-
       if (response.data.success) {
         setVendorOptions(response.data.data);
       } else {
@@ -191,18 +221,77 @@ export default function VendorInformation() {
   // Load data when modal opens
   useEffect(() => {
     if (isModalOpen) {
+      // Reset state when modal opens
+      setSelectedMaterials(new Set());
+      setSelectAll(false);
+      setFromDate("");
+      setToDate("");
+      setSelectedVendors({
+        vendor1: null,
+        vendor2: null,
+        vendor3: null
+      });
+
       fetchMaterialData();
       fetchVendorOptions();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isModalOpen, workDetail?.id]);
 
+  // Set selected vendors when both vendor options and material data are loaded
+  useEffect(() => {
+    const setVendorsFromApiData = async () => {
+      if (vendorOptions.length > 0 && materialData.length > 0) {
+        try {
+          // Re-fetch the latest data to get vendor information
+          const response = await axios.get<MaterialApiResponse>(
+            `${Base_Url}/material-vendor-data-version2/${workDetail?.id}`
+          );
+
+          if (response.data.success && response.data.data.vendorData) {
+            const vendorData = response.data.data.vendorData;
+
+            // Find and set vendors
+            const vendor1 = findVendorInOptions(
+              vendorData.vendorNameOne,
+              vendorData.vendorGstOne
+            );
+            const vendor2 = findVendorInOptions(
+              vendorData.vendorNameTwo,
+              vendorData.vendorGstTwo
+            );
+            const vendor3 = findVendorInOptions(
+              vendorData.vendorNameThree,
+              vendorData.vendorGstThree
+            );
+
+            setSelectedVendors({
+              vendor1: vendor1,
+              vendor2: vendor2,
+              vendor3: vendor3
+            });
+
+            console.log("Set vendors from API data:", {
+              vendor1,
+              vendor2,
+              vendor3
+            });
+          }
+        } catch (error) {
+          console.error("Error setting vendors from API data:", error);
+        }
+      }
+    };
+
+    setVendorsFromApiData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vendorOptions, materialData, workDetail?.id]);
+
   // Calculate vendor2 and vendor3 prices when vendor1 price changes
   const calculateDependentPrices = (vendor1Price: string) => {
     const price = Number.parseFloat(vendor1Price) || 0;
     const vendor2Price = (price * 1.02).toFixed(2);
     const vendor3Price = (price * 1.025).toFixed(2);
-
     return {
       vendor2: vendor2Price,
       vendor3: vendor3Price
@@ -256,7 +345,6 @@ export default function VendorInformation() {
   // Only vendor1 prices can be edited
   const handleVendor1PriceChange = (materialId: number, value: string) => {
     const calculatedPrices = calculateDependentPrices(value);
-
     setEditableQuotedData((prev) => ({
       ...prev,
       [materialId]: {
@@ -289,7 +377,6 @@ export default function VendorInformation() {
     }
 
     setIsSubmitting(true);
-
     try {
       // Prepare the data to send to backend
       const selectedMaterialsData = materialData
@@ -335,7 +422,6 @@ export default function VendorInformation() {
         }
       } catch (error: unknown) {
         console.error("API Error:", error);
-
         // Type guard for axios error
         if (axios.isAxiosError(error)) {
           if (error.response?.status === 400) {
@@ -703,7 +789,15 @@ export default function VendorInformation() {
                   <div className="flex justify-center pt-4">
                     <Button
                       onClick={handleSubmitMaterials}
-                      disabled={selectedMaterials.size === 0 || isSubmitting}
+                      disabled={
+                        selectedMaterials.size === 0 ||
+                        !fromDate ||
+                        !toDate ||
+                        !selectedVendors.vendor1 ||
+                        !selectedVendors.vendor2 ||
+                        !selectedVendors.vendor3 ||
+                        isSubmitting
+                      }
                       className="px-8 py-2"
                     >
                       {isSubmitting ? (
