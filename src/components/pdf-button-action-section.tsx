@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
 import { saveAs } from "file-saver";
-import { pdf } from "@react-pdf/renderer";
+import { Document, pdf } from "@react-pdf/renderer";
 import { toast } from "sonner";
 import { useFetchASCopyData } from "@/services/AdministrativeSanctionData";
 import AdministrativeSanctionPDF from "./PDFs/AsCopyPdf";
@@ -39,6 +39,11 @@ import { useFetchPaperNotification } from "@/services/PaperNotificationService";
 import PaperNotificationPDF from "./PDFs/PaperNotificationPdf";
 import { useFetchStagewiseGeoTagging } from "@/services/StageWiseGeotaggingService";
 import StageWisePhotosPDF from "./PDFs/StageWiseGeoTaggingPdf";
+import { useFetchComparativeStatement } from "@/services/ComparativeStatementService";
+import QuotationCallPDF from "./PDFs/ComparativeStatement/QuotationCallPdf";
+import ComparativeStatementPDF from "./PDFs/ComparativeStatement/ComparativePdf";
+import ContractorQuotationPDF from "./PDFs/ComparativeStatement/ContractorQuotation";
+import SupplyOrderPDF from "./PDFs/ComparativeStatement/SupplyOrderPdf";
 
 // PDF Action buttons data
 const pdfButtons = [
@@ -116,6 +121,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
   const fetchWorkCompletionData = useFetchWorkCompletion();
   const fetchPaperNotificationData = useFetchPaperNotification();
   const fetchSwgData = useFetchStagewiseGeoTagging();
+  const fetchAllQuotationPdfData = useFetchComparativeStatement();
 
   // Check if any button is currently processing
   const isAnyButtonLoading = currentDownloading !== null || isDownloading;
@@ -519,8 +525,110 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
   const handleQuotationCallForm = async () => {
     setCurrentDownloading("quotationCallForm");
     try {
-      // Add your Quotation Call Form PDF generation logic here
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
+      const data = await fetchAllQuotationPdfData();
+      if (!data) {
+        toast.error("No data found for download.");
+        return;
+      }
+
+      console.log("Data fetched:", data);
+
+      const blob = await pdf(
+        <Document>
+          <QuotationCallPDF
+            gramPanchayat={data.gramPanchayat}
+            taluka={data.taluka}
+            district={data.district}
+            year={data.year}
+            administrativeSanction={data.administrativeSanction}
+            workCode={data.workCode}
+            workName={data.workName}
+            tenderPublishDate={data.tenderPublishDate}
+            tenderSubmissionDate={data.tenderSubmissionDate}
+            materialData={data.materialData}
+          />
+          <ComparativeStatementPDF
+            gramPanchayat={data.gramPanchayat}
+            taluka={data.taluka}
+            district={data.district}
+            year={data.year}
+            workCode={data.workCode}
+            workName={data.workName}
+            tenderPublishDate={data.tenderPublishDate}
+            vendorDetails={data.vendorDetails}
+            vendorWithVendorQuotation={data.vendorWithVendorQuotation}
+          />
+          <ContractorQuotationPDF
+            gramPanchayat={data.gramPanchayat}
+            taluka={data.taluka}
+            district={data.district}
+            year={data.year}
+            workCode={data.workCode}
+            workName={data.workName}
+            tenderPublishDate={data.tenderPublishDate}
+            contractorNumber={1}
+            contractorName={data.vendorDetails.vendorNameOne}
+            contractorGst={data.vendorDetails.vendorGstOne}
+            quotationSubmissionDate={
+              data.vendorDetails.VendorOneQuotationSubmissiondate
+            }
+            vendorWithVendorQuotation={data.vendorWithVendorQuotation}
+          />
+          <ContractorQuotationPDF
+            gramPanchayat={data.gramPanchayat}
+            taluka={data.taluka}
+            district={data.district}
+            year={data.year}
+            workCode={data.workCode}
+            workName={data.workName}
+            tenderPublishDate={data.tenderPublishDate}
+            contractorNumber={2}
+            contractorName={data.vendorDetails.vendorNameTwo}
+            contractorGst={data.vendorDetails.vendorGstTwo}
+            quotationSubmissionDate={
+              data.vendorDetails.vendorTwoQuotationSubmissiondate
+            }
+            vendorWithVendorQuotation={data.vendorWithVendorQuotation}
+          />
+          <ContractorQuotationPDF
+            gramPanchayat={data.gramPanchayat}
+            taluka={data.taluka}
+            district={data.district}
+            year={data.year}
+            workCode={data.workCode}
+            workName={data.workName}
+            tenderPublishDate={data.tenderPublishDate}
+            contractorNumber={3}
+            contractorName={data.vendorDetails.vendorNameThree}
+            contractorGst={data.vendorDetails.vendorGstThree}
+            quotationSubmissionDate={
+              data.vendorDetails.vendorThreeQuotationSubmissiondate
+            }
+            vendorWithVendorQuotation={data.vendorWithVendorQuotation}
+          />
+          <SupplyOrderPDF
+            gramPanchayat={data.gramPanchayat}
+            taluka={data.taluka}
+            district={data.district}
+            year={data.year}
+            workCode={data.workCode}
+            workName={data.workName}
+            tenderPublishDate={data.tenderPublishDate}
+            winnerContractorName={data.vendorDetails.vendorNameOne}
+            winnerContractorGst={data.vendorDetails.vendorGstOne}
+            winnerQuotationSubmissionDate={
+              data.vendorDetails.VendorOneQuotationSubmissiondate
+            }
+            vendorWithVendorQuotation={data.vendorWithVendorQuotation}
+            address=""
+          />
+        </Document>
+      ).toBlob();
+
+      saveAs(
+        blob,
+        "QuotationCall-comparativeStatement-3vendorsQuotation-supplyOrder.pdf"
+      );
       toast.success("Quotation Call Form PDF downloaded successfully!");
     } catch (error) {
       console.error("Quotation Call Form Error:", error);
