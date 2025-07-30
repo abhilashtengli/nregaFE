@@ -31,6 +31,16 @@ interface MaterialData {
   contractor2Rate: string;
   contractor3Rate: string;
 }
+interface VendorDataProp {
+  vendorNameOne: string;
+  vendorNameTwo: string;
+  vendorNameThree: string;
+  vendorGstOne: string;
+  vendorGstTwo: string;
+  vendorGstThree: string;
+  fromDate: string;
+  toDate: string;
+}
 
 interface VendorData {
   vendorName: string;
@@ -39,7 +49,10 @@ interface VendorData {
 
 interface MaterialApiResponse {
   success: boolean;
-  data: MaterialData[];
+  data: {
+    vendorWithVendorQuotationData: MaterialData[];
+    vendorData: VendorDataProp;
+  };
   message: string;
 }
 
@@ -112,11 +125,12 @@ export default function VendorInformation() {
     setIsLoading(true);
     try {
       const response = await axios.get<MaterialApiResponse>(
-        `${Base_Url}/material-vendor-data/${workDetail.id}`
+        `${Base_Url}/material-vendor-data-version2/${workDetail.id}`
       );
 
       if (response.data.success) {
-        setMaterialData(response.data.data);
+        console.log("RESPONSE DATA : ", response.data);
+        setMaterialData(response.data.data.vendorWithVendorQuotationData);
 
         // Initialize units and prices
         const initialUnits: { [materialId: number]: string } = {};
@@ -128,7 +142,7 @@ export default function VendorInformation() {
           };
         } = {};
 
-        response.data.data.forEach((material) => {
+        response.data.data.vendorWithVendorQuotationData.forEach((material) => {
           initialUnits[material.slNo] = material.unit;
           initialPrices[material.slNo] = {
             vendor1: { price: material.contractor1Rate },
