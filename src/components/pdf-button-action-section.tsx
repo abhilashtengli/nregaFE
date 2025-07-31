@@ -46,6 +46,8 @@ import ContractorQuotationPDF from "./PDFs/ComparativeStatement/ContractorQuotat
 import SupplyOrderPDF from "./PDFs/ComparativeStatement/SupplyOrderPdf";
 import { useFetchBlankNMRData } from "@/services/BlankNmrService";
 import NMRPDF from "./PDFs/BlankNmrPdf";
+import { useFetchFilledNMRData } from "@/services/FilledNmrService";
+import FilledENmrPDF from "./PDFs/FilledNmrPdf";
 
 // PDF Action buttons data
 const pdfButtons = [
@@ -125,6 +127,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
   const fetchSwgData = useFetchStagewiseGeoTagging();
   const fetchAllQuotationPdfData = useFetchComparativeStatement();
   const fetchBlankNMRData = useFetchBlankNMRData();
+  const fetchFilledNMRData = useFetchFilledNMRData();
 
   // Check if any button is currently processing
   const isAnyButtonLoading = currentDownloading !== null || isDownloading;
@@ -399,8 +402,44 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
   const handleFilledEnmrs = async () => {
     setCurrentDownloading("filledEnmrs");
     try {
-      // Add your Filled E-NMR's PDF generation logic here
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
+      const data = await fetchFilledNMRData();
+
+      if (!data) {
+        toast.error("No data found for download.");
+        return;
+      }
+      console.log("DATA : ", data);
+
+      // Prepare the document with multiple NMRs
+      const doc = (
+        <Document>
+          {data.workersData.map((musterRoll) => (
+            <FilledENmrPDF
+              key={musterRoll.musterRollNo}
+              district={data.district}
+              taluka={data.taluka}
+              panchayat={data.panchayat}
+              approvalNo={data.approvalNo}
+              approvalDate={data.approvalDate}
+              workCode={data.workCode}
+              workName={data.workName}
+              financialYear={data.financialYear}
+              totalWage={data.totalWage}
+              wage={data.wage}
+              totalAttendanceCount={data.totalAttendanceCount}
+              // Props specific to this muster roll
+              musterRollNo={musterRoll.musterRollNo}
+              fromDate={musterRoll.fromDate}
+              toDate={musterRoll.toDate}
+              workersData={musterRoll.data}
+            />
+          ))}
+        </Document>
+      );
+
+      const blob = await pdf(doc).toBlob();
+
+      saveAs(blob, "Filled-NMR.pdf");
       toast.success("Filled E-NMR's PDF downloaded successfully!");
     } catch (error) {
       console.error("Filled E-NMR's Error:", error);

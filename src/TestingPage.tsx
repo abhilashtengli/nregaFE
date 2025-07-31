@@ -4,25 +4,25 @@ import { Document, pdf } from "@react-pdf/renderer";
 import PDFPreviewer from "./components/PdfViewer";
 import { toast } from "sonner";
 import {
-  useFetchBlankNMRData,
-  type BlankNMRData
-} from "./services/BlankNmrService";
-import NMRPDF from "./components/PDFs/BlankNmrPdf";
+  useFetchFilledNMRData,
+  type FilledNMRData
+} from "./services/FilledNmrService";
+import FilledENmrPDF from "./components/PDFs/FilledNmrPdf";
 
 const SimpleTestComponent = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [pdfData, setPdfData] = useState<BlankNMRData | null>(null);
+  const [pdfData, setPdfData] = useState<FilledNMRData | null>(null);
 
-  const fetchBlankNMRData = useFetchBlankNMRData();
+  const fetchFilledNMRData = useFetchFilledNMRData();
 
   const handleDownload = async () => {
     setLoading(true);
     console.log("Starting download...");
 
     try {
-      const data = await fetchBlankNMRData();
+      const data = await fetchFilledNMRData();
 
       if (!data) {
         toast.error("No data found for download.");
@@ -33,42 +33,33 @@ const SimpleTestComponent = () => {
       // Prepare the document with multiple NMRs
       const doc = (
         <Document>
-          {data.workerData.map(
-            (musterRoll: {
-              mustrollNo: string;
-              workers: {
-                slNo: number;
-                jobCardNo: string;
-                familyHeadName: string;
-                requestLetterFrom: string;
-                accountNo: string;
-              }[];
-            }) => (
-              <NMRPDF
-                key={musterRoll.mustrollNo}
-                district={data.district}
-                taluka={data.taluka}
-                gramPanchayat={data.gramPanchayat}
-                financialYear={data.financialYear}
-                workCode={data.workCode}
-                workName={data.workName}
-                fromDate={data.fromDate}
-                toDate={data.toDate}
-                technicalSanctionNo={data.technicalSanctionNo}
-                technicalSanctionDate={data.technicalSanctionDate}
-                financialSanctionNo={data.financialSanctionNo}
-                financialSanctionDate={data.financialSanctionDate}
-                musterRollNo={musterRoll.mustrollNo}
-                workerData={musterRoll.workers}
-              />
-            )
-          )}
+          {data.workersData.map((musterRoll) => (
+            <FilledENmrPDF
+              key={musterRoll.musterRollNo}
+              district={data.district}
+              taluka={data.taluka}
+              panchayat={data.panchayat}
+              approvalNo={data.approvalNo}
+              approvalDate={data.approvalDate}
+              workCode={data.workCode}
+              workName={data.workName}
+              financialYear={data.financialYear}
+              totalWage={data.totalWage}
+              wage={data.wage}
+              totalAttendanceCount={data.totalAttendanceCount}
+              // Props specific to this muster roll
+              musterRollNo={musterRoll.musterRollNo}
+              fromDate={musterRoll.fromDate}
+              toDate={musterRoll.toDate}
+              workersData={musterRoll.data}
+            />
+          ))}
         </Document>
       );
 
       const blob = await pdf(doc).toBlob();
 
-      saveAs(blob, "Blank-NMR.pdf");
+      saveAs(blob, "Filled-NMR.pdf");
       toast.success("Download started!");
     } catch (error) {
       console.error("Download Error:", error);
@@ -83,7 +74,7 @@ const SimpleTestComponent = () => {
     setPreviewError(null);
 
     try {
-      const data = await fetchBlankNMRData(); // data is FrontPageData | null
+      const data = await fetchFilledNMRData(); // data is FrontPageData | null
       console.log("Data for preview:", data);
 
       if (!data) {
@@ -175,36 +166,27 @@ const SimpleTestComponent = () => {
           <PDFPreviewer
             document={
               <Document>
-                {pdfData.workerData.map(
-                  (musterRoll: {
-                    mustrollNo: string;
-                    workers: {
-                      slNo: number;
-                      jobCardNo: string;
-                      familyHeadName: string;
-                      requestLetterFrom: string;
-                      accountNo: string;
-                    }[];
-                  }) => (
-                    <NMRPDF
-                      key={musterRoll.mustrollNo}
-                      district={pdfData.district}
-                      taluka={pdfData.taluka}
-                      gramPanchayat={pdfData.gramPanchayat}
-                      financialYear={pdfData.financialYear}
-                      workCode={pdfData.workCode}
-                      workName={pdfData.workName}
-                      fromDate={pdfData.fromDate}
-                      toDate={pdfData.toDate}
-                      technicalSanctionNo={pdfData.technicalSanctionNo}
-                      technicalSanctionDate={pdfData.technicalSanctionDate}
-                      financialSanctionNo={pdfData.financialSanctionNo}
-                      financialSanctionDate={pdfData.financialSanctionDate}
-                      musterRollNo={musterRoll.mustrollNo}
-                      workerData={musterRoll.workers}
-                    />
-                  )
-                )}
+                {pdfData.workersData.map((musterRoll) => (
+                  <FilledENmrPDF
+                    key={musterRoll.musterRollNo}
+                    district={pdfData.district}
+                    taluka={pdfData.taluka}
+                    panchayat={pdfData.panchayat}
+                    approvalNo={pdfData.approvalNo}
+                    approvalDate={pdfData.approvalDate}
+                    workCode={pdfData.workCode}
+                    workName={pdfData.workName}
+                    financialYear={pdfData.financialYear}
+                    totalWage={pdfData.totalWage}
+                    wage={pdfData.wage}
+                    totalAttendanceCount={pdfData.totalAttendanceCount}
+                    // Props specific to this muster roll
+                    musterRollNo={musterRoll.musterRollNo}
+                    fromDate={musterRoll.fromDate}
+                    toDate={musterRoll.toDate}
+                    workersData={musterRoll.data}
+                  />
+                ))}
               </Document>
             }
             onClose={handleClosePreview}
