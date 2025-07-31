@@ -48,6 +48,8 @@ import { useFetchBlankNMRData } from "@/services/BlankNmrService";
 import NMRPDF from "./PDFs/BlankNmrPdf";
 import { useFetchFilledNMRData } from "@/services/FilledNmrService";
 import FilledENmrPDF from "./PDFs/FilledNmrPdf";
+import { useFetchMaterialSupplyRegister } from "@/services/MaterialSupplyRegisterService";
+import MaterialSupplyRegisterPDF from "./PDFs/MaterialSupplyRegisterPdf";
 
 // PDF Action buttons data
 const pdfButtons = [
@@ -128,6 +130,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
   const fetchAllQuotationPdfData = useFetchComparativeStatement();
   const fetchBlankNMRData = useFetchBlankNMRData();
   const fetchFilledNMRData = useFetchFilledNMRData();
+  const fetchMaterialSupplyRegisteryData = useFetchMaterialSupplyRegister();
 
   // Check if any button is currently processing
   const isAnyButtonLoading = currentDownloading !== null || isDownloading;
@@ -573,8 +576,27 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
   const handleMaterialSupplyRegister = async () => {
     setCurrentDownloading("materialSupplyRegister");
     try {
-      // Add your Material Supply Register PDF generation logic here
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
+      const data = await fetchMaterialSupplyRegisteryData();
+
+      if (!data) {
+        toast.error("No data found for download.");
+        return;
+      }
+      console.log("DATA : ", data);
+
+      // Prepare the document with multiple NMRs
+      const doc = (
+        <MaterialSupplyRegisterPDF
+          workCode={data.workCode}
+          workName={data.workName}
+          vendorName={data.vendorName}
+          materialData={data.materialData}
+        />
+      );
+
+      const blob = await pdf(doc).toBlob();
+
+      saveAs(blob, "Material-Supply-Register.pdf");
       toast.success("Material Supply Register PDF downloaded successfully!");
     } catch (error) {
       console.error("Material Supply Register Error:", error);
