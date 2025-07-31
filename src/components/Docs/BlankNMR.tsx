@@ -1,4 +1,3 @@
-
 // PENDING (Data integration is pending..) This we will integrate in the frontend
 const NMRPDF = ({
   musterRollNo = "30515", //11

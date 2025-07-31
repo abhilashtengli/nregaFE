@@ -44,6 +44,8 @@ import QuotationCallPDF from "./PDFs/ComparativeStatement/QuotationCallPdf";
 import ComparativeStatementPDF from "./PDFs/ComparativeStatement/ComparativePdf";
 import ContractorQuotationPDF from "./PDFs/ComparativeStatement/ContractorQuotation";
 import SupplyOrderPDF from "./PDFs/ComparativeStatement/SupplyOrderPdf";
+import { useFetchBlankNMRData } from "@/services/BlankNmrService";
+import NMRPDF from "./PDFs/BlankNmrPdf";
 
 // PDF Action buttons data
 const pdfButtons = [
@@ -122,6 +124,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
   const fetchPaperNotificationData = useFetchPaperNotification();
   const fetchSwgData = useFetchStagewiseGeoTagging();
   const fetchAllQuotationPdfData = useFetchComparativeStatement();
+  const fetchBlankNMRData = useFetchBlankNMRData();
 
   // Check if any button is currently processing
   const isAnyButtonLoading = currentDownloading !== null || isDownloading;
@@ -337,8 +340,53 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
   const handleBlankNmrs = async () => {
     setCurrentDownloading("blankNmrs");
     try {
-      // Add your Blank NMR's PDF generation logic here
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
+      const data = await fetchBlankNMRData();
+
+      if (!data) {
+        toast.error("No data found for download.");
+        return;
+      }
+      console.log("DATA : ", data);
+
+      // Prepare the document with multiple NMRs
+      const doc = (
+        <Document>
+          {data.workerData.map(
+            (musterRoll: {
+              mustrollNo: string;
+              workers: {
+                slNo: number;
+                jobCardNo: string;
+                familyHeadName: string;
+                requestLetterFrom: string;
+                accountNo: string;
+              }[];
+            }) => (
+              <NMRPDF
+                key={musterRoll.mustrollNo}
+                district={data.district}
+                taluka={data.taluka}
+                gramPanchayat={data.gramPanchayat}
+                financialYear={data.financialYear}
+                workCode={data.workCode}
+                workName={data.workName}
+                fromDate={data.fromDate}
+                toDate={data.toDate}
+                technicalSanctionNo={data.technicalSanctionNo}
+                technicalSanctionDate={data.technicalSanctionDate}
+                financialSanctionNo={data.financialSanctionNo}
+                financialSanctionDate={data.financialSanctionDate}
+                musterRollNo={musterRoll.mustrollNo}
+                workerData={musterRoll.workers}
+              />
+            )
+          )}
+        </Document>
+      );
+
+      const blob = await pdf(doc).toBlob();
+
+      saveAs(blob, "Blank-NMR.pdf");
       toast.success("Blank NMR's PDF downloaded successfully!");
     } catch (error) {
       console.error("Blank NMR's Error:", error);

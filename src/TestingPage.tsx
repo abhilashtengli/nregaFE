@@ -3,133 +3,72 @@ import { saveAs } from "file-saver";
 import { Document, pdf } from "@react-pdf/renderer";
 import PDFPreviewer from "./components/PdfViewer";
 import { toast } from "sonner";
-
 import {
-  useFetchComparativeStatement,
-  type CombinedPDFData
-} from "./services/ComparativeStatementService";
-import SupplyOrderPDF from "./components/PDFs/ComparativeStatement/SupplyOrderPdf";
-import QuotationCallPDF from "./components/PDFs/ComparativeStatement/QuotationCallPdf";
-import ComparativeStatementPDF from "./components/PDFs/ComparativeStatement/ComparativePdf";
-import ContractorQuotationPDF from "./components/PDFs/ComparativeStatement/ContractorQuotation";
+  useFetchBlankNMRData,
+  type BlankNMRData
+} from "./services/BlankNmrService";
+import NMRPDF from "./components/PDFs/BlankNmrPdf";
 
 const SimpleTestComponent = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [pdfData, setPdfData] = useState<CombinedPDFData | null>(null);
+  const [pdfData, setPdfData] = useState<BlankNMRData | null>(null);
 
-  const fetchAllQuotationPdfData = useFetchComparativeStatement();
+  const fetchBlankNMRData = useFetchBlankNMRData();
 
   const handleDownload = async () => {
     setLoading(true);
     console.log("Starting download...");
 
     try {
-      const data = await fetchAllQuotationPdfData();
+      const data = await fetchBlankNMRData();
+
       if (!data) {
         toast.error("No data found for download.");
         return;
       }
+      console.log("DATA : ", data);
 
-      console.log("Data fetched:", data);
-
-      const blob = await pdf(
+      // Prepare the document with multiple NMRs
+      const doc = (
         <Document>
-          <QuotationCallPDF
-            gramPanchayat={data.gramPanchayat}
-            taluka={data.taluka}
-            district={data.district}
-            year={data.year}
-            administrativeSanction={data.administrativeSanction}
-            workCode={data.workCode}
-            workName={data.workName}
-            tenderPublishDate={data.tenderPublishDate}
-            tenderSubmissionDate={data.tenderSubmissionDate}
-            materialData={data.materialData}
-          />
-          <ComparativeStatementPDF
-            gramPanchayat={data.gramPanchayat}
-            taluka={data.taluka}
-            district={data.district}
-            year={data.year}
-            workCode={data.workCode}
-            workName={data.workName}
-            tenderPublishDate={data.tenderPublishDate}
-            vendorDetails={data.vendorDetails}
-            vendorWithVendorQuotation={data.vendorWithVendorQuotation}
-          />
-          <ContractorQuotationPDF
-            gramPanchayat={data.gramPanchayat}
-            taluka={data.taluka}
-            district={data.district}
-            year={data.year}
-            workCode={data.workCode}
-            workName={data.workName}
-            tenderPublishDate={data.tenderPublishDate}
-            contractorNumber={1}
-            contractorName={data.vendorDetails.vendorNameOne}
-            contractorGst={data.vendorDetails.vendorGstOne}
-            quotationSubmissionDate={
-              data.vendorDetails.VendorOneQuotationSubmissiondate
-            }
-            vendorWithVendorQuotation={data.vendorWithVendorQuotation}
-          />
-          <ContractorQuotationPDF
-            gramPanchayat={data.gramPanchayat}
-            taluka={data.taluka}
-            district={data.district}
-            year={data.year}
-            workCode={data.workCode}
-            workName={data.workName}
-            tenderPublishDate={data.tenderPublishDate}
-            contractorNumber={2}
-            contractorName={data.vendorDetails.vendorNameTwo}
-            contractorGst={data.vendorDetails.vendorGstTwo}
-            quotationSubmissionDate={
-              data.vendorDetails.vendorTwoQuotationSubmissiondate
-            }
-            vendorWithVendorQuotation={data.vendorWithVendorQuotation}
-          />
-          <ContractorQuotationPDF
-            gramPanchayat={data.gramPanchayat}
-            taluka={data.taluka}
-            district={data.district}
-            year={data.year}
-            workCode={data.workCode}
-            workName={data.workName}
-            tenderPublishDate={data.tenderPublishDate}
-            contractorNumber={3}
-            contractorName={data.vendorDetails.vendorNameThree}
-            contractorGst={data.vendorDetails.vendorGstThree}
-            quotationSubmissionDate={
-              data.vendorDetails.vendorThreeQuotationSubmissiondate
-            }
-            vendorWithVendorQuotation={data.vendorWithVendorQuotation}
-          />
-          <SupplyOrderPDF
-            gramPanchayat={data.gramPanchayat}
-            taluka={data.taluka}
-            district={data.district}
-            year={data.year}
-            workCode={data.workCode}
-            workName={data.workName}
-            tenderPublishDate={data.tenderPublishDate}
-            winnerContractorName={data.vendorDetails.vendorNameOne}
-            winnerContractorGst={data.vendorDetails.vendorGstOne}
-            winnerQuotationSubmissionDate={
-              data.vendorDetails.VendorOneQuotationSubmissiondate
-            }
-            vendorWithVendorQuotation={data.vendorWithVendorQuotation}
-            address=""
-          />
+          {data.workerData.map(
+            (musterRoll: {
+              mustrollNo: string;
+              workers: {
+                slNo: number;
+                jobCardNo: string;
+                familyHeadName: string;
+                requestLetterFrom: string;
+                accountNo: string;
+              }[];
+            }) => (
+              <NMRPDF
+                key={musterRoll.mustrollNo}
+                district={data.district}
+                taluka={data.taluka}
+                gramPanchayat={data.gramPanchayat}
+                financialYear={data.financialYear}
+                workCode={data.workCode}
+                workName={data.workName}
+                fromDate={data.fromDate}
+                toDate={data.toDate}
+                technicalSanctionNo={data.technicalSanctionNo}
+                technicalSanctionDate={data.technicalSanctionDate}
+                financialSanctionNo={data.financialSanctionNo}
+                financialSanctionDate={data.financialSanctionDate}
+                musterRollNo={musterRoll.mustrollNo}
+                workerData={musterRoll.workers}
+              />
+            )
+          )}
         </Document>
-      ).toBlob();
-
-      saveAs(
-        blob,
-        "QuotationCall-comparativeStatement-3vendorsQuotation-supplyOrder.pdf"
       );
+
+      const blob = await pdf(doc).toBlob();
+
+      saveAs(blob, "Blank-NMR.pdf");
       toast.success("Download started!");
     } catch (error) {
       console.error("Download Error:", error);
@@ -144,7 +83,7 @@ const SimpleTestComponent = () => {
     setPreviewError(null);
 
     try {
-      const data = await fetchAllQuotationPdfData(); // data is FrontPageData | null
+      const data = await fetchBlankNMRData(); // data is FrontPageData | null
       console.log("Data for preview:", data);
 
       if (!data) {
@@ -236,93 +175,36 @@ const SimpleTestComponent = () => {
           <PDFPreviewer
             document={
               <Document>
-                <QuotationCallPDF
-                  gramPanchayat={pdfData.gramPanchayat}
-                  taluka={pdfData.taluka}
-                  district={pdfData.district}
-                  year={pdfData.year}
-                  administrativeSanction={pdfData.administrativeSanction}
-                  workCode={pdfData.workCode}
-                  workName={pdfData.workName}
-                  tenderPublishDate={pdfData.tenderPublishDate}
-                  tenderSubmissionDate={pdfData.tenderSubmissionDate}
-                  materialData={pdfData.materialData}
-                />
-                <ComparativeStatementPDF
-                  gramPanchayat={pdfData.gramPanchayat}
-                  taluka={pdfData.taluka}
-                  district={pdfData.district}
-                  year={pdfData.year}
-                  workCode={pdfData.workCode}
-                  workName={pdfData.workName}
-                  tenderPublishDate={pdfData.tenderPublishDate}
-                  vendorDetails={pdfData.vendorDetails}
-                  vendorWithVendorQuotation={pdfData.vendorWithVendorQuotation}
-                />
-                <ContractorQuotationPDF
-                  gramPanchayat={pdfData.gramPanchayat}
-                  taluka={pdfData.taluka}
-                  district={pdfData.district}
-                  year={pdfData.year}
-                  workCode={pdfData.workCode}
-                  workName={pdfData.workName}
-                  tenderPublishDate={pdfData.tenderPublishDate}
-                  contractorNumber={1}
-                  contractorName={pdfData.vendorDetails.vendorNameOne}
-                  contractorGst={pdfData.vendorDetails.vendorGstOne}
-                  quotationSubmissionDate={
-                    pdfData.vendorDetails.VendorOneQuotationSubmissiondate
-                  }
-                  vendorWithVendorQuotation={pdfData.vendorWithVendorQuotation}
-                />
-                <ContractorQuotationPDF
-                  gramPanchayat={pdfData.gramPanchayat}
-                  taluka={pdfData.taluka}
-                  district={pdfData.district}
-                  year={pdfData.year}
-                  workCode={pdfData.workCode}
-                  workName={pdfData.workName}
-                  tenderPublishDate={pdfData.tenderPublishDate}
-                  contractorNumber={2}
-                  contractorName={pdfData.vendorDetails.vendorNameTwo}
-                  contractorGst={pdfData.vendorDetails.vendorGstTwo}
-                  quotationSubmissionDate={
-                    pdfData.vendorDetails.vendorTwoQuotationSubmissiondate
-                  }
-                  vendorWithVendorQuotation={pdfData.vendorWithVendorQuotation}
-                />
-                <ContractorQuotationPDF
-                  gramPanchayat={pdfData.gramPanchayat}
-                  taluka={pdfData.taluka}
-                  district={pdfData.district}
-                  year={pdfData.year}
-                  workCode={pdfData.workCode}
-                  workName={pdfData.workName}
-                  tenderPublishDate={pdfData.tenderPublishDate}
-                  contractorNumber={3}
-                  contractorName={pdfData.vendorDetails.vendorNameThree}
-                  contractorGst={pdfData.vendorDetails.vendorGstThree}
-                  quotationSubmissionDate={
-                    pdfData.vendorDetails.vendorThreeQuotationSubmissiondate
-                  }
-                  vendorWithVendorQuotation={pdfData.vendorWithVendorQuotation}
-                />
-                <SupplyOrderPDF
-                  gramPanchayat={pdfData.gramPanchayat}
-                  taluka={pdfData.taluka}
-                  district={pdfData.district}
-                  year={pdfData.year}
-                  workCode={pdfData.workCode}
-                  workName={pdfData.workName}
-                  tenderPublishDate={pdfData.tenderPublishDate}
-                  winnerContractorName={pdfData.vendorDetails.vendorNameOne} // Winner is contractor 1
-                  winnerContractorGst={pdfData.vendorDetails.vendorGstOne}
-                  winnerQuotationSubmissionDate={
-                    pdfData.vendorDetails.VendorOneQuotationSubmissiondate
-                  }
-                  vendorWithVendorQuotation={pdfData.vendorWithVendorQuotation}
-                  address=""
-                />
+                {pdfData.workerData.map(
+                  (musterRoll: {
+                    mustrollNo: string;
+                    workers: {
+                      slNo: number;
+                      jobCardNo: string;
+                      familyHeadName: string;
+                      requestLetterFrom: string;
+                      accountNo: string;
+                    }[];
+                  }) => (
+                    <NMRPDF
+                      key={musterRoll.mustrollNo}
+                      district={pdfData.district}
+                      taluka={pdfData.taluka}
+                      gramPanchayat={pdfData.gramPanchayat}
+                      financialYear={pdfData.financialYear}
+                      workCode={pdfData.workCode}
+                      workName={pdfData.workName}
+                      fromDate={pdfData.fromDate}
+                      toDate={pdfData.toDate}
+                      technicalSanctionNo={pdfData.technicalSanctionNo}
+                      technicalSanctionDate={pdfData.technicalSanctionDate}
+                      financialSanctionNo={pdfData.financialSanctionNo}
+                      financialSanctionDate={pdfData.financialSanctionDate}
+                      musterRollNo={musterRoll.mustrollNo}
+                      workerData={musterRoll.workers}
+                    />
+                  )
+                )}
               </Document>
             }
             onClose={handleClosePreview}
