@@ -290,7 +290,6 @@ export default function WorkCodeForm({
         `${Base_Url}/scrape-by-workcode`,
         payload,
         {
-          timeout: 30000, // 30 seconds timeout
           headers: {
             "Content-Type": "application/json"
           }

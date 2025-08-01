@@ -143,6 +143,10 @@ export default function VendorInformation() {
 
     setIsLoading(true);
     try {
+      console.log(
+        "API : ",
+        `${Base_Url}/material-vendor-data-version2/${workDetail.id}`
+      );
       const response = await axios.get<MaterialApiResponse>(
         `${Base_Url}/material-vendor-data-version2/${workDetail.id}`
       );
@@ -494,7 +498,10 @@ export default function VendorInformation() {
         <div className="flex justify-center">
           <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
             <DialogTrigger asChild>
-              <Button className="px-8 py-3" disabled={!workDetail?.id}>
+              <Button
+                className="px-8 py-3 cursor-pointer"
+                disabled={!workDetail?.id}
+              >
                 <Plus className="w-4 h-4 mr-2" />
                 Manage Vendor Materials
               </Button>
@@ -798,7 +805,7 @@ export default function VendorInformation() {
                         !selectedVendors.vendor3 ||
                         isSubmitting
                       }
-                      className="px-8 py-2"
+                      className="px-8 py-2 cursor-pointer"
                     >
                       {isSubmitting ? (
                         <>
