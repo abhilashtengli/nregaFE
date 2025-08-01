@@ -300,7 +300,7 @@ export default function SignupPage() {
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                  className="absolute right-0 cursor-pointer top-0 h-full px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={isLoading}
                 >
@@ -314,7 +314,7 @@ export default function SignupPage() {
               {formErrors.password && (
                 <p className="text-sm text-red-500">{formErrors.password}</p>
               )}
-              <p className="text-xs text-gray-500">
+              <p className="text-[11px] tracking-wide text-gray-500">
                 Password must contain uppercase, lowercase, number and special
                 character
               </p>
@@ -324,7 +324,7 @@ export default function SignupPage() {
           <CardFooter className="flex flex-col space-y-4">
             <Button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700"
+              className="w-full mt-6 cursor-pointer bg-blue-600 hover:bg-blue-700"
               disabled={isLoading}
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

@@ -1,0 +1,604 @@
+"use client";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Users,
+  UserCheck,
+  UserX,
+  Clock,
+  CheckCircle,
+  Loader2,
+  RefreshCw
+} from "lucide-react";
+import { toast } from "sonner";
+import axios from "axios";
+import { Base_Url } from "@/lib/constant";
+import { useAuthStore } from "@/stores/userAuthStore";
+
+interface User {
+  name: string;
+  email: string;
+  isVerifiedEmail: boolean;
+  isAdminVerifiedUser: boolean;
+  createdAt: string;
+}
+
+interface GetAllViewersResponse {
+  success: boolean;
+  message: string;
+  code: string;
+  data: User[];
+}
+
+interface VerifyUserResponse {
+  success: boolean;
+  message: string;
+  code: string;
+  data?: {
+    user: User;
+    action: string;
+    verifiedBy: {
+      id: string;
+      email: string;
+      name: string;
+    };
+    timestamp: string;
+  };
+}
+
+interface ApiError {
+  success: false;
+  message: string;
+  code: string;
+}
+
+export default function AdminPanelPage() {
+  const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuthStore();
+  const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const [processingUsers, setProcessingUsers] = useState<Set<string>>(
+    new Set()
+  );
+  const [error, setError] = useState<string | null>(null);
+
+  // Check if user is authenticated and is admin
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/signin");
+      return;
+    }
+
+    if (user?.role !== "admin") {
+      toast.error("Access Denied", {
+        description: "You don't have admin privileges to access this page."
+      });
+      navigate("/dashboard");
+      return;
+    }
+
+    fetchUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, user, navigate]);
+
+  const fetchUsers = async (showRefreshLoader = false) => {
+    try {
+      if (showRefreshLoader) {
+        setIsRefreshing(true);
+      } else {
+        setIsLoading(true);
+      }
+      setError(null);
+
+      const response = await axios.get<GetAllViewersResponse>(
+        `${Base_Url}/admin/get-all-viewers`,
+        {
+          timeout: 10000,
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      );
+
+      const data = response.data;
+
+      if (data.success) {
+        setUsers(data.data);
+      } else {
+        setError(data.message || "Failed to fetch users");
+      }
+    } catch (error) {
+      console.error("Fetch users error:", error);
+
+      if (axios.isAxiosError(error) && error.response?.data) {
+        const backendData = error.response.data as ApiError;
+        const errorMsg = backendData.message || "Failed to fetch users";
+        setError(errorMsg);
+
+        // Handle specific error codes
+        if (backendData.code === "UNAUTHORIZED") {
+          toast.error("Session Expired", {
+            description: "Please sign in again."
+          });
+          logout();
+        } else if (backendData.code === "FORBIDDEN") {
+          toast.error("Access Denied", {
+            description: errorMsg
+          });
+          navigate("/dashboard");
+        }
+      } else {
+        const errorMessage =
+          "Network error. Please check your internet connection.";
+        setError(errorMessage);
+      }
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
+  };
+
+  const handleUserVerification = async (
+    email: string,
+    userVerification: boolean
+  ) => {
+    try {
+      setProcessingUsers((prev) => new Set(prev).add(email));
+
+      const response = await axios.post<VerifyUserResponse>(
+        `${Base_Url}/admin/verify-user`,
+        {
+          email,
+          userVerification
+        },
+        {
+          timeout: 10000,
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      );
+
+      const data = response.data;
+
+      if (data.success) {
+        // Update the user in the local state
+        setUsers((prevUsers) =>
+          prevUsers.map((user) =>
+            user.email === email
+              ? { ...user, isAdminVerifiedUser: userVerification }
+              : user
+          )
+        );
+
+        const action = userVerification ? "accepted" : "rejected";
+        toast.success(`User ${action}`, {
+          description: data.message
+        });
+      }
+    } catch (error) {
+      console.error("User verification error:", error);
+
+      if (axios.isAxiosError(error) && error.response?.data) {
+        const backendData = error.response.data as ApiError;
+        const errorCode = backendData.code;
+        const errorMsg = backendData.message;
+
+        // Handle specific error codes from backend
+        switch (errorCode) {
+          case "UNAUTHORIZED":
+            toast.error("Authentication Required", {
+              description: errorMsg
+            });
+            logout();
+            break;
+          case "FORBIDDEN":
+            toast.error("Access Denied", {
+              description: errorMsg
+            });
+            break;
+          case "VALIDATION_ERROR":
+            toast.error("Validation Error", {
+              description: errorMsg
+            });
+            break;
+          case "INVALID_EMAIL":
+            toast.error("Invalid Email", {
+              description: errorMsg
+            });
+            break;
+          case "USER_NOT_FOUND":
+            toast.error("User Not Found", {
+              description: errorMsg
+            });
+            break;
+          case "SELF_MODIFICATION_DENIED":
+            toast.error("Action Denied", {
+              description: errorMsg
+            });
+            break;
+          case "EMAIL_NOT_VERIFIED":
+            toast.error("Email Not Verified", {
+              description: errorMsg
+            });
+            break;
+          case "NO_CHANGE_REQUIRED":
+            toast.info("No Change Required", {
+              description: errorMsg
+            });
+            break;
+          case "NETWORK_ERROR":
+            toast.error("Network Error", {
+              description: errorMsg
+            });
+            break;
+          case "TIMEOUT_ERROR":
+            toast.error("Request Timeout", {
+              description: errorMsg
+            });
+            break;
+          case "DATABASE_ERROR":
+            toast.error("Database Error", {
+              description: errorMsg
+            });
+            break;
+          case "VERIFICATION_UPDATE_FAILED":
+            toast.error("Update Failed", {
+              description: errorMsg
+            });
+            break;
+          default:
+            toast.error("Operation Failed", {
+              description: errorMsg || "An unexpected error occurred"
+            });
+        }
+      } else {
+        toast.error("Network Error", {
+          description: "Please check your internet connection."
+        });
+      }
+    } finally {
+      setProcessingUsers((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(email);
+        return newSet;
+      });
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  };
+
+  // Filter users
+  const pendingUsers = users.filter((user) => !user.isAdminVerifiedUser);
+  const verifiedUsers = users.filter((user) => user.isAdminVerifiedUser);
+  const totalUsers = users.length;
+
+  if (!isAuthenticated || !user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Admin Panel</h1>
+            <p className="text-gray-600">Manage user verification requests</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={() => fetchUsers(true)}
+              variant="outline"
+              size="sm"
+              disabled={isRefreshing}
+              className="cursor-pointer"
+            >
+              {isRefreshing ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <RefreshCw className="h-4 w-4 mr-2" />
+              )}
+              Refresh
+            </Button>
+            <Button
+              onClick={logout}
+              variant="outline"
+              className="cursor-pointer"
+            >
+              Sign Out
+            </Button>
+          </div>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalUsers}</div>
+              <p className="text-xs text-muted-foreground">
+                All registered users
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium ">
+                Pending Requests
+              </CardTitle>
+              <Clock className="h-4 w-4 text-orange-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-orange-600">
+                {pendingUsers.length}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Awaiting verification
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium ">
+                Verified Users
+              </CardTitle>
+              <UserCheck className="h-4 w-4 text-green-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">
+                {verifiedUsers.length}
+              </div>
+              <p className="text-xs text-muted-foreground">Admin approved</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Error Alert */}
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {/* Loading State */}
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-2 text-gray-600">Loading users...</p>
+            </div>
+          </div>
+        ) : (
+          /* Users Table */
+          <Card>
+            <CardHeader>
+              <CardTitle>User Management</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="pending" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger
+                    value="pending"
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <Clock className="h-4 w-4" />
+                    Pending ({pendingUsers.length})
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="verified"
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <UserCheck className="h-4 w-4" />
+                    Verified ({verifiedUsers.length})
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="pending" className="mt-6">
+                  {pendingUsers.length === 0 ? (
+                    <div className="text-center py-8">
+                      <UserCheck className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-500">
+                        No pending verification requests
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Email</TableHead>
+                            <TableHead>Email Status</TableHead>
+                            <TableHead>Joined</TableHead>
+                            <TableHead className="text-right">
+                              Actions
+                            </TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {pendingUsers.map((user) => (
+                            <TableRow key={user.email}>
+                              <TableCell className="font-medium">
+                                {user.name}
+                              </TableCell>
+                              <TableCell>{user.email}</TableCell>
+                              <TableCell>
+                                <Badge
+                                  variant={
+                                    user.isVerifiedEmail
+                                      ? "default"
+                                      : "destructive"
+                                  }
+                                  className={`${
+                                    user.isVerifiedEmail
+                                      ? "bg-green-600 tracking-wide"
+                                      : "bg-orange-300 text-black tracking-wide"
+                                  }`}
+                                >
+                                  {user.isVerifiedEmail
+                                    ? "Verified"
+                                    : "Not Verified"}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                {formatDate(user.createdAt)}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <div className="flex items-center justify-end gap-2">
+                                  <Button
+                                    size="sm"
+                                    onClick={() =>
+                                      handleUserVerification(user.email, true)
+                                    }
+                                    disabled={
+                                      processingUsers.has(user.email) ||
+                                      !user.isVerifiedEmail
+                                    }
+                                    className="bg-green-600 hover:bg-green-700 cursor-pointer"
+                                  >
+                                    {processingUsers.has(user.email) ? (
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                      <CheckCircle className="h-4 w-4" />
+                                    )}
+                                    Accept
+                                  </Button>
+                                  {/* <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    onClick={() =>
+                                      handleUserVerification(user.email, false)
+                                    }
+                                    disabled={processingUsers.has(user.email)}
+                                    className="cursor-pointer bg-white text-black border hover:bg-gray-100"
+                                  >
+                                    {processingUsers.has(user.email) ? (
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                      <XCircle className="h-4 w-4 text-red-700" />
+                                    )}
+                                    Reject
+                                  </Button> */}
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="verified" className="mt-6">
+                  {verifiedUsers.length === 0 ? (
+                    <div className="text-center py-8">
+                      <UserX className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-500">No verified users yet</p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Email</TableHead>
+                            <TableHead>Email Status</TableHead>
+                            <TableHead>Joined</TableHead>
+                            <TableHead className="text-right">
+                              Actions
+                            </TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {verifiedUsers.map((user) => (
+                            <TableRow key={user.email}>
+                              <TableCell className="font-medium">
+                                {user.name}
+                              </TableCell>
+                              <TableCell>{user.email}</TableCell>
+                              <TableCell>
+                                <Badge
+                                  variant={
+                                    user.isVerifiedEmail
+                                      ? "default"
+                                      : "destructive"
+                                  }
+                                >
+                                  {user.isVerifiedEmail
+                                    ? "Verified"
+                                    : "Not Verified"}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                {formatDate(user.createdAt)}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() =>
+                                    handleUserVerification(user.email, false)
+                                  }
+                                  disabled={processingUsers.has(user.email)}
+                                  className="cursor-pointer"
+                                >
+                                  {processingUsers.has(user.email) ? (
+                                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                  ) : (
+                                    <UserX className="h-4 w-4 mr-2" />
+                                  )}
+                                  Revoke Access
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+}

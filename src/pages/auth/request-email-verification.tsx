@@ -252,7 +252,7 @@ export default function RequestVerifyEmailPage() {
               {formErrors.email && (
                 <p className="text-sm text-red-500">{formErrors.email}</p>
               )}
-              <p className="text-xs text-gray-500">
+              <p className="text-[11px] tracking-wide text-gray-500">
                 We'll send a 6-digit verification code to this email address
               </p>
             </div>
@@ -261,7 +261,7 @@ export default function RequestVerifyEmailPage() {
           <CardFooter className="flex flex-col space-y-4">
             <Button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700"
+              className="w-full mt-7 cursor-pointer bg-blue-600 hover:bg-blue-700"
               disabled={isLoading}
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

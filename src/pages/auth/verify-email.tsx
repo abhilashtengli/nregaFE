@@ -74,19 +74,19 @@ export default function VerifyEmailPage() {
   }, [isAuthenticated, navigate, location.state]);
 
   // Check if email is provided in URL params or redirect
-  useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const emailFromParams = searchParams.get("email");
-    if (emailFromParams) {
-      setFormData((prev) => ({ ...prev, email: emailFromParams }));
-    } else {
-      // If no email provided, redirect to request verify email page
-      toast.error("Email required", {
-        description: "Please provide your email address first."
-      });
-      navigate("/request-verify-email");
-    }
-  }, [location.search, navigate]);
+//   useEffect(() => {
+//     const searchParams = new URLSearchParams(location.search);
+//     const emailFromParams = searchParams.get("email");
+//     if (emailFromParams) {
+//       setFormData((prev) => ({ ...prev, email: emailFromParams }));
+//     } else {
+//       // If no email provided, redirect to request verify email page
+//       toast.error("Email required", {
+//         description: "Please provide your email address first."
+//       });
+//       navigate("/request-verify-email");
+//     }
+//   }, [location.search, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
@@ -349,7 +349,7 @@ export default function VerifyEmailPage() {
               {formErrors.code && (
                 <p className="text-sm text-red-500">{formErrors.code}</p>
               )}
-              <p className="text-xs text-gray-500 text-center">
+              <p className="text-[11px] tracking-wide text-gray-500 text-center">
                 Check your email for the 6-digit verification code
               </p>
             </div>
@@ -358,7 +358,7 @@ export default function VerifyEmailPage() {
           <CardFooter className="flex flex-col space-y-4">
             <Button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700"
+              className="w-full mt-6 cursor-pointer bg-blue-600 hover:bg-blue-700"
               disabled={isLoading}
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -368,7 +368,7 @@ export default function VerifyEmailPage() {
             <Button
               type="button"
               variant="outline"
-              className="w-full bg-transparent"
+              className="w-full bg-transparent cursor-pointer"
               onClick={handleResendCode}
               disabled={isLoading}
             >

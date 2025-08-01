@@ -11,6 +11,9 @@ import RequestVerifyEmailPage from "./pages/auth/request-email-verification";
 import VerifyEmailPage from "./pages/auth/verify-email";
 import ProtectedRoute from "./pages/auth/protectedRoute";
 import FallbackRedirect from "./pages/auth/fallbackRedirect";
+import ForgotPasswordPage from "./pages/auth/forgetPasswordPage";
+import ResetPasswordPage from "./pages/auth/resetPasswordPage";
+import AdminPanelPage from "./pages/admin/adminPanel";
 
 function App() {
   const { isAuthenticated, fetchUser } = useAuthStore();
@@ -29,6 +32,8 @@ function App() {
             <Route path="/test" element={<SimpleTestComponent />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/signin" element={<SigninPage />} />
+            <Route path="/forget-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route
               path="/request-verify-email"
               element={<RequestVerifyEmailPage />}
@@ -41,7 +46,15 @@ function App() {
                   <Home />
                 </ProtectedRoute>
               }
-            ></Route>
+            />
+            <Route
+              path="/admin-panel"
+              element={
+                <ProtectedRoute>
+                  <AdminPanelPage />
+                </ProtectedRoute>
+              }
+            />
             <Route path="*" element={<FallbackRedirect />} />
           </Route>
         </Routes>
