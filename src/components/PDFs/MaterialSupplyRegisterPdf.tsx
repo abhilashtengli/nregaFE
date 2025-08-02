@@ -1,18 +1,11 @@
 import type React from "react";
-import {
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  Font,
-} from "@react-pdf/renderer";
+import { Page, Text, View, StyleSheet, Font } from "@react-pdf/renderer";
 
 // Register Kannada font
 Font.register({
   family: "NotoSansKannada",
   src: "/fonts/NotoSansKannada-Regular.ttf"
 });
-
 Font.register({
   family: "NotoSansKannada",
   src: "/fonts/NotoSansKannada-Bold.ttf",
@@ -48,13 +41,13 @@ const styles = StyleSheet.create({
     marginBottom: 7,
     color: "red", // Medium Red
     fontFamily: "NotoSansKannada",
-    lineHeight: 1.2,
+    lineHeight: 1.2
   },
   mainHeading: {
     fontSize: 14,
     fontWeight: "bold",
-      marginBottom: 2,
-    letterSpacing :1
+    marginBottom: 2,
+    letterSpacing: 1
   },
   subHeading: {
     fontSize: 12,
@@ -65,7 +58,8 @@ const styles = StyleSheet.create({
     color: "red", // Medium Red
     fontSize: 11,
     lineHeight: 2.5,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    marginBottom: 10
   },
   detailText: {
     fontWeight: "bold"
@@ -119,99 +113,71 @@ const MaterialSupplyRegisterPDF: React.FC<MaterialSupplyRegisterProps> = ({
   vendorName,
   materialData
 }) => {
-  const itemsPerPage = 25; // Adjust as needed
-  const totalPages = Math.ceil(materialData.length / itemsPerPage);
+  return (
+    <Page size="A4" style={styles.page}>
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.mainHeading}>ಸಾಮಗ್ರಿ ವಿತರಣಾ ವಹಿ</Text>
+          <Text style={styles.subHeading}>ಸಾಮಗ್ರಿಗಳ ವಿತರಣೆ</Text>
+        </View>
+        <View style={styles.detailsSection}>
+          <Text>
+            <Text style={styles.detailText}>1. ಕಾಮಗಾರಿ ಹೆಸರು :</Text> {workName}
+          </Text>
+          <Text>
+            <Text style={styles.detailText}>2. ಕಾಮಗಾರಿ ಸಂಕೇತ ಸಂಖ್ಯೆ :</Text>{" "}
+            {workCode}
+          </Text>
+          <Text>
+            <Text style={styles.detailText}>3. ಸಾಮಗ್ರಿ ಸರಬರಾಜುದಾರ :</Text>{" "}
+            {vendorName}
+          </Text>
+        </View>
 
-  const renderPage = (pageNumber: number) => {
-    const startIndex = (pageNumber - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const pageData = materialData.slice(startIndex, endIndex);
-    const isFirstPage = pageNumber === 1;
+        <View style={styles.table}>
+          {/* Table Header */}
+          <View style={[styles.tableRow, styles.tableHeader]} fixed>
+            <Text style={[styles.tableCell, styles.slNoCell]}>ಕ್ರಮ ಸಂಖ್ಯೆ</Text>
+            <Text style={[styles.tableCell, styles.materialNameCell]}>
+              ಸಾಮಗ್ರಿಗಳ ಹೆಸರು
+            </Text>
+            <Text style={[styles.tableCell, styles.unitCell]}>ಪರಿಮಾಣ</Text>
+            <Text style={[styles.tableCell, styles.dateCell]}>
+              ವಿತರಿಸಿದ ದಿನಾಂಕ
+            </Text>
+            <Text style={[styles.tableCell, styles.signatureCell]}>
+              ಸಾಮಗ್ರಿ ಪಡೆದವರ ಸಹಿ
+            </Text>
+            <Text
+              style={[styles.tableCell, styles.miscCell, { borderRight: 0 }]}
+            >
+              ಪರ
+            </Text>
+          </View>
 
-    return (
-      <Page key={pageNumber} size="A4" style={styles.page}>
-        <View style={styles.container}>
-          {isFirstPage && (
-            <>
-              <View style={styles.header}>
-                <Text style={styles.mainHeading}>ಸಾಮಗ್ರಿ ವಿತರಣಾ ವಹಿ</Text>
-                <Text style={styles.subHeading}>ಸಾಮಗ್ರಿಗಳ ವಿತರಣೆ</Text>
-              </View>
-              <View style={styles.detailsSection}>
-                <Text>
-                  <Text style={styles.detailText}>1. ಕಾಮಗಾರಿ ಹೆಸರು :</Text>{" "}
-                  {workName} {"     "}
-                </Text>
-                <Text>
-                  <Text style={styles.detailText}>
-                    2. ಕಾಮಗಾರಿ ಸಂಕೇತ ಸಂಖ್ಯೆ :
-                  </Text>{" "}
-                  {workCode}
-                </Text>
-                <Text>
-                  <Text style={styles.detailText}>3. ಸಾಮಗ್ರಿ ಸರಬರಾಜುದಾರ :</Text>{" "}
-                  {vendorName}
-                </Text>
-              </View>
-            </>
-          )}
-
-          <View style={styles.table}>
-            {/* Table Header */}
-            <View style={[styles.tableRow, styles.tableHeader]}>
+          {/* Table Body */}
+          {materialData.map((material, index) => (
+            <View key={index} style={styles.tableRow} wrap={false}>
               <Text style={[styles.tableCell, styles.slNoCell]}>
-                ಕ್ರಮ ಸಂಖ್ಯೆ
+                {index + 1}
               </Text>
               <Text style={[styles.tableCell, styles.materialNameCell]}>
-                ಸಾಮಗ್ರಿಗಳ ಹೆಸರು
+                {material.materialName}
               </Text>
-              <Text style={[styles.tableCell, styles.unitCell]}>ಪರಿಮಾಣ</Text>
-              <Text style={[styles.tableCell, styles.dateCell]}>
-                ವಿತರಿಸಿದ ದಿನಾಂಕ
+              <Text style={[styles.tableCell, styles.unitCell]}>
+                {material.quantity}
               </Text>
-              <Text style={[styles.tableCell, styles.signatureCell]}>
-                ಸಾಮಗ್ರಿ ಪಡೆದವರ ಸಹಿ
-              </Text>
+              <Text style={[styles.tableCell, styles.dateCell]}></Text>
+              <Text style={[styles.tableCell, styles.signatureCell]}></Text>
               <Text
                 style={[styles.tableCell, styles.miscCell, { borderRight: 0 }]}
-              >
-                ಪರ
-              </Text>
+              ></Text>
             </View>
-
-            {/* Table Body */}
-            {pageData.map((material, index) => (
-              <View key={startIndex + index} style={styles.tableRow}>
-                <Text style={[styles.tableCell, styles.slNoCell]}>
-                  {startIndex + index + 1}
-                </Text>
-                <Text style={[styles.tableCell, styles.materialNameCell]}>
-                  {material.materialName}
-                </Text>
-                <Text style={[styles.tableCell, styles.unitCell]}>
-                  {material.quantity}
-                </Text>
-                <Text style={[styles.tableCell, styles.dateCell]}></Text>
-                <Text style={[styles.tableCell, styles.signatureCell]}></Text>
-                <Text
-                  style={[
-                    styles.tableCell,
-                    styles.miscCell,
-                    { borderRight: 0 }
-                  ]}
-                ></Text>
-              </View>
-            ))}
-          </View>
+          ))}
         </View>
-      </Page>
-    );
-  };
-
-  return (
-    <>
-      {Array.from({ length: totalPages }, (_, i) => renderPage(i + 1))}
-    </>
+      </View>
+    </Page>
   );
 };
 

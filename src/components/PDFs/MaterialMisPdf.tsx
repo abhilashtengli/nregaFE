@@ -1,10 +1,5 @@
-import {
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  Font
-} from "@react-pdf/renderer";
+import type React from "react";
+import { Page, Text, View, StyleSheet, Font } from "@react-pdf/renderer";
 
 // Font registration for Kannada support
 Font.register({
@@ -51,6 +46,7 @@ const styles = StyleSheet.create({
     fontFamily: "Helvetica",
     fontSize: 10,
     paddingTop: 44,
+    paddingBottom: 44,
     paddingHorizontal: 52,
     backgroundColor: "white"
   },
@@ -168,9 +164,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold"
   },
   pageFooter: {
+    position: "absolute",
+    bottom: 30,
+    left: 0,
+    right: 0,
     textAlign: "center",
-    marginTop: 16,
-    fontSize: 6
+    fontSize: 8,
+    color: "grey"
   },
   boldLabel: {
     fontWeight: "bold"
@@ -183,144 +183,126 @@ const styles = StyleSheet.create({
 const MaterialMisPDF: React.FC<MaterialMisPDFProps> = ({ data }) => {
   if (!data) {
     return (
-        <Page size="A4" style={styles.page}>
-          <Text>No data provided.</Text>
-        </Page>
+      <Page size="A4" style={styles.page}>
+        <Text>No data provided.</Text>
+      </Page>
     );
   }
-
   const { workCode, vendorName, financialYear, materialData, workName } = data;
-
   const totalAmount = materialData.reduce(
     (sum, item) => sum + Number.parseFloat(item.amount || "0"),
     0
   );
 
-  // Split materials into pages
-  const itemsPerPage = 15;
-  const pages = [];
-  for (let i = 0; i < materialData.length; i += itemsPerPage) {
-    pages.push(materialData.slice(i, i + itemsPerPage));
-  }
-
   return (
-    <>
-      {pages.map((pageMaterials, pageIndex) => (
-        <Page key={pageIndex} size="A4" style={styles.page}>
-          <View style={styles.container}>
-            {/* Work Code Header */}
-            <View style={styles.workCodeHeader}>
-              <Text>
-                Work Code: <Text style={styles.kannadaText}>{workName}</Text> (
-                {financialYear})({workCode})
-              </Text>
+    <Page size="A4" style={styles.page}>
+      <View style={styles.container}>
+        {/* Work Code Header - Fixed on every page */}
+        <View style={styles.workCodeHeader} fixed>
+          <Text>
+            Work Code: <Text style={styles.kannadaText}>{workName}</Text> (
+            {financialYear})({workCode})
+          </Text>
+        </View>
+
+        {/* Material Sections */}
+        {materialData.map((material, index) => (
+          <View key={index} style={styles.materialSection} wrap={false}>
+            {/* Bill Information Row */}
+            <View style={styles.billInfoRow}>
+              <View style={styles.billInfoCell}>
+                <Text>
+                  <Text style={styles.boldLabel}>Bill No.:</Text>
+                  {material.billNo}
+                </Text>
+              </View>
+              <View style={styles.billInfoCell}>
+                <Text>
+                  <Text style={styles.boldLabel}>Bill Amount:</Text>
+                  {material.billAmount}
+                </Text>
+              </View>
+              <View style={styles.billInfoCell}>
+                <Text>
+                  <Text style={styles.boldLabel}>Bill Date:</Text>
+                  {material.billDate}
+                </Text>
+              </View>
+              <View style={styles.billInfoCellLast}>
+                <Text>
+                  <Text style={styles.boldLabel}>Date of Payment</Text>
+                  {material.dateOfPayment}
+                </Text>
+              </View>
             </View>
-
-            {/* Material Sections for current page */}
-            {pageMaterials.map((material, index) => (
-              <View key={index} style={styles.materialSection}>
-                {/* Bill Information Row */}
-                <View style={styles.billInfoRow}>
-                  <View style={styles.billInfoCell}>
-                    <Text>
-                      <Text style={styles.boldLabel}>Bill No.:</Text>
-                      {material.billNo}
-                    </Text>
-                  </View>
-                  <View style={styles.billInfoCell}>
-                    <Text>
-                      <Text style={styles.boldLabel}>Bill Amount:</Text>
-                      {material.billAmount}
-                    </Text>
-                  </View>
-                  <View style={styles.billInfoCell}>
-                    <Text>
-                      <Text style={styles.boldLabel}>Bill Date:</Text>
-                      {material.billDate}
-                    </Text>
-                  </View>
-                  <View style={styles.billInfoCellLast}>
-                    <Text>
-                      <Text style={styles.boldLabel}>Date of Payment</Text>
-                      {material.dateOfPayment}
-                    </Text>
-                  </View>
-                </View>
-
-                {/* Vendor Information Row */}
-                <View style={styles.vendorInfoRow}>
-                  <View style={styles.vendorInfoCellLeft}>
-                    <Text>
-                      <Text style={styles.boldLabel}>Vendor name:</Text>
-                      {vendorName}
-                    </Text>
-                  </View>
-                  <View style={styles.vendorInfoCellRight}>
-                    <Text>
-                      <Text style={styles.boldLabel}>Financial Year:</Text>
-                      {financialYear}
-                    </Text>
-                  </View>
-                </View>
-
-                {/* Material Header Row */}
-                <View style={styles.materialHeaderRow}>
-                  <View style={styles.materialHeaderCell}>
-                    <Text>Material</Text>
-                  </View>
-                  <View style={styles.materialHeaderCellCenter}>
-                    <Text>Unit Price (In Rupees)</Text>
-                  </View>
-                  <View style={styles.materialHeaderCellCenter}>
-                    <Text>Quantity</Text>
-                  </View>
-                  <View style={styles.materialHeaderCellLast}>
-                    <Text>Amount (In Rupees)</Text>
-                  </View>
-                </View>
-
-                {/* Material Data Row */}
-                <View style={styles.materialDataRow}>
-                  <View style={styles.materialDataCell}>
-                    <Text>{material.material}</Text>
-                  </View>
-                  <View style={styles.materialDataCell}>
-                    <Text>{material.unitPrice}</Text>
-                  </View>
-                  <View style={styles.materialDataCell}>
-                    <Text>{material.quantity}</Text>
-                  </View>
-                  <View style={styles.materialDataCellLast}>
-                    <Text>{material.amount}</Text>
-                  </View>
-                </View>
+            {/* Vendor Information Row */}
+            <View style={styles.vendorInfoRow}>
+              <View style={styles.vendorInfoCellLeft}>
+                <Text>
+                  <Text style={styles.boldLabel}>Vendor name:</Text>
+                  {vendorName}
+                </Text>
               </View>
-            ))}
-
-            {/* Total Amount Row - only on last page */}
-            {pageIndex === pages.length - 1 && (
-              <View style={styles.totalAmountRow}>
-                <View style={styles.totalAmountCellLeft}>
-                  <Text>Total Amount</Text>
-                </View>
-                <View style={styles.totalAmountCellRight}>
-                  <Text>{totalAmount.toFixed(2)}</Text>
-                </View>
+              <View style={styles.vendorInfoCellRight}>
+                <Text>
+                  <Text style={styles.boldLabel}>Financial Year:</Text>
+                  {financialYear}
+                </Text>
               </View>
-            )}
+            </View>
+            {/* Material Header Row */}
+            <View style={styles.materialHeaderRow}>
+              <View style={styles.materialHeaderCell}>
+                <Text>Material</Text>
+              </View>
+              <View style={styles.materialHeaderCellCenter}>
+                <Text>Unit Price (In Rupees)</Text>
+              </View>
+              <View style={styles.materialHeaderCellCenter}>
+                <Text>Quantity</Text>
+              </View>
+              <View style={styles.materialHeaderCellLast}>
+                <Text>Amount (In Rupees)</Text>
+              </View>
+            </View>
+            {/* Material Data Row */}
+            <View style={styles.materialDataRow}>
+              <View style={styles.materialDataCell}>
+                <Text>{material.material}</Text>
+              </View>
+              <View style={styles.materialDataCell}>
+                <Text>{material.unitPrice}</Text>
+              </View>
+              <View style={styles.materialDataCell}>
+                <Text>{material.quantity}</Text>
+              </View>
+              <View style={styles.materialDataCellLast}>
+                <Text>{material.amount}</Text>
+              </View>
+            </View>
           </View>
+        ))}
 
-          {/* Page number footer */}
-          {pages.length > 1 && (
-            <View style={styles.pageFooter}>
-              <Text>
-                Page {pageIndex + 1} of {pages.length}
-              </Text>
-            </View>
-          )}
-        </Page>
-      ))}
-    </>
+        {/* Total Amount Row - appears only once at the end */}
+        <View style={styles.totalAmountRow}>
+          <View style={styles.totalAmountCellLeft}>
+            <Text>Total Amount</Text>
+          </View>
+          <View style={styles.totalAmountCellRight}>
+            <Text>{totalAmount.toFixed(2)}</Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Page number footer - fixed on every page */}
+      <Text
+        style={styles.pageFooter}
+        render={({ pageNumber, totalPages }) =>
+          `Page ${pageNumber} of ${totalPages}`
+        }
+        fixed
+      />
+    </Page>
   );
 };
 
