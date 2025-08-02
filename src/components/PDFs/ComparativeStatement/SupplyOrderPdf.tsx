@@ -1,5 +1,6 @@
 import type React from "react";
 import { Page, Text, View, StyleSheet, Font, Image } from "@react-pdf/renderer";
+// NOTE: The asset paths are placeholders. You should replace them with your actual asset paths.
 import mnreaga from "@/assets/MGNREGA logo.jpg";
 import emblem from "@/assets/State embalm.jpeg";
 import state_logo from "@/assets/State logo.jpeg";
@@ -9,7 +10,6 @@ Font.register({
   family: "NotoSansKannada",
   src: "/fonts/NotoSansKannada-Regular.ttf"
 });
-
 Font.register({
   family: "NotoSansKannada",
   src: "/fonts/NotoSansKannada-Bold.ttf",
@@ -120,7 +120,6 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     fontWeight: "bold"
   },
-
   date: {
     fontSize: 10,
     fontFamily: "NotoSansKannada",
@@ -317,169 +316,148 @@ const SupplyOrderPDF: React.FC<SupplyOrderProps> = ({
   vendorWithVendorQuotation,
   address = ""
 }) => {
-  // Dynamic pagination based on data length
-  const itemsPerPage = 15; // Items per page for supply order
-  const totalPages = Math.ceil(vendorWithVendorQuotation.length / itemsPerPage);
-
-  const renderPage = (pageNumber: number) => {
-    const startIndex = (pageNumber - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const pageData = vendorWithVendorQuotation.slice(startIndex, endIndex);
-    const isFirstPage = pageNumber === 1;
-    const isLastPage = pageNumber === totalPages;
-
-    return (
-      <Page key={`supply-order-${pageNumber}`} size="A4" style={styles.page}>
-        <View style={styles.container}>
-          {/* Header - Only on first page */}
-          {isFirstPage && (
-            <>
-              {/* Header with logos */}
-              <View style={styles.headerSection}>
-                <View style={styles.leftlogoContainer}>
-                  <Image
-                    style={styles.logo}
-                    src={mnreaga || "/placeholder.svg"}
-                  />
-                </View>
-                <View style={styles.centerHeader}>
-                  <View style={styles.centerEmblem}>
-                    <Text style={styles.karnatakaSarkar}>ಕರ್ನಾಟಕ</Text>
-                    <View style={styles.emblemContainer}>
-                      <Image
-                        style={styles.logo}
-                        src={emblem || "/placeholder.svg"}
-                      />
-                    </View>
-                    <Text style={styles.karnatakaSarkar}>ಸರ್ಕಾರ</Text>
-                  </View>
-                  <Text style={styles.headerText}>
-                    ಗ್ರಾಮ ಪಂಚಾಯತಿ, {gramPanchayat}, ತಾ|| {taluka}. ಜಿ||{" "}
-                    {district}
-                  </Text>
-                  <Text style={styles.headerSubText}>
-                    ಮಹಾತ್ಮ ಗಾಂಧಿ ನರೇಗಾ ಯೋಜನೆ, ಕರ್ನಾಟಕ {"    "}
-                  </Text>
-                </View>
-                <View style={styles.logoContainer}>
-                  <Image
-                    style={styles.logo}
-                    src={state_logo || "/placeholder.svg"}
-                  />
-                </View>
-              </View>
-              <View style={styles.refNumAndDate}>
-                <Text style={styles.referenceNumber}>
-                  ಕ್ರ.ಸಂ/ಗ್ರಾ.ಪಂ./ಮ.ರಾ.ಗ್ರಾ.ಉ.ಖಾ.ಯೋ/ಸಾ.ಸ.ಆ/{year}
-                </Text>
-
-                <Text style={styles.date}>ದಿನಾಂಕ: {tenderPublishDate}</Text>
-              </View>
-
-              <Text style={styles.title}>ಸಾಮಗ್ರಿ ಸರಬರಾಜು ಆದೇಶ{"   "}</Text>
-
-              <View style={styles.subjectSection}>
-                <View style={styles.subjectRow}>
-                  <Text style={styles.subjectLabel}>ವಿಷಯ: </Text>
-                  <Text style={styles.subjectContent}>
-                    ಮಹಾತ್ಮ ಗಾಂಧಿ ರಾಷ್ಟ್ರೀಯ ಗ್ರಾಮೀಣ ಉದ್ಯೋಗ ಖಾತ್ರಿ ಯೋಜನೆಡಿ
-                    ಕೈಗೊಳ್ಳಲಾಗುವ ಕಾಮಗಾರಿಗಳಿಗೆ ಸಾಮಗ್ರಿ{"\n"} ಸರಬರಾಜು ಮಾಡುವ ಕುರಿತು{" "}
-                    {"          "}
-                  </Text>
-                </View>
-                <View style={styles.referenceSection}>
-                  <Text style={styles.referenceLabel}>ಉಲ್ಲೇಖ :{"  "}</Text>
-                  <Text style={styles.referenceContent}>
-                    ಈ ಕಛೇರಿ ದರಪಟ್ಟಿ ಆಹ್ವಾನ ಪ್ರಕಟಣೆ ದಿನಾಂಕ : {tenderPublishDate}
-                    {"\n    "}2) ನೀವು ಸಲ್ಲಿಸಿರುವ ದರಪಟ್ಟಿ ದಿನಾಂಕ:{" "}
-                    {winnerQuotationSubmissionDate}
-                  </Text>
-                </View>
-              </View>
-
-              <Text style={styles.separatorLine}>********</Text>
-
-              <Text style={styles.mainContent}>
-                ಈ ಮೇಲ್ಕಂಡ ವಿಷಯ ಹಾಗೂ ಉಲ್ಲೇಖಗಳಿಗೆ ಸಂಬಂಧಿಸಿದಂತೆ {year} ನೇ ಸಾಲಿನ
-                ಮಹಾತ್ಮ ಗಾಂಧಿ ರಾಷ್ಟ್ರೀಯ ಗ್ರಾಮೀಣ ಉದ್ಯೋಗ ಖಾತ್ರಿ ಯೋಜನೆಡಿ
-                ಕೈಗೊಳ್ಳಲಾಗುತ್ತಿರುವ {workName}({workCode})ಕಾಮಗಾರಿಗಾಗಿ
-                ಸಾಮಗ್ರಿಗಳನ್ನು ಸರಬರಾಜು ಮಾಡಲು ಉಲ್ಲೇಖ (1)ರ ಪ್ರಕಾರ ದರಪಟ್ಟಿಯನ್ನು
-                ಆಹ್ವಾನಿಸಲಾಗಿದ್ದು, ಉಲ್ಲೇಖ (2)ರ ಪ್ರಕಾರ ನೀವು ಗ್ರಾಮ ಪಂಚಾಯತಿ
-                ವಿಧಿಸಿರುವ ಷರತ್ತುಗಳನ್ನು ಒಪ್ಪಿಕೊಂಡು ಸಲ್ಲಿಸಿರುವ ದರಪಟ್ಟಿಯನ್ನು
-                ಅಂಗೀಕರಿಸಲಾಗಿದ್ದು, ಸದರಿ ದರಪಟ್ಟಿಯಂತೆ ಈ ಕೆಳಕಂಡ ದರಗಳಲ್ಲಿ ಜಿ.ಎಸ್.ಟಿ.
-                ಬಿಲ್ಲಿನೊಂದಿಗೆ ಸಾಮಗ್ರಿಗಳನ್ನು ಸರಬರಾಜು ಮಾಡಲು ಈ ಮೂಲಕ ಸಾಮಗ್ರಿ ಸರಬರಾಜು
-                ಆದೇಶ ನೀಡಲಾಗಿದೆ.
-              </Text>
-            </>
-          )}
-
-          {/* Supply Order Table */}
-          <View style={styles.table}>
-            <View style={styles.tableHeader}>
-              <Text style={[styles.tableCellSlnoHeading, styles.slNoCell]}>
-                ಕ್ರ. ಸಂ.
-              </Text>
-              <Text style={[styles.tableCellHeading, styles.materialNameCell]}>
-                ಸಾಮಗ್ರಿ ಹೆಸರು
-              </Text>
-              <Text style={[styles.tableCellHeading, styles.quantityCell]}>
-                ಪ್ರಮಾಣ
-              </Text>
-              <Text style={[styles.tableCellHeading, styles.rateCell]}>ದರ</Text>
-            </View>
-
-            {pageData.map((item, index) => (
-              <View key={startIndex + index} style={styles.tableRow}>
-                <Text style={[styles.tableCellSlno, styles.slNoCell]}>
-                  {item.slNo}
-                </Text>
-                <Text style={[styles.tableCell, styles.materialNameCell]}>
-                  {item.materialName}
-                </Text>
-                <Text style={[styles.tableCell, styles.quantityCell]}>
-                  {item.quantity}
-                </Text>
-                <Text style={[styles.tableCell, styles.rateCell]}>
-                  {item.contractor1Rate}
-                </Text>
-              </View>
-            ))}
+  return (
+    <Page size="A4" style={styles.page}>
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.headerSection}>
+          <View style={styles.leftlogoContainer}>
+            <Image
+              style={styles.logo}
+              src={
+                mnreaga ||
+                "/placeholder.svg?height=64&width=74&query=MGNREGA+logo"
+              }
+            />
           </View>
-
-          {/* Footer - Only on last page */}
-          {isLastPage && (
-            <View style={styles.footerSection}>
-              <View style={styles.leftFooter}>
-                <Text style={styles.footerLabel}>ಗೆ,</Text>
-                <Text style={styles.footerText}>
-                  <Text style={styles.footerLabel}>ಶ್ರೀ/ಶ್ರೀಮತಿ :-</Text>{" "}
-                  <Text style={styles.highlight}>{winnerContractorName}</Text>
-                </Text>
-                <Text style={styles.footerTextGst}>
-                  <Text style={styles.footerLabel}>GST :-</Text>{" "}
-                  {winnerContractorGst}
-                </Text>
-                <Text style={styles.footerText}>
-                  <Text style={styles.footerLabel}>ವಿಳಾಸ :-</Text>{" "}
-                  <Text style={styles.highlight}>{address}</Text>
-                </Text>
+          <View style={styles.centerHeader}>
+            <View style={styles.centerEmblem}>
+              <Text style={styles.karnatakaSarkar}>ಕರ್ನಾಟಕ</Text>
+              <View style={styles.emblemContainer}>
+                <Image
+                  style={styles.logo}
+                  src={
+                    emblem ||
+                    "/placeholder.svg?height=44&width=44&query=State+emblem"
+                  }
+                />
               </View>
-              <View style={styles.rightFooter}>
-                <Text style={styles.signatureTitle}>
-                  ಪಂಚಾಯತ ಅಭಿವೃದ್ಧಿ ಅಧಿಕಾರಿಗಳು / ಅಧ್ಯಕ್ಷರು
-                </Text>
-                <Text style={styles.signatureLocation}>
-                  ಗ್ರಾಮ ಪಂಚಾಯತಿ, {gramPanchayat}
-                </Text>
-              </View>
+              <Text style={styles.karnatakaSarkar}>ಸರ್ಕಾರ</Text>
             </View>
-          )}
+            <Text style={styles.headerText}>
+              ಗ್ರಾಮ ಪಂಚಾಯತಿ, {gramPanchayat}, ತಾ|| {taluka}. ಜಿ|| {district}
+            </Text>
+            <Text style={styles.headerSubText}>
+              ಮಹಾತ್ಮ ಗಾಂಧಿ ನರೇಗಾ ಯೋಜನೆ, ಕರ್ನಾಟಕ{" "}
+            </Text>
+          </View>
+          <View style={styles.logoContainer}>
+            <Image
+              style={styles.logo}
+              src={
+                state_logo ||
+                "/placeholder.svg?height=64&width=64&query=State+logo"
+              }
+            />
+          </View>
         </View>
-      </Page>
-    );
-  };
+        <View style={styles.refNumAndDate}>
+          <Text style={styles.referenceNumber}>
+            ಕ್ರ.ಸಂ/ಗ್ರಾ.ಪಂ./ಮ.ರಾ.ಗ್ರಾ.ಉ.ಖಾ.ಯೋ/ಸಾ.ಸ.ಆ/{year}
+          </Text>
+          <Text style={styles.date}>ದಿನಾಂಕ: {tenderPublishDate}</Text>
+        </View>
+        <Text style={styles.title}>ಸಾಮಗ್ರಿ ಸರಬರಾಜು ಆದೇಶ </Text>
+        <View style={styles.subjectSection}>
+          <View style={styles.subjectRow}>
+            <Text style={styles.subjectLabel}>ವಿಷಯ: </Text>
+            <Text style={styles.subjectContent}>
+              ಮಹಾತ್ಮ ಗಾಂಧಿ ರಾಷ್ಟ್ರೀಯ ಗ್ರಾಮೀಣ ಉದ್ಯೋಗ ಖಾತ್ರಿ ಯೋಜನೆಡಿ ಕೈಗೊಳ್ಳಲಾಗುವ
+              ಕಾಮಗಾರಿಗಳಿಗೆ ಸಾಮಗ್ರಿ{"\n"} ಸರಬರಾಜು ಮಾಡುವ ಕುರಿತು{" "}
+            </Text>
+          </View>
+          <View style={styles.referenceSection}>
+            <Text style={styles.referenceLabel}>ಉಲ್ಲೇಖ : </Text>
+            <Text style={styles.referenceContent}>
+              ಈ ಕಛೇರಿ ದರಪಟ್ಟಿ ಆಹ್ವಾನ ಪ್ರಕಟಣೆ ದಿನಾಂಕ : {tenderPublishDate}
+              {"\n"}2) ನೀವು ಸಲ್ಲಿಸಿರುವ ದರಪಟ್ಟಿ ದಿನಾಂಕ:{" "}
+              {winnerQuotationSubmissionDate}
+            </Text>
+          </View>
+        </View>
+        <Text style={styles.separatorLine}>********</Text>
+        <Text style={styles.mainContent}>
+          ಈ ಮೇಲ್ಕಂಡ ವಿಷಯ ಹಾಗೂ ಉಲ್ಲೇಖಗಳಿಗೆ ಸಂಬಂಧಿಸಿದಂತೆ {year} ನೇ ಸಾಲಿನ ಮಹಾತ್ಮ
+          ಗಾಂಧಿ ರಾಷ್ಟ್ರೀಯ ಗ್ರಾಮೀಣ ಉದ್ಯೋಗ ಖಾತ್ರಿ ಯೋಜನೆಡಿ ಕೈಗೊಳ್ಳಲಾಗುತ್ತಿರುವ{" "}
+          {workName}({workCode})ಕಾಮಗಾರಿಗಾಗಿ ಸಾಮಗ್ರಿಗಳನ್ನು ಸರಬರಾಜು ಮಾಡಲು ಉಲ್ಲೇಖ
+          (1)ರ ಪ್ರಕಾರ ದರಪಟ್ಟಿಯನ್ನು ಆಹ್ವಾನಿಸಲಾಗಿದ್ದು, ಉಲ್ಲೇಖ (2)ರ ಪ್ರಕಾರ ನೀವು
+          ಗ್ರಾಮ ಪಂಚಾಯತಿ ವಿಧಿಸಿರುವ ಷರತ್ತುಗಳನ್ನು ಒಪ್ಪಿಕೊಂಡು ಸಲ್ಲಿಸಿರುವ
+          ದರಪಟ್ಟಿಯನ್ನು ಅಂಗೀಕರಿಸಲಾಗಿದ್ದು, ಸದರಿ ದರಪಟ್ಟಿಯಂತೆ ಈ ಕೆಳಕಂಡ ದರಗಳಲ್ಲಿ
+          ಜಿ.ಎಸ್.ಟಿ. ಬಿಲ್ಲಿನೊಂದಿಗೆ ಸಾಮಗ್ರಿಗಳನ್ನು ಸರಬರಾಜು ಮಾಡಲು ಈ ಮೂಲಕ ಸಾಮಗ್ರಿ
+          ಸರಬರಾಜು ಆದೇಶ ನೀಡಲಾಗಿದೆ.
+        </Text>
 
-  return <>{Array.from({ length: totalPages }, (_, i) => renderPage(i + 1))}</>;
+        {/* Supply Order Table */}
+        <View style={styles.table}>
+          <View style={styles.tableHeader} fixed>
+            <Text style={[styles.tableCellSlnoHeading, styles.slNoCell]}>
+              ಕ್ರ. ಸಂ.
+            </Text>
+            <Text style={[styles.tableCellHeading, styles.materialNameCell]}>
+              ಸಾಮಗ್ರಿ ಹೆಸರು
+            </Text>
+            <Text style={[styles.tableCellHeading, styles.quantityCell]}>
+              ಪ್ರಮಾಣ
+            </Text>
+            <Text style={[styles.tableCellHeading, styles.rateCell]}>ದರ</Text>
+          </View>
+          {vendorWithVendorQuotation.map((item, index) => (
+            <View key={item.slNo} style={styles.tableRow} wrap={false}>
+              <Text style={[styles.tableCellSlno, styles.slNoCell]}>
+                {index + 1}
+              </Text>
+              <Text style={[styles.tableCell, styles.materialNameCell]}>
+                {item.materialName}
+              </Text>
+              <Text style={[styles.tableCell, styles.quantityCell]}>
+                {item.quantity}
+              </Text>
+              <Text style={[styles.tableCell, styles.rateCell]}>
+                {item.contractor1Rate}
+              </Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Footer */}
+        <View style={styles.footerSection} wrap={false}>
+          <View style={styles.leftFooter}>
+            <Text style={styles.footerLabel}>ಗೆ,</Text>
+            <Text style={styles.footerText}>
+              <Text style={styles.footerLabel}>ಶ್ರೀ/ಶ್ರೀಮತಿ :-</Text>{" "}
+              <Text style={styles.highlight}>{winnerContractorName}</Text>
+            </Text>
+            <Text style={styles.footerTextGst}>
+              <Text style={styles.footerLabel}>GST :-</Text>{" "}
+              {winnerContractorGst}
+            </Text>
+            <Text style={styles.footerText}>
+              <Text style={styles.footerLabel}>ವಿಳಾಸ :-</Text>{" "}
+              <Text style={styles.highlight}>{address}</Text>
+            </Text>
+          </View>
+          <View style={styles.rightFooter}>
+            <Text style={styles.signatureTitle}>
+              ಪಂಚಾಯತ ಅಭಿವೃದ್ಧಿ ಅಧಿಕಾರಿಗಳು / ಅಧ್ಯಕ್ಷರು
+            </Text>
+            <Text style={styles.signatureLocation}>
+              ಗ್ರಾಮ ಪಂಚಾಯತಿ, {gramPanchayat}
+            </Text>
+          </View>
+        </View>
+      </View>
+    </Page>
+  );
 };
 
 export default SupplyOrderPDF;

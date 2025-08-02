@@ -6,7 +6,6 @@ Font.register({
   family: "NotoSansKannada",
   src: "/fonts/NotoSansKannada-Regular.ttf"
 });
-
 Font.register({
   family: "NotoSansKannada",
   src: "/fonts/NotoSansKannada-Bold.ttf",
@@ -244,156 +243,121 @@ const ContractorQuotationPDF: React.FC<ContractorQuotationProps> = ({
   quotationSubmissionDate,
   vendorWithVendorQuotation
 }) => {
-  // Format dates from ISO strings to readable format
-
-
-  // Dynamic pagination based on data length
-  const itemsPerPage = 18; // Items per page for contractor quotations (portrait)
-  const totalPages = Math.ceil(vendorWithVendorQuotation.length / itemsPerPage);
-
-  const renderPage = (pageNumber: number) => {
-    const startIndex = (pageNumber - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const pageData = vendorWithVendorQuotation.slice(startIndex, endIndex);
-    const isFirstPage = pageNumber === 1;
-    const isLastPage = pageNumber === totalPages;
-
-    return (
-      <Page
-        key={`contractor-${contractorNumber}-${pageNumber}`}
-        size="A4"
-        style={styles.page}
-      >
-        <View style={styles.container}>
-          {/* Header - Only on first page */}
-          {isFirstPage && (
-            <>
-              {/* Address Section */}
-              <View style={styles.headerSection}>
-                <Text style={styles.addressLine}>ಗೆ,</Text>
-                <Text style={styles.addressLine}>
-                  ಅಧ್ಯಕ್ಷರು / ಪಂಚಾಯತ ಅಭಿವೃದ್ಧಿ ಅಧಿಕಾರಿಗಳು,
-                </Text>
-                <Text style={styles.addressLine}>
-                  ಗ್ರಾಮ ಪಂಚಾಯತಿ: {gramPanchayat}
-                </Text>
-                <Text style={styles.addressLine}>
-                  ತಾಲೂಕು: {taluka} / ಜಿಲ್ಲೆ: {district}
-                </Text>
-                <Text style={styles.respectfulGreeting}>ಮಾನ್ಯರೆ,</Text>
-              </View>
-
-              {/* Subject Section */}
-              <View style={styles.subjectSection}>
-                <View style={styles.subjectRow}>
-                  <Text style={styles.subjectLabel}>ವಿಷಯ:</Text>
-                  <Text style={styles.subjectContent}>
-                    ಸಾಮಗ್ರಿಗಳಿಗೆ ಐಟಂವಾರು ದರಪಟ್ಟಿ ಸಲ್ಲಿಸುವ ಕುರಿತು
-                  </Text>
-                </View>
-                <View style={styles.referenceRow}>
-                  <Text style={styles.referenceLabel}>ಉಲ್ಲೇಖ:</Text>
-                  <Text style={styles.referenceContent}>
-                    ತಮ್ಮ ದರಪಟ್ಟಿ ಆಹ್ವಾನ ಪ್ರಕಟಣೆ ದಿನಾಂಕ : ದಿನಾಂಕ :{" "}
-                    {tenderPublishDate}
-                  </Text>
-                </View>
-                <Text style={styles.separatorLine}>********</Text>
-              </View>
-
-              {/* Main Content */}
-              <Text style={styles.mainContent}>
-                ಈ ಮೇಲ್ಕಂಡಿಸಿದ ವಿಷಯ ಹಾಗೂ ಉಲ್ಲೇಖಕ್ಕೆ ಸಂಬಂಧಿಸಿದಂತೆ ನಾನು GST ಅಡಿ
-                ನೋಂದಾಯಿತ ಸಾಮಗ್ರಿ ಸರಬರಾಜುದಾರನಾಗಿದ್ದು, {year} ನೇ ಸಾಲಿನ ಮಹಾತ್ಮ
-                ಗಾಂಧಿ ರಾಷ್ಟ್ರೀಯ ಗ್ರಾಮೀಣ ಉದ್ಯೋಗ ಖಾತ್ರಿ ಯೋಜನೆಡಿ ಕೈಗೊಳ್ಳಲಾಗುವ
-                {workName}({workCode}) ಕಾಮಗಾರಿಗೆ ಅವಶ್ಯವಿರುವ ಸಾಮಗ್ರಿಗಳಿಗೆ ತಾವು
-                ವಿಧಿಸಿರುವ ಷರತ್ತುಗಳಿಗೆ ಬದ್ಧನಾಗಿ ಈ ಕೆಳಗಿನಂತೆ ದರಪಟ್ಟಿಯನ್ನು
-                ಸಲ್ಲಿಸುತ್ತಿದ್ದು, ನನ್ನ ದರಪಟ್ಟಿಯನ್ನು ಅಂಗೀಕರಿಸಿಸಾಮಗ್ರಿ ಸರಬರಾಜು ಆದೇಶ
-                ನೀಡಬೇಕಾಗಿ ತಮ್ಮಲ್ಲಿ ಕೋರುತ್ತೇನೆ.
-              </Text>
-            </>
-          )}
-
-          {/* Quotation Table */}
-          <View style={styles.table}>
-            <View style={styles.tableHeader}>
-              <Text style={[styles.tableCellSlnoHeading, styles.slNoCell]}>
-                ಕ್ರ. ಸಂ.
-              </Text>
-              <Text style={[styles.tableCellHeading, styles.materialNameCell]}>
-                ಸಾಮಗ್ರಿ ಹೆಸರು
-              </Text>
-              <Text style={[styles.tableCellHeading, styles.quantityCell]}>
-                ಪ್ರಮಾಣ
-              </Text>
-              <Text style={[styles.tableCellHeading, styles.srRateCell]}>
-                ದರ (as per SR)
-              </Text>
-              <Text style={[styles.tableCellHeading, styles.quotedRateCell]}>
-                ದರ (ಅಂಕಿಗಳಲ್ಲಿ)
-              </Text>
-              <Text style={[styles.tableCellHeading, styles.rateWordsCell]}>
-                ದರ (ಅಕ್ಷರಗಳಲ್ಲಿ)
-              </Text>
-            </View>
-
-            {pageData.map((item, index) => {
-              const contractorRate =
-                contractorNumber === 1
-                  ? item.contractor1Rate
-                  : contractorNumber === 2
-                  ? item.contractor2Rate
-                  : item.contractor3Rate;
-
-              return (
-                <View key={startIndex + index} style={styles.tableRow}>
-                  <Text style={[styles.tableCellSlno, styles.slNoCell]}>
-                    {item.slNo}
-                  </Text>
-                  <Text style={[styles.tableCell, styles.materialNameCell]}>
-                    {item.materialName}
-                  </Text>
-                  <Text style={[styles.tableCell, styles.quantityCell]}>
-                    {item.quantity}
-                  </Text>
-                  <Text style={[styles.tableCell, styles.srRateCell]}>
-                    {item.rate}
-                  </Text>
-                  <Text style={[styles.tableCell, styles.quotedRateCell]}>
-                    {contractorRate}
-                  </Text>
-                  <Text style={[styles.tableCell, styles.rateWordsCell]}></Text>
-                </View>
-              );
-            })}
-          </View>
-
-          {/* Footer - Only on last page */}
-          {isLastPage && (
-            <View style={styles.footerSection}>
-              <Text style={styles.faithfullyYours}>ತಮ್ಮ ವಿಶ್ವಾಸಿ</Text>
-
-              <View style={styles.signatureSection}>
-                <View style={styles.leftFooter}>
-                  <Text style={styles.footerText}>ಸ್ಥಳ:</Text>
-                  <Text style={styles.footerText}>
-                    ದಿನಾಂಕ: {quotationSubmissionDate}
-                  </Text>
-                </View>
-                <View style={styles.rightFooter}>
-                  <Text style={styles.footerText}>ಸರಬರಾಜುದಾರರ ಸಹಿ</Text>
-                  <Text style={styles.footerText}>ಹೆಸರು: {contractorName}</Text>
-                  <Text style={styles.footerText}>GST: {contractorGst}</Text>
-                </View>
-              </View>
-            </View>
-          )}
+  return (
+    <Page size="A4" style={styles.page}>
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.headerSection}>
+          <Text style={styles.addressLine}>ಗೆ,</Text>
+          <Text style={styles.addressLine}>
+            ಅಧ್ಯಕ್ಷರು / ಪಂಚಾಯತ ಅಭಿವೃದ್ಧಿ ಅಧಿಕಾರಿಗಳು,
+          </Text>
+          <Text style={styles.addressLine}>ಗ್ರಾಮ ಪಂಚಾಯತಿ: {gramPanchayat}</Text>
+          <Text style={styles.addressLine}>
+            ತಾಲೂಕು: {taluka} / ಜಿಲ್ಲೆ: {district}
+          </Text>
+          <Text style={styles.respectfulGreeting}>ಮಾನ್ಯರೆ,</Text>
         </View>
-      </Page>
-    );
-  };
 
-  return <>{Array.from({ length: totalPages }, (_, i) => renderPage(i + 1))}</>;
+        {/* Subject Section */}
+        <View style={styles.subjectSection}>
+          <View style={styles.subjectRow}>
+            <Text style={styles.subjectLabel}>ವಿಷಯ:</Text>
+            <Text style={styles.subjectContent}>
+              ಸಾಮಗ್ರಿಗಳಿಗೆ ಐಟಂವಾರು ದರಪಟ್ಟಿ ಸಲ್ಲಿಸುವ ಕುರಿತು
+            </Text>
+          </View>
+          <View style={styles.referenceRow}>
+            <Text style={styles.referenceLabel}>ಉಲ್ಲೇಖ:</Text>
+            <Text style={styles.referenceContent}>
+              ತಮ್ಮ ದರಪಟ್ಟಿ ಆಹ್ವಾನ ಪ್ರಕಟಣೆ ದಿನಾಂಕ : ದಿನಾಂಕ : {tenderPublishDate}
+            </Text>
+          </View>
+          <Text style={styles.separatorLine}>********</Text>
+        </View>
+
+        {/* Main Content */}
+        <Text style={styles.mainContent}>
+          ಈ ಮೇಲ್ಕಂಡಿಸಿದ ವಿಷಯ ಹಾಗೂ ಉಲ್ಲೇಖಕ್ಕೆ ಸಂಬಂಧಿಸಿದಂತೆ ನಾನು GST ಅಡಿ ನೋಂದಾಯಿತ
+          ಸಾಮಗ್ರಿ ಸರಬರಾಜುದಾರನಾಗಿದ್ದು, {year} ನೇ ಸಾಲಿನ ಮಹಾತ್ಮ ಗಾಂಧಿ ರಾಷ್ಟ್ರೀಯ
+          ಗ್ರಾಮೀಣ ಉದ್ಯೋಗ ಖಾತ್ರಿ ಯೋಜನೆಡಿ ಕೈಗೊಳ್ಳಲಾಗುವ {workName}({workCode})
+          ಕಾಮಗಾರಿಗೆ ಅವಶ್ಯವಿರುವ ಸಾಮಗ್ರಿಗಳಿಗೆ ತಾವು ವಿಧಿಸಿರುವ ಷರತ್ತುಗಳಿಗೆ ಬದ್ಧನಾಗಿ
+          ಈ ಕೆಳಗಿನಂತೆ ದರಪಟ್ಟಿಯನ್ನು ಸಲ್ಲಿಸುತ್ತಿದ್ದು, ನನ್ನ ದರಪಟ್ಟಿಯನ್ನು
+          ಅಂಗೀಕರಿಸಿಸಾಮಗ್ರಿ ಸರಬರಾಜು ಆದೇಶ ನೀಡಬೇಕಾಗಿ ತಮ್ಮಲ್ಲಿ ಕೋರುತ್ತೇನೆ.
+        </Text>
+
+        {/* Quotation Table */}
+        <View style={styles.table}>
+          <View style={styles.tableHeader} fixed>
+            <Text style={[styles.tableCellSlnoHeading, styles.slNoCell]}>
+              ಕ್ರ. ಸಂ.
+            </Text>
+            <Text style={[styles.tableCellHeading, styles.materialNameCell]}>
+              ಸಾಮಗ್ರಿ ಹೆಸರು
+            </Text>
+            <Text style={[styles.tableCellHeading, styles.quantityCell]}>
+              ಪ್ರಮಾಣ
+            </Text>
+            <Text style={[styles.tableCellHeading, styles.srRateCell]}>
+              ದರ (as per SR)
+            </Text>
+            <Text style={[styles.tableCellHeading, styles.quotedRateCell]}>
+              ದರ (ಅಂಕಿಗಳಲ್ಲಿ)
+            </Text>
+            <Text style={[styles.tableCellHeading, styles.rateWordsCell]}>
+              ದರ (ಅಕ್ಷರಗಳಲ್ಲಿ)
+            </Text>
+          </View>
+          {vendorWithVendorQuotation.map((item, index) => {
+            const contractorRate =
+              contractorNumber === 1
+                ? item.contractor1Rate
+                : contractorNumber === 2
+                ? item.contractor2Rate
+                : item.contractor3Rate;
+            return (
+              <View key={item.slNo} style={styles.tableRow} wrap={false}>
+                <Text style={[styles.tableCellSlno, styles.slNoCell]}>
+                  {index + 1}
+                </Text>
+                <Text style={[styles.tableCell, styles.materialNameCell]}>
+                  {item.materialName}
+                </Text>
+                <Text style={[styles.tableCell, styles.quantityCell]}>
+                  {item.quantity}
+                </Text>
+                <Text style={[styles.tableCell, styles.srRateCell]}>
+                  {item.rate}
+                </Text>
+                <Text style={[styles.tableCell, styles.quotedRateCell]}>
+                  {contractorRate}
+                </Text>
+                <Text style={[styles.tableCell, styles.rateWordsCell]}></Text>
+              </View>
+            );
+          })}
+        </View>
+
+        {/* Footer */}
+        <View style={styles.footerSection} wrap={false}>
+          <Text style={styles.faithfullyYours}>ತಮ್ಮ ವಿಶ್ವಾಸಿ</Text>
+          <View style={styles.signatureSection}>
+            <View style={styles.leftFooter}>
+              <Text style={styles.footerText}>ಸ್ಥಳ:</Text>
+              <Text style={styles.footerText}>
+                ದಿನಾಂಕ: {quotationSubmissionDate}
+              </Text>
+            </View>
+            <View style={styles.rightFooter}>
+              <Text style={styles.footerText}>ಸರಬರಾಜುದಾರರ ಸಹಿ</Text>
+              <Text style={styles.footerText}>ಹೆಸರು: {contractorName}</Text>
+              <Text style={styles.footerText}>GST: {contractorGst}</Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    </Page>
+  );
 };
 
 export default ContractorQuotationPDF;

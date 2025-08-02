@@ -70,7 +70,7 @@ const fetchComparativeStatement = async (
     if (!apiData) {
       return {
         success: false,
-        message: "No data found for the provided ID"
+        message: "No data found for the provided ID",
       };
     }
 
@@ -84,15 +84,21 @@ const fetchComparativeStatement = async (
       workName: apiData.workName,
       tenderPublishDate: apiData.tenderPublishDate,
       tenderSubmissionDate: apiData.tenderSubmissionDate,
-      materialData: apiData.materialData.map((item: MaterialData) => ({
-        slNo: item.slNo,
-        materialName: item.materialName,
-        quantity: Number(item.quantity).toFixed(2).toString(),
-        price: item.price
-      })),
+      materialData: apiData.materialData
+        .sort((a: MaterialData, b: MaterialData) => a.slNo - b.slNo)
+        .map((item: MaterialData) => ({
+          slNo: item.slNo,
+          materialName: item.materialName,
+          quantity: Number(item.quantity).toFixed(2).toString(),
+          price: item.price,
+        })),
       vendorDetails: apiData.vendorDetails,
-      vendorWithVendorQuotation: apiData.vendorWithVendorQuotation.map(
-        (item: VendorWithVendorQuotation) => ({
+      vendorWithVendorQuotation: apiData.vendorWithVendorQuotation
+        .sort(
+          (a: VendorWithVendorQuotation, b: VendorWithVendorQuotation) =>
+            a.slNo - b.slNo
+        )
+        .map((item: VendorWithVendorQuotation) => ({
           slNo: item.slNo,
           materialName: item.materialName,
           quantity: Number(item.quantity).toFixed(2).toString(),
@@ -100,14 +106,13 @@ const fetchComparativeStatement = async (
           unit: item.unit,
           contractor1Rate: item.contractor1Rate,
           contractor2Rate: item.contractor2Rate,
-          contractor3Rate: item.contractor3Rate
-        })
-      )
+          contractor3Rate: item.contractor3Rate,
+        })),
     };
 
     return {
       success: true,
-      data: formattedData
+      data: formattedData,
     };
   } catch (error: unknown) {
     let message = "Failed to fetch comparative statement data.";
@@ -118,7 +123,7 @@ const fetchComparativeStatement = async (
 
     return {
       success: false,
-      message
+      message,
     };
   }
 };
@@ -131,7 +136,7 @@ export const useFetchComparativeStatement = () => {
 
     if (!id) {
       toast.error("No work Id", {
-        description: "Please refresh"
+        description: "Please refresh",
       });
       return null;
     }
