@@ -1,4 +1,4 @@
-import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
+import { Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 
 // Type definitions
 type AdministrativeSanctionPDFProps = {
@@ -150,107 +150,105 @@ const AdministrativeSanctionPDF = ({ asData }: ASData) => {
   const proceedingsNo = technicalSanctionNo;
 
   return (
-    <Document>
-      <Page size="A4" style={styles.page}>
-        <View style={styles.container}>
-          {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>
-              ADMINISTRATIVE/FINANCIAL SANCTION FOR WORKS
+    <Page size="A4" style={styles.page}>
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>
+            ADMINISTRATIVE/FINANCIAL SANCTION FOR WORKS
+          </Text>
+        </View>
+
+        {/* Date */}
+        <View style={styles.dateSection}>
+          <Text style={styles.dateMedium}>
+            Dated : {administrativeSanctionDate}
+          </Text>
+        </View>
+
+        {/* Work Name Section - Centered and Bold */}
+        <View style={styles.workNameSection}>
+          <View style={styles.workNameItem}>
+            <Text style={styles.workNameBold}>
+              Work Name: Mahatma Gandhi NREGA Construction of{" "}
             </Text>
           </View>
-
-          {/* Date */}
-          <View style={styles.dateSection}>
-            <Text style={styles.dateMedium}>
-              Dated : {administrativeSanctionDate}
+          <View style={styles.workNameItem}>
+            <Text
+              style={[styles.workNameBold, { fontFamily: "NotoSansKannada" }]}
+            >
+              {workCode} - {financialYear} {workName}
             </Text>
           </View>
+        </View>
 
-          {/* Work Name Section - Centered and Bold */}
-          <View style={styles.workNameSection}>
-            <View style={styles.workNameItem}>
-              <Text style={styles.workNameBold}>
-                Work Name: Mahatma Gandhi NREGA Construction of{" "}
+        {/* Panchayat Details */}
+        <View style={styles.panchayatSection}>
+          <View style={styles.panchayatContent}>
+            <View style={styles.panchayatItem}>
+              <Text style={styles.panchayatMedium}>
+                Gram Panchayat : {gramPanchayat}
               </Text>
-            </View>
-            <View style={styles.workNameItem}>
-              <Text
-                style={[styles.workNameBold, { fontFamily: "NotoSansKannada" }]}
-              >
-                {workCode} - {financialYear} {workName}
-              </Text>
-            </View>
-          </View>
-
-          {/* Panchayat Details */}
-          <View style={styles.panchayatSection}>
-            <View style={styles.panchayatContent}>
-              <View style={styles.panchayatItem}>
-                <Text style={styles.panchayatMedium}>
-                  Gram Panchayat : {gramPanchayat}
-                </Text>
-              </View>
-              <View>
-                <Text style={styles.panchayatMedium}>
-                  Block Panchayat : {blockPanchayat}
-                </Text>
-              </View>
-            </View>
-          </View>
-
-          {/* Main Content Paragraph */}
-          <View style={styles.mainContent}>
-            <Text>
-              Considering importance and necessity of the work and resolute by
-              the Panchayat, {gramPanchayat} and Technically Approved /
-              Sanctioned vide TSR No {technicalSanctionNo} ,the estimate of the
-              proposed work has been accorded Administrative Sanction for Rs{" "}
-              {sanctionedAmount} /- ({sanctionedAmountInWords}) vide Proceedings
-              No. {proceedingsNo} date {administrativeSanctionDate},
-            </Text>
-          </View>
-
-          {/* Financial Details */}
-          <View style={styles.financialSection}>
-            <View style={styles.financialItem}>
-              <Text>Labour Charges (Unskilled): {unskilledLabourCharges}</Text>
-            </View>
-            <View style={styles.financialItem}>
-              <Text>Materials : {estimatedMaterialCost}</Text>
-            </View>
-            <View style={styles.financialItem}>
-              <Text>Lumpsum : 0</Text>
-            </View>
-            <View style={styles.financialItem}>
-              <Text>Admin Lumpsum : 0.00</Text>
-            </View>
-            <View style={styles.financialItem}>
-              <Text>Number of man days : {estimatePersonDays}</Text>
-            </View>
-          </View>
-
-          {/* Authority Section */}
-          <View style={styles.authoritySection}>
-            <View style={styles.authorityItem}>
-              <Text style={styles.authorityMedium}>
-                Administrative sanction given by : (PDO) {gramPanchayat}.
-              </Text>
-            </View>
-          </View>
-
-          {/* Signature Section */}
-          <View style={styles.signatureSection}>
-            <View style={styles.signatureItem}>
-              <Text style={styles.signatureMedium}>-sd</Text>
             </View>
             <View>
-              <Text style={styles.signatureMedium}>(PDO) {gramPanchayat}</Text>
+              <Text style={styles.panchayatMedium}>
+                Block Panchayat : {blockPanchayat}
+              </Text>
             </View>
           </View>
         </View>
-      </Page>
-    </Document>
+
+        {/* Main Content Paragraph */}
+        <View style={styles.mainContent}>
+          <Text>
+            Considering importance and necessity of the work and resolute by the
+            Panchayat, {gramPanchayat} and Technically Approved / Sanctioned
+            vide TSR No {technicalSanctionNo} ,the estimate of the proposed work
+            has been accorded Administrative Sanction for Rs {sanctionedAmount}{" "}
+            /- ({sanctionedAmountInWords}) vide Proceedings No. {proceedingsNo}{" "}
+            date {administrativeSanctionDate},
+          </Text>
+        </View>
+
+        {/* Financial Details */}
+        <View style={styles.financialSection}>
+          <View style={styles.financialItem}>
+            <Text>Labour Charges (Unskilled): {unskilledLabourCharges}</Text>
+          </View>
+          <View style={styles.financialItem}>
+            <Text>Materials : {estimatedMaterialCost}</Text>
+          </View>
+          <View style={styles.financialItem}>
+            <Text>Lumpsum : 0</Text>
+          </View>
+          <View style={styles.financialItem}>
+            <Text>Admin Lumpsum : 0.00</Text>
+          </View>
+          <View style={styles.financialItem}>
+            <Text>Number of man days : {estimatePersonDays}</Text>
+          </View>
+        </View>
+
+        {/* Authority Section */}
+        <View style={styles.authoritySection}>
+          <View style={styles.authorityItem}>
+            <Text style={styles.authorityMedium}>
+              Administrative sanction given by : (PDO) {gramPanchayat}.
+            </Text>
+          </View>
+        </View>
+
+        {/* Signature Section */}
+        <View style={styles.signatureSection}>
+          <View style={styles.signatureItem}>
+            <Text style={styles.signatureMedium}>-sd</Text>
+          </View>
+          <View>
+            <Text style={styles.signatureMedium}>(PDO) {gramPanchayat}</Text>
+          </View>
+        </View>
+      </View>
+    </Page>
   );
 };
 

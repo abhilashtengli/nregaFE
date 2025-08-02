@@ -1,5 +1,4 @@
 import {
-  Document,
   Page,
   Text,
   View,
@@ -206,9 +205,8 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: "normal",
     marginBottom: 8,
-      fontFamily: "NotoSansKannada",
-      textAlign : "center"
-    
+    fontFamily: "NotoSansKannada",
+    textAlign: "center"
   },
   table: {
     borderLeft: "1px solid black",
@@ -298,173 +296,164 @@ const Form8PDF: React.FC<Form8Data> = ({ form8Data }: Form8Data) => {
   ];
 
   return (
-    <Document>
-      <Page size="A4" style={styles.page} wrap>
-        <View style={styles.container}>
-          {/* Header */}
-          <View style={styles.headerSection}>
-            <View style={styles.mnregalogoContainer}>
-              <Image style={styles.logo} src={mnreaga} />
-            </View>
-            <View style={styles.centerHeader}>
-              <View style={styles.centerEmblem}>
-                <Text style={styles.karnatakaSarkar}>ಕರ್ನಾಟಕ</Text>
-                <View style={styles.emblemContainer}>
-                  <Image style={styles.logo} src={emblem} />
-                </View>
-                <Text style={styles.karnatakaSarkar}>ಸರ್ಕಾರ</Text>
+    <Page size="A4" style={styles.page} wrap>
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.headerSection}>
+          <View style={styles.mnregalogoContainer}>
+            <Image style={styles.logo} src={mnreaga} />
+          </View>
+          <View style={styles.centerHeader}>
+            <View style={styles.centerEmblem}>
+              <Text style={styles.karnatakaSarkar}>ಕರ್ನಾಟಕ</Text>
+              <View style={styles.emblemContainer}>
+                <Image style={styles.logo} src={emblem} />
               </View>
-              <Text style={styles.headerText}>
-                ಗ್ರಾಮ ಪಂಚಾಯತ, {gramPanchayat}, ತಾ|| {taluka}. ಜ|| {district}
-              </Text>
-              <Text style={styles.headerSubText}>
-                ಅನುಬಂಧ - IV Annexture - IV (ನಮೂನೆ-8)
-              </Text>
-              <Text style={styles.headerSubText}>ಕೆಲಸ ಹಂಚಿಕೆ ನಮೂನೆ</Text>
-              <Text style={styles.headerSubText}>
-                ಮಹಾತ್ಮಾ ಗಾಂಧಿ ನರೇಗಾ ಯೋಜನೆ ಅನುಸೂಚಿ II ಕಂಡಕೆ 11 ಕಾಯ್ದೆ 3(1) ರಂತೆ
-              </Text>
+              <Text style={styles.karnatakaSarkar}>ಸರ್ಕಾರ</Text>
             </View>
-            <View style={styles.logoContainer}>
-              <Image style={styles.logo} src={state_logo} />
-            </View>
-          </View>
-
-          {/* Letter Header */}
-          <View style={styles.letterHeader}>
-            <Text style={styles.letterNumber}>
-              ಪತ್ರದ ಸಂಖ್ಯೆ {applicationNumber}
+            <Text style={styles.headerText}>
+              ಗ್ರಾಮ ಪಂಚಾಯತ, {gramPanchayat}, ತಾ|| {taluka}. ಜ|| {district}
             </Text>
-            <Text style={styles.letterNumber}>ದಿನಾಂಕ {date}</Text>
-          </View>
-
-          {/* Address Section */}
-          <View style={styles.addressSection}>
-            <View style={styles.addressLeft}>
-              <Text style={styles.addressText}>ಗೆ,</Text>
-              <Text style={styles.addressText}>
-                ಶ್ರೀ / ಶ್ರೀಮತಿ ಈ ಕೆಳಗಿನ ಪಟ್ಟಿಯಲ್ಲಿರುವಂತೆ
-              </Text>
-              <Text style={styles.addressText}>{gramPanchayat}</Text>
-              <Text style={styles.addressText}>
-                {gramPanchayat} ಗ್ರಾಮ ಪಂಚಾಯತ
-              </Text>
-              <Text style={styles.addressText}>{taluka} ತಾಲೂಕು</Text>
-              <Text style={styles.addressText}>{district} ಜಿಲ್ಲೆ</Text>
-            </View>
-            <View style={styles.addressBox}>
-              <Text style={styles.addressBoxTitle}>
-                ಕಾಮಗಾರಿಕೆ ಕೋಡ್ ಕಾಗದಕ್ಕಾಗಿ
-              </Text>
-              <Text style={styles.addressBoxTitle}>
-                ನಮೂನೆ 8 ನೀಡದ - ಸ್ವೀಕೃತಿ ಪತ್ರ
-              </Text>
-            </View>
-          </View>
-
-          {/* Job Card Section */}
-          <View style={styles.jobCardSection}>
-            <Text style={styles.jobCardText}>
-              ಉದ್ಯೋಗ ಚೀಟಿಯ ಸಂಖ್ಯೆ: ಈ ಕೆಳಗಿನ ಪಟ್ಟಿಯಲ್ಲಿರುವಂತೆ
+            <Text style={styles.headerSubText}>
+              ಅನುಬಂಧ - IV Annexture - IV (ನಮೂನೆ-8)
+            </Text>
+            <Text style={styles.headerSubText}>ಕೆಲಸ ಹಂಚಿಕೆ ನಮೂನೆ</Text>
+            <Text style={styles.headerSubText}>
+              ಮಹಾತ್ಮಾ ಗಾಂಧಿ ನರೇಗಾ ಯೋಜನೆ ಅನುಸೂಚಿ II ಕಂಡಕೆ 11 ಕಾಯ್ದೆ 3(1) ರಂತೆ
             </Text>
           </View>
-
-          {/* Subject */}
-          <View style={styles.subjectSection}>
-            <Text style={styles.subjectText}>
-              ವಿಷಯ: ಕೆಲಸ ಹಂಚಿಕೆ ಬಗ್ಗೆ ಮಾಹಿತಿ
-            </Text>
-          </View>
-
-          {/* Body Text */}
-          <Text style={styles.bodyText}>
-            ಕೆಲಸದ ಅರ್ಜಿ ಸಂಖ್ಯೆ {applicationNumber} ಯ {date} (ದಿನಾಂಕ)ದ ನಿಮ್ಮ
-            ಕೆಲಸದ ಅರ್ಜಿಗೆ ಸಂಬಂಧಿಸಿದಂತೆ ಎಂಜಿಎನ್‌ಆರ್‌ಇಜಿ ಕಾಯ್ದೆ 2005 ರ ಷೆಡ್ಯೂಲ್ II
-            ಕಂಡಕೆ II ಪ್ರಕಾರ ನಿಮಗೆ ಈ ಕೆಳಕಂಡ ಕಾಮಗಾರಿಯನ್ನು ಹಂಚಿಕೆ ಮಾಡಲಾಗಿದೆ.
-            ಆದ್ದರಿಂದ ನೀವು ಈ ಕೆಲಸಕ್ಕೆ ದಿನಾಂಕ {workDate} ರಂದು ಹಾಜರಾಗಲು ಈ ಮೂಲಕ
-            ತಿಳಿಸಲಾಗಿದೆ
-          </Text>
-
-          {/* Work Details Table */}
-          <View style={styles.workDetailsTable}>
-            {workDetails.map((detail) => (
-              <View key={detail.id} style={styles.workDetailRow}>
-                <Text style={styles.workDetailNumberCell}>{detail.id}</Text>
-                <Text style={styles.workDetailLabelCell}>{detail.label}</Text>
-                <Text style={styles.workDetailValueCell}>{detail.value} </Text>
-              </View>
-            ))}
-          </View>
-
-          {/* Note Text */}
-          <Text style={styles.noteText}>
-            ಈ ಪತ್ರದ ಸ್ವೀಕೃತಿಯ ನಂತರ ಕಾಮಗಾರಿ ಹಂಚಿಕೆ ಮಾಡಿದ ದಿನಾಂಕದ ಒಳಗಾಗಿ ನೀವು
-            ಕೆಲಸಕ್ಕೆ ಹಾಜರಾಗದಿದ್ದಲ್ಲಿ ಮಹಾತ್ಮ ಗಾಂಧಿ ಎನ್ ಆರ್ ಇಜಿ {""} ಕಾಯ್ದೆಯ
-            ಸೆಕ್ಷನ್ 9 ರ ಪ್ರಕಾರ ಮುಂದಿನ ಮೂರು ತಿಂಗಳವರೆಗೆ ನೀವು ನಿರುದ್ಯೋಗ ಭತ್ಯೆಯನ್ನು
-            ಪಡೆಯಲು ಅರ್ಹರಾಗಿರುವುದಿಲ್ಲ. ಹಾಗಾದರೂ ನೀವು ಯಾವುದೇ ಸಮಯದಲ್ಲಿಯೂ
-            ಉದ್ಯೋಗಕ್ಕಾಗಿ ಅರ್ಜಿ ಸಲ್ಲಿಸಬಹುದು.
-          </Text>
-
-          {/* Table Introduction */}
-          <Text style={styles.tableIntroText}>
-            ಈ ಕಾಮಗಾರಿಯನ್ನು ಈ ಕೆಳಕಂಡವರಿಗೆ ಕೆಲಸ ಹಂಚಿಕೆ ಮಾಡಲಾಗಿದೆ
-          </Text>
-
-          {/* Applicants Table */}
-          <View style={styles.table}>
-            {/* Table Header */}
-            <View style={styles.tableHeader} fixed>
-              <Text style={[styles.tableHeaderCell, styles.slNoCell]}>
-                ಕ್ರ.ಸಂ.
-              </Text>
-              <Text style={[styles.tableHeaderCell, styles.nameCell]}>
-                ಹೆಸರು
-              </Text>
-              <Text style={[styles.tableHeaderCell, styles.jobCardCell]}>
-                ಉದ್ಯೋಗ ಚೀಟಿ ಸಂಖ್ಯೆ
-              </Text>
-              <Text style={[styles.tableHeaderCell, styles.signatureCell]}>
-                ನಮೂನೆ-8 ಸ್ವೀಕೃತಿ ಸಹಿ
-              </Text>
-            </View>
-
-            {/* Table Rows */}
-            {applicantsData.map((applicant) => (
-              <View key={applicant.slNo} style={styles.tableRow} wrap={false}>
-                <Text style={[styles.tableCell, styles.slNoCell]}>
-                  {applicant.slNo}
-                </Text>
-                <Text style={[styles.tableCell, styles.nameCell]}>
-                  {applicant.applicantName}
-                </Text>
-                <Text style={[styles.tableCell, styles.jobCardCell]}>
-                  {applicant.jobCardNo}
-                </Text>
-                <Text style={[styles.tableCell, styles.signatureCell]}>
-                  {/* Empty cell for signature */}
-                </Text>
-              </View>
-            ))}
-          </View>
-
-          {/* Footer */}
-          <View style={styles.footerSection}>
-            <View style={styles.footerLeft}>
-              <Text>ದಿನಾಂಕ : {date}</Text>
-            </View>
-            <View>
-              {" "}
-              <Text style={styles.footerLeft}>ಗ್ರಾ.ಪಂ.ಮೊಹರು</Text>
-            </View>
-
-            <View style={styles.footerRight}>
-              <Text style={styles.officerTitle}>ಪಂಚಾಯತ್ ಅಭಿವೃದ್ಧಿ ಅಧಿಕಾರಿ</Text>
-              <Text>ಗ್ರಾಮ ಪಂಚಾಯತಿ, {gramPanchayat}.</Text>
-            </View>
+          <View style={styles.logoContainer}>
+            <Image style={styles.logo} src={state_logo} />
           </View>
         </View>
-      </Page>
-    </Document>
+
+        {/* Letter Header */}
+        <View style={styles.letterHeader}>
+          <Text style={styles.letterNumber}>
+            ಪತ್ರದ ಸಂಖ್ಯೆ {applicationNumber}
+          </Text>
+          <Text style={styles.letterNumber}>ದಿನಾಂಕ {date}</Text>
+        </View>
+
+        {/* Address Section */}
+        <View style={styles.addressSection}>
+          <View style={styles.addressLeft}>
+            <Text style={styles.addressText}>ಗೆ,</Text>
+            <Text style={styles.addressText}>
+              ಶ್ರೀ / ಶ್ರೀಮತಿ ಈ ಕೆಳಗಿನ ಪಟ್ಟಿಯಲ್ಲಿರುವಂತೆ
+            </Text>
+            <Text style={styles.addressText}>{gramPanchayat}</Text>
+            <Text style={styles.addressText}>{gramPanchayat} ಗ್ರಾಮ ಪಂಚಾಯತ</Text>
+            <Text style={styles.addressText}>{taluka} ತಾಲೂಕು</Text>
+            <Text style={styles.addressText}>{district} ಜಿಲ್ಲೆ</Text>
+          </View>
+          <View style={styles.addressBox}>
+            <Text style={styles.addressBoxTitle}>
+              ಕಾಮಗಾರಿಕೆ ಕೋಡ್ ಕಾಗದಕ್ಕಾಗಿ
+            </Text>
+            <Text style={styles.addressBoxTitle}>
+              ನಮೂನೆ 8 ನೀಡದ - ಸ್ವೀಕೃತಿ ಪತ್ರ
+            </Text>
+          </View>
+        </View>
+
+        {/* Job Card Section */}
+        <View style={styles.jobCardSection}>
+          <Text style={styles.jobCardText}>
+            ಉದ್ಯೋಗ ಚೀಟಿಯ ಸಂಖ್ಯೆ: ಈ ಕೆಳಗಿನ ಪಟ್ಟಿಯಲ್ಲಿರುವಂತೆ
+          </Text>
+        </View>
+
+        {/* Subject */}
+        <View style={styles.subjectSection}>
+          <Text style={styles.subjectText}>ವಿಷಯ: ಕೆಲಸ ಹಂಚಿಕೆ ಬಗ್ಗೆ ಮಾಹಿತಿ</Text>
+        </View>
+
+        {/* Body Text */}
+        <Text style={styles.bodyText}>
+          ಕೆಲಸದ ಅರ್ಜಿ ಸಂಖ್ಯೆ {applicationNumber} ಯ {date} (ದಿನಾಂಕ)ದ ನಿಮ್ಮ ಕೆಲಸದ
+          ಅರ್ಜಿಗೆ ಸಂಬಂಧಿಸಿದಂತೆ ಎಂಜಿಎನ್‌ಆರ್‌ಇಜಿ ಕಾಯ್ದೆ 2005 ರ ಷೆಡ್ಯೂಲ್ II ಕಂಡಕೆ
+          II ಪ್ರಕಾರ ನಿಮಗೆ ಈ ಕೆಳಕಂಡ ಕಾಮಗಾರಿಯನ್ನು ಹಂಚಿಕೆ ಮಾಡಲಾಗಿದೆ. ಆದ್ದರಿಂದ ನೀವು
+          ಈ ಕೆಲಸಕ್ಕೆ ದಿನಾಂಕ {workDate} ರಂದು ಹಾಜರಾಗಲು ಈ ಮೂಲಕ ತಿಳಿಸಲಾಗಿದೆ
+        </Text>
+
+        {/* Work Details Table */}
+        <View style={styles.workDetailsTable}>
+          {workDetails.map((detail) => (
+            <View key={detail.id} style={styles.workDetailRow}>
+              <Text style={styles.workDetailNumberCell}>{detail.id}</Text>
+              <Text style={styles.workDetailLabelCell}>{detail.label}</Text>
+              <Text style={styles.workDetailValueCell}>{detail.value} </Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Note Text */}
+        <Text style={styles.noteText}>
+          ಈ ಪತ್ರದ ಸ್ವೀಕೃತಿಯ ನಂತರ ಕಾಮಗಾರಿ ಹಂಚಿಕೆ ಮಾಡಿದ ದಿನಾಂಕದ ಒಳಗಾಗಿ ನೀವು
+          ಕೆಲಸಕ್ಕೆ ಹಾಜರಾಗದಿದ್ದಲ್ಲಿ ಮಹಾತ್ಮ ಗಾಂಧಿ ಎನ್ ಆರ್ ಇಜಿ {""} ಕಾಯ್ದೆಯ ಸೆಕ್ಷನ್
+          9 ರ ಪ್ರಕಾರ ಮುಂದಿನ ಮೂರು ತಿಂಗಳವರೆಗೆ ನೀವು ನಿರುದ್ಯೋಗ ಭತ್ಯೆಯನ್ನು ಪಡೆಯಲು
+          ಅರ್ಹರಾಗಿರುವುದಿಲ್ಲ. ಹಾಗಾದರೂ ನೀವು ಯಾವುದೇ ಸಮಯದಲ್ಲಿಯೂ ಉದ್ಯೋಗಕ್ಕಾಗಿ ಅರ್ಜಿ
+          ಸಲ್ಲಿಸಬಹುದು.
+        </Text>
+
+        {/* Table Introduction */}
+        <Text style={styles.tableIntroText}>
+          ಈ ಕಾಮಗಾರಿಯನ್ನು ಈ ಕೆಳಕಂಡವರಿಗೆ ಕೆಲಸ ಹಂಚಿಕೆ ಮಾಡಲಾಗಿದೆ
+        </Text>
+
+        {/* Applicants Table */}
+        <View style={styles.table}>
+          {/* Table Header */}
+          <View style={styles.tableHeader} fixed>
+            <Text style={[styles.tableHeaderCell, styles.slNoCell]}>
+              ಕ್ರ.ಸಂ.
+            </Text>
+            <Text style={[styles.tableHeaderCell, styles.nameCell]}>ಹೆಸರು</Text>
+            <Text style={[styles.tableHeaderCell, styles.jobCardCell]}>
+              ಉದ್ಯೋಗ ಚೀಟಿ ಸಂಖ್ಯೆ
+            </Text>
+            <Text style={[styles.tableHeaderCell, styles.signatureCell]}>
+              ನಮೂನೆ-8 ಸ್ವೀಕೃತಿ ಸಹಿ
+            </Text>
+          </View>
+
+          {/* Table Rows */}
+          {applicantsData.map((applicant) => (
+            <View key={applicant.slNo} style={styles.tableRow} wrap={false}>
+              <Text style={[styles.tableCell, styles.slNoCell]}>
+                {applicant.slNo}
+              </Text>
+              <Text style={[styles.tableCell, styles.nameCell]}>
+                {applicant.applicantName}
+              </Text>
+              <Text style={[styles.tableCell, styles.jobCardCell]}>
+                {applicant.jobCardNo}
+              </Text>
+              <Text style={[styles.tableCell, styles.signatureCell]}>
+                {/* Empty cell for signature */}
+              </Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Footer */}
+        <View style={styles.footerSection}>
+          <View style={styles.footerLeft}>
+            <Text>ದಿನಾಂಕ : {date}</Text>
+          </View>
+          <View>
+            {" "}
+            <Text style={styles.footerLeft}>ಗ್ರಾ.ಪಂ.ಮೊಹರು</Text>
+          </View>
+
+          <View style={styles.footerRight}>
+            <Text style={styles.officerTitle}>ಪಂಚಾಯತ್ ಅಭಿವೃದ್ಧಿ ಅಧಿಕಾರಿ</Text>
+            <Text>ಗ್ರಾಮ ಪಂಚಾಯತಿ, {gramPanchayat}.</Text>
+          </View>
+        </View>
+      </View>
+    </Page>
   );
 };
 

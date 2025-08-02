@@ -1,6 +1,7 @@
 import { Base_Url } from "@/lib/constant";
 import { useWorkStore } from "@/stores/workStore";
 import type { ServiceResponse } from "@/types/types";
+import { subtractDays } from "@/utils/substractDays";
 import axios from "axios";
 import { toast } from "sonner";
 
@@ -51,7 +52,7 @@ const fetchForm9 = async (id: string): Promise<ServiceResponse<Form9Data>> => {
         workName: apiData.workName,
         taluka: apiData.taluka,
         district: apiData.district,
-        date: apiData.date,
+        date: subtractDays(apiData.date, 2),
         applicationNumber: apiData.applicationNumber,
         applicantsData: apiData.applicantsData?.map(
           (applicant: ApplicantData) => ({

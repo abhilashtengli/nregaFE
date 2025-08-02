@@ -1,11 +1,4 @@
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  Font
-} from "@react-pdf/renderer";
+import { Page, Text, View, StyleSheet, Font } from "@react-pdf/renderer";
 
 // Register fonts
 Font.register({
@@ -325,105 +318,101 @@ const ChecklistPDF = ({ checklistData }: ChecklistPDFProps) => {
   ];
 
   return (
-    <Document>
-      <Page size="A4" style={styles.page}>
-        <View style={styles.container}>
-          {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>
-              ಗ್ರಾಮ ಪಂಚಾಯಿತಿ: {gramPanchayat}
-            </Text>
-            <Text style={styles.headerSubtitle}>
-              ಅನುಬಂಧ - II: ಕಾಮಗಾರಿ ಕಡತದ ಚಿಕ್ ಲಿಸ್ಟ
-            </Text>
+    <Page size="A4" style={styles.page}>
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>
+            ಗ್ರಾಮ ಪಂಚಾಯಿತಿ: {gramPanchayat}
+          </Text>
+          <Text style={styles.headerSubtitle}>
+            ಅನುಬಂಧ - II: ಕಾಮಗಾರಿ ಕಡತದ ಚಿಕ್ ಲಿಸ್ಟ
+          </Text>
+        </View>
+
+        {/* Document Info */}
+        <View style={styles.documentInfo}>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>ಕಾಮಗಾರಿ ಹೆಸರು: </Text>
+            <Text style={styles.infoValue}>{workName}</Text>
           </View>
-
-          {/* Document Info */}
-          <View style={styles.documentInfo}>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>ಕಾಮಗಾರಿ ಹೆಸರು: </Text>
-              <Text style={styles.infoValue}>{workName}</Text>
-            </View>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>ಕಾಮಗಾರಿ ಸಂಖ್ಯೆ ಸಂಬಂಧ: </Text>
-              <Text style={styles.infoValue}>{workCode}</Text>
-            </View>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>ಕಾಮಗಾರಿಮಂಜೂರಾದ ವರ್ಷ: </Text>
-              <Text style={styles.infoValue}>{sanctionedYear}</Text>
-            </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>ಕಾಮಗಾರಿ ಸಂಖ್ಯೆ ಸಂಬಂಧ: </Text>
+            <Text style={styles.infoValue}>{workCode}</Text>
           </View>
-
-          {/* Table */}
-          <View style={styles.table}>
-            {/* Table Header */}
-            <View style={styles.tableHeader}>
-              <View style={styles.serialCell}>
-                <Text style={styles.headerText}>ಕ್ರ.ಸಂ</Text>
-              </View>
-              <View style={styles.checklistCell}>
-                <Text style={styles.headerText}> ಚಿಕ್ ಲಿಸ್ಟ</Text>
-              </View>
-              <View style={styles.requiredCell}>
-                <Text style={styles.headerText}>
-                  ಅಗತ್ಯವಿರುವ ಗಿಲ್ಲಟ್ಟಿ (ಇಲ್ಲ/ಹೌದು)
-                </Text>
-              </View>
-              <View style={styles.pagesCell}>
-                <Text style={styles.headerText}>ಪುಟಗಳ ಸಂಖ್ಯೆ ಪ್ರತಿ ಸಂಖ್ಯೆ</Text>
-              </View>
-            </View>
-
-            {/* Table Rows */}
-            {checklistItems.map((item, index) => (
-              <View key={index} style={styles.tableRow}>
-                <View style={styles.serialCell}>
-                  <Text style={styles.serialText}>{item.sl}</Text>
-                </View>
-                <View style={styles.checklistCell}>
-                  <Text style={styles.kannadaText}>{item.kannada}</Text>
-                  <Text style={styles.englishText}>{item.english}</Text>
-                </View>
-                <View style={styles.requiredCell}>
-                  <Text style={styles.centeredText}>{item.required}</Text>
-                </View>
-                <View style={styles.pagesCell}>
-                  <Text style={styles.centeredText}>{item.pages}</Text>
-                </View>
-              </View>
-            ))}
-
-            {/* Empty rows */}
-            {[...Array(2)].map((_, index) => (
-              <View
-                key={`empty-${index}`}
-                style={[styles.tableRow, styles.emptyRow]}
-              >
-                <View style={styles.serialCell}>
-                  <Text></Text>
-                </View>
-                <View style={styles.checklistCell}>
-                  <Text></Text>
-                </View>
-                <View style={styles.requiredCell}>
-                  <Text></Text>
-                </View>
-                <View style={styles.pagesCell}>
-                  <Text></Text>
-                </View>
-              </View>
-            ))}
-          </View>
-
-          {/* Bottom Right Signature */}
-          <View style={styles.signatureSection}>
-            <Text style={styles.signatureText}>
-              ಪಂಚಾಯತ ಅಭಿವೃದ್ಧಿ ಅಧಿಕಾರಿಗಳು
-            </Text>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>ಕಾಮಗಾರಿಮಂಜೂರಾದ ವರ್ಷ: </Text>
+            <Text style={styles.infoValue}>{sanctionedYear}</Text>
           </View>
         </View>
-      </Page>
-    </Document>
+
+        {/* Table */}
+        <View style={styles.table}>
+          {/* Table Header */}
+          <View style={styles.tableHeader}>
+            <View style={styles.serialCell}>
+              <Text style={styles.headerText}>ಕ್ರ.ಸಂ</Text>
+            </View>
+            <View style={styles.checklistCell}>
+              <Text style={styles.headerText}> ಚಿಕ್ ಲಿಸ್ಟ</Text>
+            </View>
+            <View style={styles.requiredCell}>
+              <Text style={styles.headerText}>
+                ಅಗತ್ಯವಿರುವ ಗಿಲ್ಲಟ್ಟಿ (ಇಲ್ಲ/ಹೌದು)
+              </Text>
+            </View>
+            <View style={styles.pagesCell}>
+              <Text style={styles.headerText}>ಪುಟಗಳ ಸಂಖ್ಯೆ ಪ್ರತಿ ಸಂಖ್ಯೆ</Text>
+            </View>
+          </View>
+
+          {/* Table Rows */}
+          {checklistItems.map((item, index) => (
+            <View key={index} style={styles.tableRow}>
+              <View style={styles.serialCell}>
+                <Text style={styles.serialText}>{item.sl}</Text>
+              </View>
+              <View style={styles.checklistCell}>
+                <Text style={styles.kannadaText}>{item.kannada}</Text>
+                <Text style={styles.englishText}>{item.english}</Text>
+              </View>
+              <View style={styles.requiredCell}>
+                <Text style={styles.centeredText}>{item.required}</Text>
+              </View>
+              <View style={styles.pagesCell}>
+                <Text style={styles.centeredText}>{item.pages}</Text>
+              </View>
+            </View>
+          ))}
+
+          {/* Empty rows */}
+          {[...Array(2)].map((_, index) => (
+            <View
+              key={`empty-${index}`}
+              style={[styles.tableRow, styles.emptyRow]}
+            >
+              <View style={styles.serialCell}>
+                <Text></Text>
+              </View>
+              <View style={styles.checklistCell}>
+                <Text></Text>
+              </View>
+              <View style={styles.requiredCell}>
+                <Text></Text>
+              </View>
+              <View style={styles.pagesCell}>
+                <Text></Text>
+              </View>
+            </View>
+          ))}
+        </View>
+
+        {/* Bottom Right Signature */}
+        <View style={styles.signatureSection}>
+          <Text style={styles.signatureText}>ಪಂಚಾಯತ ಅಭಿವೃದ್ಧಿ ಅಧಿಕಾರಿಗಳು</Text>
+        </View>
+      </View>
+    </Page>
   );
 };
 

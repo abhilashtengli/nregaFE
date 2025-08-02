@@ -5,7 +5,6 @@ import {
   View,
   StyleSheet,
   Font,
-  Document
 } from "@react-pdf/renderer";
 
 // Register Kannada font
@@ -210,9 +209,9 @@ const MaterialSupplyRegisterPDF: React.FC<MaterialSupplyRegisterProps> = ({
   };
 
   return (
-    <Document>
+    <>
       {Array.from({ length: totalPages }, (_, i) => renderPage(i + 1))}
-    </Document>
+    </>
   );
 };
 

@@ -1,13 +1,5 @@
 import { Base_Url } from "@/lib/constant";
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  Font,
-  Image
-} from "@react-pdf/renderer";
+import { Page, Text, View, StyleSheet, Font, Image } from "@react-pdf/renderer";
 import mnreaga from "@/assets/MGNREGA logo.jpg";
 import state_logo from "@/assets/State logo.jpeg";
 import emblem from "@/assets/State embalm.jpeg";
@@ -211,86 +203,84 @@ const StageWisePhotosPDF: React.FC<StageWiseGTProp> = ({ sWGTData }) => {
   };
 
   return (
-    <Document>
-      <Page size="A4" style={styles.page}>
-        <View style={styles.container}>
-          {/* Header with three logos */}
-          <View style={styles.headerSection}>
-            {/* Left Logo */}
-            <View style={styles.leftlogoContainer}>
-              <Image style={styles.logo} src={mnreaga} />
-            </View>
+    <Page size="A4" style={styles.page}>
+      <View style={styles.container}>
+        {/* Header with three logos */}
+        <View style={styles.headerSection}>
+          {/* Left Logo */}
+          <View style={styles.leftlogoContainer}>
+            <Image style={styles.logo} src={mnreaga} />
+          </View>
 
-            {/* Center Section */}
-            <View style={styles.centerSection}>
-              <Image style={styles.centerLogo} src={emblem} />
-              <View style={styles.centerTextContainer}>
-                <Text style={styles.headerText}>
-                  ಗ್ರಾಮ ಪಂಚಾಯತಿ {gramPanchayat} ತಾ|| {taluka} ಜಿ|| {district}
-                </Text>
-                <Text style={styles.headerSubText}>
-                  ಮಹಾತ್ಮಾ ಗಾಂಧಿ ನರೇಗಾ ಯೋಜನೆ - ಕರ್ನಾಟಕ
-                </Text>
-              </View>
-            </View>
-
-            {/* Right Logo */}
-            <View style={styles.logoContainer}>
-              <Image style={styles.logo} src={state_logo} />
+          {/* Center Section */}
+          <View style={styles.centerSection}>
+            <Image style={styles.centerLogo} src={emblem} />
+            <View style={styles.centerTextContainer}>
+              <Text style={styles.headerText}>
+                ಗ್ರಾಮ ಪಂಚಾಯತಿ {gramPanchayat} ತಾ|| {taluka} ಜಿ|| {district}
+              </Text>
+              <Text style={styles.headerSubText}>
+                ಮಹಾತ್ಮಾ ಗಾಂಧಿ ನರೇಗಾ ಯೋಜನೆ - ಕರ್ನಾಟಕ
+              </Text>
             </View>
           </View>
 
-          {/* Title */}
-          <View style={styles.titleSection}>
-            <Text style={styles.mainTitle}>
-              ಹಂತವಾರು ಕಾಮಗಾರಿ ಛಾಯಾಚಿತ್ರಗಳು (Stage Wise Work Photos)
-            </Text>
-          </View>
-
-          {/* Work Details */}
-          <View style={styles.workDetailsSection}>
-            <Text style={styles.workDetailText}>
-              ಕಾಮಗಾರಿ ಹೆಸರು : {financialYear} {workName}
-            </Text>
-            <Text style={styles.workDetailText}>
-              ಕಾಮಗಾರಿ ಸಂಕೇತ ಸಂಖ್ಯೆ: {workCode}
-            </Text>
-          </View>
-
-          {/* Before Stage */}
-          <View style={styles.stageContainer}>
-            <Text style={styles.stageTitle}>Before Stage</Text>
-            <View style={styles.photoContainer}>
-              {renderPhoto(
-                beforeStageImageUrl,
-                "Before Stage",
-                "Before Stage Image Placeholder"
-              )}
-            </View>
-          </View>
-
-          {/* During Stage */}
-          <View style={styles.stageContainer}>
-            <Text style={styles.stageTitle}>During Stage</Text>
-            <View style={styles.photoContainer}>
-              {renderPhoto(
-                duringStageImageUrl,
-                "During Stage",
-                "During Stage Image Placeholder"
-              )}
-            </View>
-          </View>
-
-          {/* After Stage */}
-          <View style={styles.stageContainer}>
-            <Text style={styles.stageTitle}>After Stage</Text>
-            <View style={styles.photoContainer}>
-              {renderPhoto(afterStageImageUrl, "After Stage")}
-            </View>
+          {/* Right Logo */}
+          <View style={styles.logoContainer}>
+            <Image style={styles.logo} src={state_logo} />
           </View>
         </View>
-      </Page>
-    </Document>
+
+        {/* Title */}
+        <View style={styles.titleSection}>
+          <Text style={styles.mainTitle}>
+            ಹಂತವಾರು ಕಾಮಗಾರಿ ಛಾಯಾಚಿತ್ರಗಳು (Stage Wise Work Photos)
+          </Text>
+        </View>
+
+        {/* Work Details */}
+        <View style={styles.workDetailsSection}>
+          <Text style={styles.workDetailText}>
+            ಕಾಮಗಾರಿ ಹೆಸರು : {financialYear} {workName}
+          </Text>
+          <Text style={styles.workDetailText}>
+            ಕಾಮಗಾರಿ ಸಂಕೇತ ಸಂಖ್ಯೆ: {workCode}
+          </Text>
+        </View>
+
+        {/* Before Stage */}
+        <View style={styles.stageContainer}>
+          <Text style={styles.stageTitle}>Before Stage</Text>
+          <View style={styles.photoContainer}>
+            {renderPhoto(
+              beforeStageImageUrl,
+              "Before Stage",
+              "Before Stage Image Placeholder"
+            )}
+          </View>
+        </View>
+
+        {/* During Stage */}
+        <View style={styles.stageContainer}>
+          <Text style={styles.stageTitle}>During Stage</Text>
+          <View style={styles.photoContainer}>
+            {renderPhoto(
+              duringStageImageUrl,
+              "During Stage",
+              "During Stage Image Placeholder"
+            )}
+          </View>
+        </View>
+
+        {/* After Stage */}
+        <View style={styles.stageContainer}>
+          <Text style={styles.stageTitle}>After Stage</Text>
+          <View style={styles.photoContainer}>
+            {renderPhoto(afterStageImageUrl, "After Stage")}
+          </View>
+        </View>
+      </View>
+    </Page>
   );
 };
 

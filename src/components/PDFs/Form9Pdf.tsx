@@ -1,5 +1,4 @@
 import {
-  Document,
   Page,
   Text,
   View,
@@ -251,7 +250,6 @@ const Form9PDF: React.FC<Form9Data> = ({ form9Data }: Form9Data) => {
   ];
 
   return (
-    <Document>
       <Page size="A4" style={styles.page} wrap>
         <View style={styles.container}>
           {/* Header */}
@@ -351,7 +349,6 @@ const Form9PDF: React.FC<Form9Data> = ({ form9Data }: Form9Data) => {
           </View>
         </View>
       </Page>
-    </Document>
   );
 };
 

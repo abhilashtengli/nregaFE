@@ -1,5 +1,4 @@
 import {
-  Document,
   Page,
   Text,
   View,
@@ -362,7 +361,7 @@ const Form32PDF: React.FC<Form32Data> = ({ form32Data }) => {
   const totalPages = dataChunks.length;
 
   return (
-    <Document>
+    <>
       {dataChunks.map((chunk, pageIndex) => (
         <Page
           key={pageIndex}
@@ -501,7 +500,7 @@ const Form32PDF: React.FC<Form32Data> = ({ form32Data }) => {
           </View>
         </Page>
       ))}
-    </Document>
+    </>
   );
 };
 

@@ -27,6 +27,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import { Base_Url } from "@/lib/constant";
 import { useAuthStore } from "@/stores/userAuthStore";
+import UserManagementSkeleton from "@/components/shimmer/userManagementSkeleton";
 
 interface User {
   name: string;
@@ -299,7 +300,7 @@ export default function AdminPanelPage() {
 
   if (!isAuthenticated || !user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-l from-violet-100 to-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-2 text-gray-600">Loading...</p>
@@ -309,7 +310,7 @@ export default function AdminPanelPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen bg-gradient-to-l from-violet-100 to-white p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
@@ -399,12 +400,7 @@ export default function AdminPanelPage() {
 
         {/* Loading State */}
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-2 text-gray-600">Loading users...</p>
-            </div>
-          </div>
+          <UserManagementSkeleton />
         ) : (
           /* Users Table */
           <Card>
@@ -500,22 +496,6 @@ export default function AdminPanelPage() {
                                     )}
                                     Accept
                                   </Button>
-                                  {/* <Button
-                                    size="sm"
-                                    variant="destructive"
-                                    onClick={() =>
-                                      handleUserVerification(user.email, false)
-                                    }
-                                    disabled={processingUsers.has(user.email)}
-                                    className="cursor-pointer bg-white text-black border hover:bg-gray-100"
-                                  >
-                                    {processingUsers.has(user.email) ? (
-                                      <Loader2 className="h-4 w-4 animate-spin" />
-                                    ) : (
-                                      <XCircle className="h-4 w-4 text-red-700" />
-                                    )}
-                                    Reject
-                                  </Button> */}
                                 </div>
                               </TableCell>
                             </TableRow>

@@ -1,5 +1,4 @@
 import {
-  Document,
   Page,
   Text,
   View,
@@ -323,7 +322,6 @@ const PaperNotificationPDF: React.FC<PaperNotificationData> = ({
   };
 
   return (
-    <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.container}>
           {/* Header */}
@@ -554,7 +552,6 @@ const PaperNotificationPDF: React.FC<PaperNotificationData> = ({
           </View>
         </View>
       </Page>
-    </Document>
   );
 };
 

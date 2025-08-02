@@ -1,5 +1,4 @@
 import {
-  Document,
   Page,
   Text,
   View,
@@ -184,11 +183,9 @@ const styles = StyleSheet.create({
 const MaterialMisPDF: React.FC<MaterialMisPDFProps> = ({ data }) => {
   if (!data) {
     return (
-      <Document>
         <Page size="A4" style={styles.page}>
           <Text>No data provided.</Text>
         </Page>
-      </Document>
     );
   }
 
@@ -207,7 +204,7 @@ const MaterialMisPDF: React.FC<MaterialMisPDFProps> = ({ data }) => {
   }
 
   return (
-    <Document>
+    <>
       {pages.map((pageMaterials, pageIndex) => (
         <Page key={pageIndex} size="A4" style={styles.page}>
           <View style={styles.container}>
@@ -323,7 +320,7 @@ const MaterialMisPDF: React.FC<MaterialMisPDFProps> = ({ data }) => {
           )}
         </Page>
       ))}
-    </Document>
+    </>
   );
 };
 

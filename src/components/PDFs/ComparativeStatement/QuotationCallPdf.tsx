@@ -373,7 +373,7 @@ const QuotationCallPDF: React.FC<QuotationCallProps> = ({
                   <Text style={styles.subjectContent}>
                     ಮಹಾತ್ಮ ಗಾಂಧಿ ರಾಷ್ಟ್ರೀಯ ಗ್ರಾಮೀಣ ಉದ್ಯೋಗ ಖಾತ್ರಿ ಯೋಜನೆಯಲ್ಲಿ
                     ಕೈಗೊಳ್ಳಲಾಗುವ ಕಾಮಗಾರಿಗಳಿಗೆ ಸಾಮಗ್ರಿ ಸರಬರಾಜು ಮಾಡಲು ದರಪಟ್ಟಿ
-                    ಆಹ್ವಾನಿಸುವ ಬಗ್ಗೆ.
+                    ಆಹ್ವಾನಿಸುವ ಬಗ್ಗೆ. {"       "}
                   </Text>
                 </View>
                 <View style={styles.referenceSection}>

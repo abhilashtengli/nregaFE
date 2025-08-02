@@ -1,5 +1,4 @@
 import {
-  Document,
   Page,
   Text,
   View,
@@ -218,7 +217,6 @@ const Form6PDF: React.FC<Form6Data> = ({ form6Data }) => {
   const address = "";
 
   return (
-    <Document>
       <Page size="A4" style={styles.page} wrap>
         <View style={styles.container}>
           {/* Header */}
@@ -362,7 +360,6 @@ const Form6PDF: React.FC<Form6Data> = ({ form6Data }) => {
           </View>
         </View>
       </Page>
-    </Document>
   );
 };
 

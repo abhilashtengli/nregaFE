@@ -37,15 +37,16 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
+    <div className="min-h-screen bg-gradient-to-r from-violet-100 to-white 0 p-4 ">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center py-6">
           <h1 className="text-3xl font-bold text-gray-900">
-            Work Code & Vendor Management System
+            NREGA PDF Generator
           </h1>
-          <p className="text-gray-600 mt-2">
-            Manage work codes, financial years, and vendor information
+          <p className="text-slate-600 text-lg max-w-2xl mx-auto leading-relaxed">
+            Professional PDF report generation for work codes, financial
+            management, and vendor information
           </p>
         </div>
 
@@ -59,16 +60,50 @@ export default function Home() {
         <ActionsSection workData={workData} />
 
         {/* Status Information */}
-        <Card className="bg-blue-50 border-blue-200">
+        <Card className="bg-gradient-to-r from-green-50 via-indigo-50 to-gray-100 border border-blue-200/50 shadow-lg backdrop-blur-sm">
           <CardContent className="pt-6">
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-4">
-                <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                  System Status: Active
-                </span>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="px-3 py-1.5 rounded-full text-sm font-medium bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 border border-green-200">
+                    System Status: Active
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      workData ? "bg-blue-500" : "bg-amber-500"
+                    } animate-pulse`}
+                  ></div>
+                  <span
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium border ${
+                      workData
+                        ? "bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 border-blue-200"
+                        : "bg-gradient-to-r from-amber-100 to-orange-100 text-amber-700 border-amber-200"
+                    }`}
+                  >
+                    Data Status: {workData ? "Retrieved" : "Pending"}
+                  </span>
+                </div>
               </div>
-              <div className="text-gray-600">
-                Data Status: {workData ? "Retrieved" : "Pending"}
+              <div className="flex items-center gap-2 text-slate-600">
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <span className="text-sm font-medium">
+                  Last Updated: {new Date().toLocaleTimeString()}
+                </span>
               </div>
             </div>
           </CardContent>

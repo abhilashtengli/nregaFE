@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import { useWorkStore } from "@/stores/workStore";
 import { Base_Url } from "@/lib/constant";
+import MaterialDataSkeleton from "./shimmer/materialDataShimmer";
 
 // API Response Types
 interface MaterialData {
@@ -512,10 +513,7 @@ export default function VendorInformation() {
               </DialogHeader>
 
               {isLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-8 h-8 animate-spin mr-2" />
-                  <span>Loading material data...</span>
-                </div>
+                <MaterialDataSkeleton />
               ) : (
                 <div className="space-y-4">
                   {/* Date Range Inputs */}

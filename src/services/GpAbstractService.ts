@@ -29,6 +29,9 @@ export type GPAbstractData = {
   sanctionedYear: string;
   workCode: string;
   workStatus: string;
+  district: string;
+  block: string; //taluka
+  panchayat: string;
   workPurposeStatus: string;
   sanctionNoAndDate: string;
   includedInPerspectivePlan: string;
@@ -60,6 +63,9 @@ const fetchGPAbstract = async (
     const formattedData: GPAbstractData = {
       workName: apiData.workName,
       workStatus: apiData.workStatus,
+      district: apiData.district,
+      block: apiData.block,
+      panchayat: apiData.panchayat,
       workPurposeStatus: apiData.workPurposeStatus,
       workCode: apiData.workCode,
       sanctionedYear: apiData.sanctionedYear,

@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
   }
 });
 
-const NMRPDF: React.FC<NMRPDFProps> = ({
+const BlankNMRPDF: React.FC<NMRPDFProps> = ({
   district,
   taluka,
   gramPanchayat,
@@ -540,4 +540,4 @@ const NMRPDF: React.FC<NMRPDFProps> = ({
   return <>{Array.from({ length: totalPages }, (_, i) => renderPage(i + 1))}</>;
 };
 
-export default NMRPDF;
+export default BlankNMRPDF;

@@ -317,20 +317,6 @@ const SupplyOrderPDF: React.FC<SupplyOrderProps> = ({
   vendorWithVendorQuotation,
   address = ""
 }) => {
-  // Format dates from ISO strings to readable format
-  const formatDate = (isoString: string) => {
-    const date = new Date(isoString);
-    return date
-      .toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric"
-      })
-      .replace(/\//g, "/");
-  };
-
-  const formattedTenderPublishDate = formatDate(tenderPublishDate);
-
   // Dynamic pagination based on data length
   const itemsPerPage = 15; // Items per page for supply order
   const totalPages = Math.ceil(vendorWithVendorQuotation.length / itemsPerPage);
@@ -387,9 +373,7 @@ const SupplyOrderPDF: React.FC<SupplyOrderProps> = ({
                   ಕ್ರ.ಸಂ/ಗ್ರಾ.ಪಂ./ಮ.ರಾ.ಗ್ರಾ.ಉ.ಖಾ.ಯೋ/ಸಾ.ಸ.ಆ/{year}
                 </Text>
 
-                <Text style={styles.date}>
-                  ದಿನಾಂಕ: {formattedTenderPublishDate}
-                </Text>
+                <Text style={styles.date}>ದಿನಾಂಕ: {tenderPublishDate}</Text>
               </View>
 
               <Text style={styles.title}>ಸಾಮಗ್ರಿ ಸರಬರಾಜು ಆದೇಶ{"   "}</Text>
@@ -406,8 +390,7 @@ const SupplyOrderPDF: React.FC<SupplyOrderProps> = ({
                 <View style={styles.referenceSection}>
                   <Text style={styles.referenceLabel}>ಉಲ್ಲೇಖ :{"  "}</Text>
                   <Text style={styles.referenceContent}>
-                    ಈ ಕಛೇರಿ ದರಪಟ್ಟಿ ಆಹ್ವಾನ ಪ್ರಕಟಣೆ ದಿನಾಂಕ :{" "}
-                    {formattedTenderPublishDate}
+                    ಈ ಕಛೇರಿ ದರಪಟ್ಟಿ ಆಹ್ವಾನ ಪ್ರಕಟಣೆ ದಿನಾಂಕ : {tenderPublishDate}
                     {"\n    "}2) ನೀವು ಸಲ್ಲಿಸಿರುವ ದರಪಟ್ಟಿ ದಿನಾಂಕ:{" "}
                     {winnerQuotationSubmissionDate}
                   </Text>

@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -45,11 +43,12 @@ import ComparativeStatementPDF from "./PDFs/ComparativeStatement/ComparativePdf"
 import ContractorQuotationPDF from "./PDFs/ComparativeStatement/ContractorQuotation";
 import SupplyOrderPDF from "./PDFs/ComparativeStatement/SupplyOrderPdf";
 import { useFetchBlankNMRData } from "@/services/BlankNmrService";
-import NMRPDF from "./PDFs/BlankNmrPdf";
 import { useFetchFilledNMRData } from "@/services/FilledNmrService";
 import FilledENmrPDF from "./PDFs/FilledNmrPdf";
 import { useFetchMaterialSupplyRegister } from "@/services/MaterialSupplyRegisterService";
 import MaterialSupplyRegisterPDF from "./PDFs/MaterialSupplyRegisterPdf";
+import BlankNMRPDF from "./PDFs/BlankNmrPdf";
+import { addDays } from "@/utils/addDays";
 
 // PDF Action buttons data
 const pdfButtons = [
@@ -104,6 +103,8 @@ interface ActionsSectionProps {
 
 export default function ActionsSection({ workData }: ActionsSectionProps) {
   const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState<string>("");
+
   const [currentDownloading, setCurrentDownloading] = useState<string | null>(
     null
   );
@@ -146,7 +147,11 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
         return;
       }
 
-      const blob = await pdf(<ChecklistPDF checklistData={data} />).toBlob();
+      const blob = await pdf(
+        <Document>
+          <ChecklistPDF checklistData={data} />
+        </Document>
+      ).toBlob();
       saveAs(blob, "checklist.pdf");
       toast.success("Checklist PDF downloaded successfully!");
     } catch (error) {
@@ -169,7 +174,11 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
 
       console.log("Data fetched:", data);
 
-      const blob = await pdf(<FrontPagePDF frontPageData={data} />).toBlob();
+      const blob = await pdf(
+        <Document>
+          <FrontPagePDF frontPageData={data} />
+        </Document>
+      ).toBlob();
 
       saveAs(blob, "Frontpage.pdf");
       toast.success("Front Page PDF downloaded successfully!");
@@ -193,7 +202,11 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
 
       console.log("Data fetched:", data);
 
-      const blob = await pdf(<GPAbstractPDF GpAbstractData={data} />).toBlob();
+      const blob = await pdf(
+        <Document>
+          <GPAbstractPDF GpAbstractData={data} />
+        </Document>
+      ).toBlob();
 
       saveAs(blob, "GpAbstract.pdf"); // Simulate API call
       toast.success("GP Abstract PDF downloaded successfully!");
@@ -217,7 +230,11 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
 
       console.log("Data fetched:", data);
 
-      const blob = await pdf(<WorkOrderPDF workOrderData={data} />).toBlob();
+      const blob = await pdf(
+        <Document>
+          <WorkOrderPDF workOrderData={data} />
+        </Document>
+      ).toBlob();
 
       saveAs(blob, "Workorder.pdf"); // Simulate API call
       toast.success("Work Order PDF downloaded successfully!");
@@ -240,7 +257,11 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
 
       console.log("Data fetched:", data);
 
-      const blob = await pdf(<TechnicalSanctionPDF tsData={data} />).toBlob();
+      const blob = await pdf(
+        <Document>
+          <TechnicalSanctionPDF tsData={data} />
+        </Document>
+      ).toBlob();
 
       saveAs(blob, "TsCopy.pdf"); // Simulate API call
       toast.success("TS Copy PDF downloaded successfully!");
@@ -262,7 +283,9 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
       }
 
       const blob = await pdf(
-        <AdministrativeSanctionPDF asData={data} />
+        <Document>
+          <AdministrativeSanctionPDF asData={data} />
+        </Document>
       ).toBlob();
       saveAs(blob, "administrative-sanction.pdf");
       toast.success("AS Copy PDF downloaded successfully!");
@@ -286,7 +309,11 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
 
       console.log("Data fetched:", data);
 
-      const blob = await pdf(<Form6PDF form6Data={data} />).toBlob();
+      const blob = await pdf(
+        <Document>
+          <Form6PDF form6Data={data} />
+        </Document>
+      ).toBlob();
 
       saveAs(blob, "form6.pdf");
       toast.success("Form 6 PDF downloaded successfully!");
@@ -308,7 +335,11 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
         return;
       }
 
-      const blob = await pdf(<Form8PDF form8Data={data.form8Data} />).toBlob();
+      const blob = await pdf(
+        <Document>
+          <Form8PDF form8Data={data.form8Data} />
+        </Document>
+      ).toBlob();
 
       saveAs(blob, "Form8.pdf");
       toast.success("Form 8 PDF downloaded successfully!");
@@ -331,7 +362,11 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
 
       console.log("Data fetched:", data);
 
-      const blob = await pdf(<Form9PDF form9Data={data.form9Data} />).toBlob();
+      const blob = await pdf(
+        <Document>
+          <Form9PDF form9Data={data.form9Data} />
+        </Document>
+      ).toBlob();
 
       saveAs(blob, "Form9.pdf"); // Simulate API call
       toast.success("Form 9 PDF downloaded successfully!");
@@ -368,7 +403,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
                 accountNo: string;
               }[];
             }) => (
-              <NMRPDF
+              <BlankNMRPDF
                 key={musterRoll.mustrollNo}
                 district={data.district}
                 taluka={data.taluka}
@@ -465,7 +500,9 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
       console.log("Data fetched:", data);
 
       const blob = await pdf(
-        <MovementSlipPDF movementSlipData={data} />
+        <Document>
+          <MovementSlipPDF movementSlipData={data} />
+        </Document>
       ).toBlob();
 
       saveAs(blob, "Movementslip.pdf");
@@ -489,7 +526,11 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
 
       console.log("Data fetched:", data);
 
-      const blob = await pdf(<WLFTOPdf wlfto={data} />).toBlob();
+      const blob = await pdf(
+        <Document>
+          <WLFTOPdf wlfto={data} />
+        </Document>
+      ).toBlob();
 
       saveAs(blob, "Wl-Fto.pdf"); // Simulate API call
       toast.success("WL/Fto's PDF downloaded successfully!");
@@ -513,7 +554,11 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
 
       console.log("Data fetched:", data);
 
-      const blob = await pdf(<Form32PDF form32Data={data} />).toBlob();
+      const blob = await pdf(
+        <Document>
+          <Form32PDF form32Data={data} />
+        </Document>
+      ).toBlob();
 
       saveAs(blob, "Form32.pdf");
       toast.success("Form 32 PDF downloaded successfully!");
@@ -536,7 +581,11 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
 
       console.log("Data fetched:", data);
 
-      const blob = await pdf(<MaterialMisPDF data={data} />).toBlob();
+      const blob = await pdf(
+        <Document>
+          <MaterialMisPDF data={data} />
+        </Document>
+      ).toBlob();
 
       saveAs(blob, "MaterialMis.pdf"); // Simulate API call
       toast.success("Material MIS PDF downloaded successfully!");
@@ -560,7 +609,9 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
       console.log("Data fetched:", data);
 
       const blob = await pdf(
-        <WorkCompletionPDF workCompletionData={data} />
+        <Document>
+          <WorkCompletionPDF workCompletionData={data} />
+        </Document>
       ).toBlob();
 
       saveAs(blob, "Work-completion.pdf");
@@ -586,12 +637,14 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
 
       // Prepare the document with multiple NMRs
       const doc = (
-        <MaterialSupplyRegisterPDF
-          workCode={data.workCode}
-          workName={data.workName}
-          vendorName={data.vendorName}
-          materialData={data.materialData}
-        />
+        <Document>
+          <MaterialSupplyRegisterPDF
+            workCode={data.workCode}
+            workName={data.workName}
+            vendorName={data.vendorName}
+            materialData={data.materialData}
+          />
+        </Document>
       );
 
       const blob = await pdf(doc).toBlob();
@@ -618,7 +671,9 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
       console.log("Data fetched:", data);
 
       const blob = await pdf(
-        <PaperNotificationPDF paperNotificationData={data} />
+        <Document>
+          <PaperNotificationPDF paperNotificationData={data} />
+        </Document>
       ).toBlob();
 
       saveAs(blob, "Paper-Notification.pdf");
@@ -639,6 +694,13 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
         toast.error("No data found for download.");
         return;
       }
+      const comparativeStatementDate = addDays(data.tenderPublishDate, 9);
+      const supplyOrderDate = addDays(data.tenderPublishDate, 10);
+      console.log(
+        `comparativeStatementDate Date  : `,
+        comparativeStatementDate
+      );
+      console.log(`supplyOrderDate Date  : `, supplyOrderDate);
 
       console.log("Data fetched:", data);
 
@@ -663,7 +725,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
             year={data.year}
             workCode={data.workCode}
             workName={data.workName}
-            tenderPublishDate={data.tenderPublishDate}
+            tenderPublishDate={comparativeStatementDate}
             vendorDetails={data.vendorDetails}
             vendorWithVendorQuotation={data.vendorWithVendorQuotation}
           />
@@ -674,7 +736,9 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
             year={data.year}
             workCode={data.workCode}
             workName={data.workName}
-            tenderPublishDate={data.tenderPublishDate}
+            tenderPublishDate={
+              data.vendorDetails.VendorOneQuotationSubmissiondate
+            }
             contractorNumber={1}
             contractorName={data.vendorDetails.vendorNameOne}
             contractorGst={data.vendorDetails.vendorGstOne}
@@ -690,7 +754,9 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
             year={data.year}
             workCode={data.workCode}
             workName={data.workName}
-            tenderPublishDate={data.tenderPublishDate}
+            tenderPublishDate={
+              data.vendorDetails.vendorTwoQuotationSubmissiondate
+            }
             contractorNumber={2}
             contractorName={data.vendorDetails.vendorNameTwo}
             contractorGst={data.vendorDetails.vendorGstTwo}
@@ -706,7 +772,9 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
             year={data.year}
             workCode={data.workCode}
             workName={data.workName}
-            tenderPublishDate={data.tenderPublishDate}
+            tenderPublishDate={
+              data.vendorDetails.vendorThreeQuotationSubmissiondate
+            }
             contractorNumber={3}
             contractorName={data.vendorDetails.vendorNameThree}
             contractorGst={data.vendorDetails.vendorGstThree}
@@ -722,7 +790,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
             year={data.year}
             workCode={data.workCode}
             workName={data.workName}
-            tenderPublishDate={data.tenderPublishDate}
+            tenderPublishDate={supplyOrderDate}
             winnerContractorName={data.vendorDetails.vendorNameOne}
             winnerContractorGst={data.vendorDetails.vendorGstOne}
             winnerQuotationSubmissionDate={
@@ -758,7 +826,11 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
 
       console.log("Data fetched:", data);
 
-      const blob = await pdf(<StageWisePhotosPDF sWGTData={data} />).toBlob();
+      const blob = await pdf(
+        <Document>
+          <StageWisePhotosPDF sWGTData={data} />
+        </Document>
+      ).toBlob();
 
       saveAs(blob, "Stage-wise-geo-tagging.pdf");
       toast.success("Stage wise Geo tagging PDF downloaded successfully!");
@@ -794,6 +866,22 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
     stageWiseGeoTagging: handleStageWiseGeoTagging
   };
 
+  // const handleDownloadAll = async () => {
+  //   if (!workData) {
+  //     toast.error("Missing Information", {
+  //       description: "Please submit work code data first."
+  //     });
+  //     return;
+  //   }
+
+  //   setIsDownloading(true);
+  //   await new Promise((resolve) => setTimeout(resolve, 3000));
+  //   setIsDownloading(false);
+
+  //   toast.success("Download Complete", {
+  //     description: "All PDFs have been generated and downloaded successfully."
+  //   });
+  // };
   const handleDownloadAll = async () => {
     if (!workData) {
       toast.error("Missing Information", {
@@ -803,12 +891,438 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
     }
 
     setIsDownloading(true);
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    setIsDownloading(false);
+    setDownloadProgress("Fetching data...");
 
-    toast.success("Download Complete", {
-      description: "All PDFs have been generated and downloaded successfully."
-    });
+    try {
+      // Create an array to track successful components
+      const successfulComponents: string[] = [];
+      const failedComponents: string[] = [];
+
+      // Helper function to safely fetch data
+      const safeFetch = async <T,>(
+        fetchFn: () => Promise<T | null>,
+        name: string
+      ): Promise<T | null> => {
+        try {
+          setDownloadProgress(`Fetching ${name}...`);
+          const data = await fetchFn();
+          if (data) {
+            successfulComponents.push(name);
+          }
+          return data;
+        } catch (error) {
+          console.error(`Failed to fetch ${name}:`, error);
+          failedComponents.push(name);
+          return null;
+        }
+      };
+
+      // Fetch all data with progress updates
+      const [
+        asData,
+        checklistData,
+        frontPageData,
+        gpAbstractData,
+        workOrderData,
+        tsData,
+        form6Data,
+        form8Data,
+        form9Data,
+        movementSlipData,
+        wlFtoData,
+        form32Data,
+        materialMisData,
+        workCompletionData,
+        paperNotificationData,
+        swgData,
+        quotationData,
+        blankNMRData,
+        filledNMRData,
+        materialSupplyRegisterData
+      ] = await Promise.all([
+        safeFetch(fetchASCopyData, "AS Copy"),
+        safeFetch(fetchCheckListDataData, "Checklist"),
+        safeFetch(fetchFrontPageData, "Front Page"),
+        safeFetch(fetchGpAbstractData, "GP Abstract"),
+        safeFetch(fetchWorkOrderData, "Work Order"),
+        safeFetch(fetchTsCopyData, "TS Copy"),
+        safeFetch(fetchForm6Data, "Form 6"),
+        safeFetch(fetchForm8Data, "Form 8"),
+        safeFetch(fetchForm9Data, "Form 9"),
+        safeFetch(fetchMovementSlipData, "Movement Slip"),
+        safeFetch(fetchWlFtoData, "WL/FTO"),
+        safeFetch(fetchForm32Data, "Form 32"),
+        safeFetch(fetchMaterialMisData, "Material MIS"),
+        safeFetch(fetchWorkCompletionData, "Work Completion"),
+        safeFetch(fetchPaperNotificationData, "Paper Notification"),
+        safeFetch(fetchSwgData, "Stage-wise Geo Tagging"),
+        safeFetch(fetchAllQuotationPdfData, "Quotation Forms"),
+        safeFetch(fetchBlankNMRData, "Blank NMRs"),
+        safeFetch(fetchFilledNMRData, "Filled NMRs"),
+        safeFetch(fetchMaterialSupplyRegisteryData, "Material Supply Register")
+      ]);
+
+      setDownloadProgress("Generating PDFs...");
+
+      // Create an array to hold all PDF components
+      const allPdfComponents: React.ReactElement[] = [];
+
+      // Helper to add component with error handling
+      const addComponent = (component: React.ReactElement, name: string) => {
+        try {
+          allPdfComponents.push(component);
+        } catch (error) {
+          console.error(`Failed to add ${name} component:`, error);
+          failedComponents.push(name);
+        }
+      };
+
+      // Add all components (same as before, but with error handling)
+      if (checklistData)
+        addComponent(
+          <ChecklistPDF key="checklist" checklistData={checklistData} />,
+          "Checklist"
+        );
+      if (frontPageData)
+        addComponent(
+          <FrontPagePDF key="frontpage" frontPageData={frontPageData} />,
+          "Front Page"
+        );
+      if (gpAbstractData)
+        addComponent(
+          <GPAbstractPDF key="gpabstract" GpAbstractData={gpAbstractData} />,
+          "GP Abstract"
+        );
+      if (workOrderData)
+        addComponent(
+          <WorkOrderPDF key="workorder" workOrderData={workOrderData} />,
+          "Work Order"
+        );
+      if (tsData)
+        addComponent(
+          <TechnicalSanctionPDF key="tscopy" tsData={tsData} />,
+          "TS Copy"
+        );
+      if (asData)
+        addComponent(
+          <AdministrativeSanctionPDF key="ascopy" asData={asData} />,
+          "AS Copy"
+        );
+      if (form6Data)
+        addComponent(<Form6PDF key="form6" form6Data={form6Data} />, "Form 6");
+      if (form8Data)
+        addComponent(
+          <Form8PDF key="form8" form8Data={form8Data.form8Data} />,
+          "Form 8"
+        );
+      if (form9Data)
+        addComponent(
+          <Form9PDF key="form9" form9Data={form9Data.form9Data} />,
+          "Form 9"
+        );
+
+      // Handle multiple page documents
+      if (blankNMRData?.workerData) {
+        blankNMRData.workerData.forEach(
+          (
+            musterRoll: {
+              mustrollNo: string;
+              workers: {
+                slNo: number;
+                jobCardNo: string;
+                familyHeadName: string;
+                requestLetterFrom: string;
+                accountNo: string;
+              }[];
+            },
+            index: number
+          ) => {
+            addComponent(
+              <BlankNMRPDF
+                key={`blanknmr-${index}`}
+                district={blankNMRData.district}
+                taluka={blankNMRData.taluka}
+                gramPanchayat={blankNMRData.gramPanchayat}
+                financialYear={blankNMRData.financialYear}
+                workCode={blankNMRData.workCode}
+                workName={blankNMRData.workName}
+                fromDate={blankNMRData.fromDate}
+                toDate={blankNMRData.toDate}
+                technicalSanctionNo={blankNMRData.technicalSanctionNo}
+                technicalSanctionDate={blankNMRData.technicalSanctionDate}
+                financialSanctionNo={blankNMRData.financialSanctionNo}
+                financialSanctionDate={blankNMRData.financialSanctionDate}
+                musterRollNo={musterRoll.mustrollNo}
+                workerData={musterRoll.workers}
+              />,
+              `Blank NMR ${index + 1}`
+            );
+          }
+        );
+      }
+
+      if (filledNMRData?.workersData) {
+        filledNMRData.workersData.forEach(
+          (
+            musterRoll: {
+              musterRollNo: string | undefined;
+              fromDate: string | undefined;
+              toDate: string | undefined;
+              data: {
+                slNo: number;
+                name: string;
+                jobCardNo: string;
+                totalAttendance: number;
+                oneDayWage: number;
+                pendingAmountByAttendance: number;
+                totalCashPayment: number;
+                bankName: string;
+                wagelistNo: string;
+                creditedDate: string;
+                signature: string;
+                attendanceBy: string;
+              }[];
+            },
+            index: number
+          ) => {
+            addComponent(
+              <FilledENmrPDF
+                key={`fillednmr-${index}`}
+                district={filledNMRData.district}
+                taluka={filledNMRData.taluka}
+                panchayat={filledNMRData.panchayat}
+                approvalNo={filledNMRData.approvalNo}
+                approvalDate={filledNMRData.approvalDate}
+                workCode={filledNMRData.workCode}
+                workName={filledNMRData.workName}
+                financialYear={filledNMRData.financialYear}
+                totalWage={filledNMRData.totalWage}
+                wage={filledNMRData.wage}
+                totalAttendanceCount={filledNMRData.totalAttendanceCount}
+                musterRollNo={musterRoll.musterRollNo}
+                fromDate={musterRoll.fromDate}
+                toDate={musterRoll.toDate}
+                workersData={musterRoll.data}
+              />,
+              `Filled NMR ${index + 1}`
+            );
+          }
+        );
+      }
+
+      // Add remaining components...
+      if (movementSlipData)
+        addComponent(
+          <MovementSlipPDF
+            key="movementslip"
+            movementSlipData={movementSlipData}
+          />,
+          "Movement Slip"
+        );
+      if (wlFtoData)
+        addComponent(<WLFTOPdf key="wlfto" wlfto={wlFtoData} />, "WL/FTO");
+      if (form32Data)
+        addComponent(
+          <Form32PDF key="form32" form32Data={form32Data} />,
+          "Form 32"
+        );
+      if (materialMisData)
+        addComponent(
+          <MaterialMisPDF key="materialmis" data={materialMisData} />,
+          "Material MIS"
+        );
+      if (workCompletionData)
+        addComponent(
+          <WorkCompletionPDF
+            key="workcompletion"
+            workCompletionData={workCompletionData}
+          />,
+          "Work Completion"
+        );
+
+      if (materialSupplyRegisterData) {
+        addComponent(
+          <MaterialSupplyRegisterPDF
+            key="materialsupplyregister"
+            workCode={materialSupplyRegisterData.workCode}
+            workName={materialSupplyRegisterData.workName}
+            vendorName={materialSupplyRegisterData.vendorName}
+            materialData={materialSupplyRegisterData.materialData}
+          />,
+          "Material Supply Register"
+        );
+      }
+
+      if (paperNotificationData) {
+        addComponent(
+          <PaperNotificationPDF
+            key="papernotification"
+            paperNotificationData={paperNotificationData}
+          />,
+          "Paper Notification"
+        );
+      }
+
+      // Add quotation documents
+      if (quotationData) {
+        const comparativeStatementDate = addDays(
+          quotationData.tenderPublishDate,
+          9
+        );
+        const supplyOrderDate = addDays(quotationData.tenderPublishDate, 10);
+        console.log(
+          "comparativeStatementDate combine : ",
+          comparativeStatementDate
+        );
+        console.log("supplyOrderDate combine : ", supplyOrderDate);
+
+        addComponent(
+          <QuotationCallPDF
+            key="quotationcall"
+            gramPanchayat={quotationData.gramPanchayat}
+            taluka={quotationData.taluka}
+            district={quotationData.district}
+            year={quotationData.year}
+            administrativeSanction={quotationData.administrativeSanction}
+            workCode={quotationData.workCode}
+            workName={quotationData.workName}
+            tenderPublishDate={quotationData.tenderPublishDate}
+            tenderSubmissionDate={quotationData.tenderSubmissionDate}
+            materialData={quotationData.materialData}
+          />,
+          "Quotation Call"
+        );
+
+        addComponent(
+          <ComparativeStatementPDF
+            key="comparativestatement"
+            gramPanchayat={quotationData.gramPanchayat}
+            taluka={quotationData.taluka}
+            district={quotationData.district}
+            year={quotationData.year}
+            workCode={quotationData.workCode}
+            workName={quotationData.workName}
+            tenderPublishDate={comparativeStatementDate}
+            vendorDetails={quotationData.vendorDetails}
+            vendorWithVendorQuotation={quotationData.vendorWithVendorQuotation}
+          />,
+          "Comparative Statement"
+        );
+
+        // Add contractor quotations
+        const contractors = [
+          {
+            name: quotationData.vendorDetails.vendorNameOne,
+            gst: quotationData.vendorDetails.vendorGstOne,
+            date: quotationData.vendorDetails.VendorOneQuotationSubmissiondate,
+            number: 1
+          },
+          {
+            name: quotationData.vendorDetails.vendorNameTwo,
+            gst: quotationData.vendorDetails.vendorGstTwo,
+            date: quotationData.vendorDetails.vendorTwoQuotationSubmissiondate,
+            number: 2
+          },
+          {
+            name: quotationData.vendorDetails.vendorNameThree,
+            gst: quotationData.vendorDetails.vendorGstThree,
+            date: quotationData.vendorDetails
+              .vendorThreeQuotationSubmissiondate,
+            number: 3
+          }
+        ];
+
+        contractors.forEach((contractor, index) => {
+          addComponent(
+            <ContractorQuotationPDF
+              key={`contractor-${index}`}
+              gramPanchayat={quotationData.gramPanchayat}
+              taluka={quotationData.taluka}
+              district={quotationData.district}
+              year={quotationData.year}
+              workCode={quotationData.workCode}
+              workName={quotationData.workName}
+              tenderPublishDate={contractor.date}
+              contractorNumber={contractor.number}
+              contractorName={contractor.name}
+              contractorGst={contractor.gst}
+              quotationSubmissionDate={contractor.date}
+              vendorWithVendorQuotation={
+                quotationData.vendorWithVendorQuotation
+              }
+            />,
+            `Contractor ${contractor.number} Quotation`
+          );
+        });
+
+        addComponent(
+          <SupplyOrderPDF
+            key="supplyorder"
+            gramPanchayat={quotationData.gramPanchayat}
+            taluka={quotationData.taluka}
+            district={quotationData.district}
+            year={quotationData.year}
+            workCode={quotationData.workCode}
+            workName={quotationData.workName}
+            tenderPublishDate={supplyOrderDate}
+            winnerContractorName={quotationData.vendorDetails.vendorNameOne}
+            winnerContractorGst={quotationData.vendorDetails.vendorGstOne}
+            winnerQuotationSubmissionDate={
+              quotationData.vendorDetails.VendorOneQuotationSubmissiondate
+            }
+            vendorWithVendorQuotation={quotationData.vendorWithVendorQuotation}
+            address=""
+          />,
+          "Supply Order"
+        );
+      }
+
+      if (swgData) {
+        addComponent(
+          <StageWisePhotosPDF key="stagewise" sWGTData={swgData} />,
+          "Stage-wise Photos"
+        );
+      }
+
+      // Check if we have any components to render
+      if (allPdfComponents.length === 0) {
+        toast.error("No data available to generate PDFs");
+        return;
+      }
+
+      setDownloadProgress("Compiling document...");
+
+      // Generate the combined PDF with memory optimization
+      const document = <Document>{allPdfComponents}</Document>;
+
+      // Use toBlob with onUpdate for progress
+      const blob = await pdf(document).toBlob();
+
+      // Save the combined PDF
+      const currentDate = new Date().toISOString().split("T")[0];
+      const fileName = `${workData.workDetail.workCode}_Complete_Documentation_${currentDate}.pdf`;
+      saveAs(blob, fileName);
+
+      // Show detailed success message
+      let message = `Successfully generated ${successfulComponents.length} documents.`;
+      if (failedComponents.length > 0) {
+        message += ` Failed to generate: ${failedComponents.join(", ")}.`;
+      }
+
+      toast.success("Download Complete", {
+        description: message,
+        duration: 5000
+      });
+    } catch (error) {
+      console.error("Error downloading all PDFs:", error);
+      toast.error("Failed to generate complete PDF", {
+        description:
+          "Please try downloading individual documents or contact support."
+      });
+    } finally {
+      setIsDownloading(false);
+      setDownloadProgress("");
+    }
   };
 
   return (
@@ -843,7 +1357,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
           </div>
 
           <div className="flex justify-center pt-4 border-t">
-            <Button
+            {/* <Button
               size="lg"
               onClick={handleDownloadAll}
               disabled={!workData || isAnyButtonLoading}
@@ -853,6 +1367,24 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
                 <>
                   <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                   Generating PDFs...
+                </>
+              ) : (
+                <>
+                  <Download className="w-5 h-5 mr-2" />
+                  Download All PDFs
+                </>
+              )}
+            </Button> */}
+            <Button
+              size="lg"
+              onClick={handleDownloadAll}
+              disabled={!workData || isAnyButtonLoading}
+              className="px-8 py-4 text-lg cursor-pointer font-semibold bg-blue-600 hover:bg-blue-700"
+            >
+              {isDownloading ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  {downloadProgress || "Generating PDFs..."}
                 </>
               ) : (
                 <>

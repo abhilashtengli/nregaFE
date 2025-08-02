@@ -87,7 +87,7 @@ const fetchComparativeStatement = async (
       materialData: apiData.materialData.map((item: MaterialData) => ({
         slNo: item.slNo,
         materialName: item.materialName,
-        quantity: item.quantity,
+        quantity: Number(item.quantity).toFixed(2).toString(),
         price: item.price
       })),
       vendorDetails: apiData.vendorDetails,
@@ -95,7 +95,7 @@ const fetchComparativeStatement = async (
         (item: VendorWithVendorQuotation) => ({
           slNo: item.slNo,
           materialName: item.materialName,
-          quantity: item.quantity,
+          quantity: Number(item.quantity).toFixed(2).toString(),
           rate: item.rate,
           unit: item.unit,
           contractor1Rate: item.contractor1Rate,

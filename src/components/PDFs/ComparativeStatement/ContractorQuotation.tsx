@@ -245,18 +245,7 @@ const ContractorQuotationPDF: React.FC<ContractorQuotationProps> = ({
   vendorWithVendorQuotation
 }) => {
   // Format dates from ISO strings to readable format
-  const formatDate = (isoString: string) => {
-    const date = new Date(isoString);
-    return date
-      .toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric"
-      })
-      .replace(/\//g, "/");
-  };
 
-  const formattedTenderPublishDate = formatDate(tenderPublishDate);
 
   // Dynamic pagination based on data length
   const itemsPerPage = 18; // Items per page for contractor quotations (portrait)
@@ -306,7 +295,7 @@ const ContractorQuotationPDF: React.FC<ContractorQuotationProps> = ({
                   <Text style={styles.referenceLabel}>ಉಲ್ಲೇಖ:</Text>
                   <Text style={styles.referenceContent}>
                     ತಮ್ಮ ದರಪಟ್ಟಿ ಆಹ್ವಾನ ಪ್ರಕಟಣೆ ದಿನಾಂಕ : ದಿನಾಂಕ :{" "}
-                    {formattedTenderPublishDate}
+                    {tenderPublishDate}
                   </Text>
                 </View>
                 <Text style={styles.separatorLine}>********</Text>

@@ -1,5 +1,4 @@
 import {
-  Document,
   Page,
   Text,
   View,
@@ -245,7 +244,6 @@ const MovementSlipPDF: React.FC<MovementSlipData> = ({ movementSlipData }) => {
   }
 
   return (
-    <Document>
       <Page size="A4" style={styles.page} wrap>
         <View style={styles.container}>
           {/* Header */}
@@ -407,7 +405,6 @@ const MovementSlipPDF: React.FC<MovementSlipData> = ({ movementSlipData }) => {
           </View>
         </View>
       </Page>
-    </Document>
   );
 };
 

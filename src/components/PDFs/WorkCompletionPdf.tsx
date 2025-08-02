@@ -1,12 +1,4 @@
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  Font,
-  Image
-} from "@react-pdf/renderer";
+import { Page, Text, View, StyleSheet, Font, Image } from "@react-pdf/renderer";
 import mnrega from "@/assets/MGNREGA logo.jpg";
 import embelem from "@/assets/State embalm.jpeg";
 import state_logo from "@/assets/State logo.jpeg";
@@ -299,198 +291,184 @@ const WorkCompletionPDF: React.FC<WorkCompletionData> = ({
   };
 
   return (
-    <Document>
-      <Page size="A4" style={styles.page}>
-        <View style={styles.container}>
-          {/* Header with logos */}
-          <View style={styles.headerSection}>
-            {/* Left Logo */}
-            <Image style={styles.logoLeft} src={mnrega} />
+    <Page size="A4" style={styles.page}>
+      <View style={styles.container}>
+        {/* Header with logos */}
+        <View style={styles.headerSection}>
+          {/* Left Logo */}
+          <Image style={styles.logoLeft} src={mnrega} />
 
-            {/* Center Content */}
-            <View style={styles.centerContent}>
-              <View style={styles.centerHeader}>
-                <Text style={styles.kannadaTitle}>ಕರ್ನಾಟಕ</Text>
-                <Image style={styles.centerLogo} src={embelem} />
-                <Text style={styles.kannadaTitle}>ಸರ್ಕಾರ</Text>
-              </View>
-              <Text style={styles.annexureText}>ಅನುಬಂಧ - V Annexture - V</Text>
-              <Text style={styles.mainTitle}>
-                ಕಾಮಗಾರಿಯ ಮುಕ್ತಾಯ ದೃಢೀಕರಣ ನಮೂನೆ{" "}
-              </Text>
+          {/* Center Content */}
+          <View style={styles.centerContent}>
+            <View style={styles.centerHeader}>
+              <Text style={styles.kannadaTitle}>ಕರ್ನಾಟಕ</Text>
+              <Image style={styles.centerLogo} src={embelem} />
+              <Text style={styles.kannadaTitle}>ಸರ್ಕಾರ</Text>
             </View>
-
-            {/* Right Logo */}
-            <Image style={styles.logoRight} src={state_logo} />
-          </View>
-
-          {/* Address Section */}
-          <View style={styles.addressSection}>
-            <Text style={styles.addressLine}>ಗೆ,</Text>
-            <Text style={styles.addressLine}>
-              ಅಧ್ಯಕ್ಷರು / ಕಾರ್ಯಕ್ರಮ ಅಧಿಕಾರಿ
-            </Text>
-            <Text style={styles.addressLine}>
-              {gramPanchayat} ಗ್ರಾಮ ಪಂಚಾಯತಿ
-            </Text>
-            <Text style={styles.addressLine}>{taluka} ತಾಲ್ಲೂಕು</Text>
-            <Text style={styles.addressLine}>{district} ಜಿಲ್ಲೆ</Text>
-          </View>
-
-          {/* Subject */}
-          <View style={styles.subjectSection}>
-            <Text style={styles.subjectTitle}>
-              ವಿಷಯ: {year} ಸಾಲಿನಲ್ಲಿ {gramPanchayat} ಗ್ರಾಮ ಪಂಚಾಯಿತಿಯ ಘನತ್ಯಾಜ್ಯ
-              ವಿಲೇವಾರಿ ಘಟಕ ನಿರ್ಮಾಣ ಕಾಮಗಾರಿಯ ಮುಕ್ತಾಯ ದೃಢೀಕರಣ
+            <Text style={styles.annexureText}>ಅನುಬಂಧ - V Annexture - V</Text>
+            <Text style={styles.mainTitle}>
+              ಕಾಮಗಾರಿಯ ಮುಕ್ತಾಯ ದೃಢೀಕರಣ ನಮೂನೆ{" "}
             </Text>
           </View>
 
-          {/* Salutation */}
-          <View style={styles.salutationSection}>
-            <Text style={styles.salutation}>ಮಾನ್ಯರೇ,</Text>
-            <Text style={styles.introText}>
-              ಮೇಲಿನ ವಿಷಯಕ್ಕೆ ಸಂಬಂಧಿಸಿದಂತೆ ಈ ಕೆಳಕಂಡ ವಿವರಗಳೊಂದಿಗೆ ಕಾಮಗಾರಿ ಮುಕ್ತಾಯ
-              ದೃಢೀಕರಣ ಸಲ್ಲಿಸುತ್ತಿದ್ದೇನೆ.
+          {/* Right Logo */}
+          <Image style={styles.logoRight} src={state_logo} />
+        </View>
+
+        {/* Address Section */}
+        <View style={styles.addressSection}>
+          <Text style={styles.addressLine}>ಗೆ,</Text>
+          <Text style={styles.addressLine}>ಅಧ್ಯಕ್ಷರು / ಕಾರ್ಯಕ್ರಮ ಅಧಿಕಾರಿ</Text>
+          <Text style={styles.addressLine}>{gramPanchayat} ಗ್ರಾಮ ಪಂಚಾಯತಿ</Text>
+          <Text style={styles.addressLine}>{taluka} ತಾಲ್ಲೂಕು</Text>
+          <Text style={styles.addressLine}>{district} ಜಿಲ್ಲೆ</Text>
+        </View>
+
+        {/* Subject */}
+        <View style={styles.subjectSection}>
+          <Text style={styles.subjectTitle}>
+            ವಿಷಯ: {year} ಸಾಲಿನಲ್ಲಿ {gramPanchayat} ಗ್ರಾಮ ಪಂಚಾಯಿತಿಯ ಘನತ್ಯಾಜ್ಯ
+            ವಿಲೇವಾರಿ ಘಟಕ ನಿರ್ಮಾಣ ಕಾಮಗಾರಿಯ ಮುಕ್ತಾಯ ದೃಢೀಕರಣ
+          </Text>
+        </View>
+
+        {/* Salutation */}
+        <View style={styles.salutationSection}>
+          <Text style={styles.salutation}>ಮಾನ್ಯರೇ,</Text>
+          <Text style={styles.introText}>
+            ಮೇಲಿನ ವಿಷಯಕ್ಕೆ ಸಂಬಂಧಿಸಿದಂತೆ ಈ ಕೆಳಕಂಡ ವಿವರಗಳೊಂದಿಗೆ ಕಾಮಗಾರಿ ಮುಕ್ತಾಯ
+            ದೃಢೀಕರಣ ಸಲ್ಲಿಸುತ್ತಿದ್ದೇನೆ.
+          </Text>
+        </View>
+
+        {/* Work Details with Border */}
+        <View style={styles.workDetailsContainer}>
+          <View style={styles.workDetailRow}>
+            <Text style={styles.workDetailLabel}>ಕಾಮಗಾರಿ ಸಂಕೇತ:</Text>
+            <Text style={styles.workDetailValue}>{workCode}</Text>
+          </View>
+
+          <View style={styles.workDetailRow}>
+            <Text style={styles.workDetailLabel}>ಕಾಮಗಾರಿ ಹೆಸರು:</Text>
+            <Text style={styles.workDetailValue}>{workName}</Text>
+          </View>
+
+          <View style={styles.workDetailRow}>
+            <View style={styles.gramaRow}>
+              <Text style={styles.workDetailLabelgram}>ಗ್ರಾಮ:</Text>
+              <Text style={styles.workDetailValue}>{grama}</Text>
+            </View>
+
+            <View style={styles.gramaRow}>
+              <Text style={styles.workDetailLabelgramPanchayat}>
+                ಗ್ರಾಮ ಪಂಚಾಯತ್:
+              </Text>
+              <Text style={styles.workDetailValue}>{gramPanchayat}</Text>
+            </View>
+          </View>
+
+          <View style={styles.workDetailRow}>
+            <Text style={styles.workDetailLabelWide}>
+              ಕಾಮಗಾರಿ ಸ್ಥಳ (ಪ್ಲಾಟ್ ಸಂಖ್ಯೆ, ಇತ್ಯಾದಿ):
+            </Text>
+            <Text style={styles.workDetailValue}>{worksite}</Text>
+          </View>
+
+          <View style={styles.workDetailRow}>
+            <Text style={styles.workDetailLabel}>
+              ಆಡಳಿತಾತ್ಮಕ ಅನುಮತಿ ಸಂಖ್ಯೆ:
+            </Text>
+            <Text style={styles.workDetailValue}>
+              {administrativeSanctionNo}
             </Text>
           </View>
 
-          {/* Work Details with Border */}
-          <View style={styles.workDetailsContainer}>
-            <View style={styles.workDetailRow}>
-              <Text style={styles.workDetailLabel}>ಕಾಮಗಾರಿ ಸಂಕೇತ:</Text>
-              <Text style={styles.workDetailValue}>{workCode}</Text>
-            </View>
-
-            <View style={styles.workDetailRow}>
-              <Text style={styles.workDetailLabel}>ಕಾಮಗಾರಿ ಹೆಸರು:</Text>
-              <Text style={styles.workDetailValue}>{workName}</Text>
-            </View>
-
-            <View style={styles.workDetailRow}>
-              <View style={styles.gramaRow}>
-                <Text style={styles.workDetailLabelgram}>ಗ್ರಾಮ:</Text>
-                <Text style={styles.workDetailValue}>{grama}</Text>
-              </View>
-
-              <View style={styles.gramaRow}>
-                <Text style={styles.workDetailLabelgramPanchayat}>
-                  ಗ್ರಾಮ ಪಂಚಾಯತ್:
-                </Text>
-                <Text style={styles.workDetailValue}>{gramPanchayat}</Text>
-              </View>
-            </View>
-
-            <View style={styles.workDetailRow}>
-              <Text style={styles.workDetailLabelWide}>
-                ಕಾಮಗಾರಿ ಸ್ಥಳ (ಪ್ಲಾಟ್ ಸಂಖ್ಯೆ, ಇತ್ಯಾದಿ):
-              </Text>
-              <Text style={styles.workDetailValue}>{worksite}</Text>
-            </View>
-
-            <View style={styles.workDetailRow}>
-              <Text style={styles.workDetailLabel}>
-                ಆಡಳಿತಾತ್ಮಕ ಅನುಮತಿ ಸಂಖ್ಯೆ:
-              </Text>
-              <Text style={styles.workDetailValue}>
-                {administrativeSanctionNo}
-              </Text>
-            </View>
-
-            <View style={styles.workDetailRow}>
-              <Text style={styles.workDetailLabelWide}>
-                ಕಾರ್ಯಾದೇಶ ಸಂಖ್ಯೆ ಮತ್ತು ದಿನಾಂಕ:{" "}
-              </Text>
-              <Text style={styles.workDetailValue}>
-                {workOrderNo}, {workOrderDate}
-              </Text>
-            </View>
-
-            <View style={styles.workDetailRow}>
-              <Text style={styles.workDetailLabel}>
-                ಕಾಮಗಾರಿ ಪ್ರಾರಂಭ ದಿನಾಂಕ:
-              </Text>
-              <Text style={styles.workDetailValue}>
-                {formatDate(workStartDate)}
-              </Text>
-            </View>
-
-            <View style={styles.workDetailRow}>
-              <Text style={styles.workDetailLabel}>
-                ಕಾಮಗಾರಿ ಮುಕ್ತಾಯ ದಿನಾಂಕ:
-              </Text>
-              <Text style={styles.workDetailValue}>{workEndDate}</Text>
-            </View>
-
-            <View style={styles.workDetailRow}>
-              <Text style={styles.workDetailLabel}>
-                ಬಳಸಿದ ಮಸ್ಟರ್ ರೋಲ್‌ನ ಐಡಿ:
-              </Text>
-              <Text style={styles.workDetailValue}>{masterollId}</Text>
-            </View>
-
-            <View style={styles.workDetailRow}>
-              <Text style={styles.workDetailLabel}>ವೆಚ್ಚ:</Text>
-              <Text style={styles.workDetailValue}>{expenditure}</Text>
-            </View>
-
-            <View style={styles.bottomRow}>
-              <View style={styles.bottomRowItem}>
-                <Text style={styles.workDetailLabelBottomRow}>ಕೂಲಿ:</Text>
-                <Text style={styles.workDetailValue}>{wage}</Text>
-              </View>
-
-              <View style={styles.bottomRowItem}>
-                <Text style={styles.workDetailLabelBottomRow}>ಸಾಮಾಗ್ರಿ:</Text>
-                <Text style={styles.workDetailValue}>{material}</Text>
-              </View>
-
-              <View style={styles.bottomRowItem}>
-                <Text style={styles.workDetailLabelBottomRow}>ಒಟ್ಟು:</Text>
-                <Text style={styles.workDetailValue}>{total}</Text>
-              </View>
-            </View>
+          <View style={styles.workDetailRow}>
+            <Text style={styles.workDetailLabelWide}>
+              ಕಾರ್ಯಾದೇಶ ಸಂಖ್ಯೆ ಮತ್ತು ದಿನಾಂಕ:{" "}
+            </Text>
+            <Text style={styles.workDetailValue}>
+              {workOrderNo}, {workOrderDate}
+            </Text>
           </View>
 
-          {/* Social Audit Date */}
-          <View style={styles.socialAuditSection}>
-            <View style={styles.socialAuditRow}>
-              <Text style={styles.socialAuditLabel}>
-                ಸಾಮಾಜಿಕ ಪರಿಶೋಧನೆ ದಿನಾಂಕ: {"   "}
-              </Text>
-              {/* <Text style={styles.socialAuditValue}>_________________</Text> */}
-            </View>
+          <View style={styles.workDetailRow}>
+            <Text style={styles.workDetailLabel}>ಕಾಮಗಾರಿ ಪ್ರಾರಂಭ ದಿನಾಂಕ:</Text>
+            <Text style={styles.workDetailValue}>
+              {formatDate(workStartDate)}
+            </Text>
           </View>
 
-          {/* Signature Section */}
-          <View style={styles.signatureSection}>
-            <View style={styles.signatureContainer}>
-              <View style={styles.signatureBox}>
-                <Text style={styles.signatureLabel}>(ಸಹಿ)</Text>
-                <View style={styles.signatureLineContainer}>
-                  <View style={styles.signatureLineRow}>
-                    <View style={styles.signatureLine}></View>
-                    <View style={styles.signatureText}>
-                      <Text style={styles.signatureTextOnly}>
-                        ರವರಿಂದ ದೃಢೀಕರಣ
-                      </Text>
-                    </View>
+          <View style={styles.workDetailRow}>
+            <Text style={styles.workDetailLabel}>ಕಾಮಗಾರಿ ಮುಕ್ತಾಯ ದಿನಾಂಕ:</Text>
+            <Text style={styles.workDetailValue}>{workEndDate}</Text>
+          </View>
+
+          <View style={styles.workDetailRow}>
+            <Text style={styles.workDetailLabel}>ಬಳಸಿದ ಮಸ್ಟರ್ ರೋಲ್‌ನ ಐಡಿ:</Text>
+            <Text style={styles.workDetailValue}>{masterollId}</Text>
+          </View>
+
+          <View style={styles.workDetailRow}>
+            <Text style={styles.workDetailLabel}>ವೆಚ್ಚ:</Text>
+            <Text style={styles.workDetailValue}>{expenditure}</Text>
+          </View>
+
+          <View style={styles.bottomRow}>
+            <View style={styles.bottomRowItem}>
+              <Text style={styles.workDetailLabelBottomRow}>ಕೂಲಿ:</Text>
+              <Text style={styles.workDetailValue}>{wage}</Text>
+            </View>
+
+            <View style={styles.bottomRowItem}>
+              <Text style={styles.workDetailLabelBottomRow}>ಸಾಮಾಗ್ರಿ:</Text>
+              <Text style={styles.workDetailValue}>{material}</Text>
+            </View>
+
+            <View style={styles.bottomRowItem}>
+              <Text style={styles.workDetailLabelBottomRow}>ಒಟ್ಟು:</Text>
+              <Text style={styles.workDetailValue}>{total}</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Social Audit Date */}
+        <View style={styles.socialAuditSection}>
+          <View style={styles.socialAuditRow}>
+            <Text style={styles.socialAuditLabel}>
+              ಸಾಮಾಜಿಕ ಪರಿಶೋಧನೆ ದಿನಾಂಕ: {"   "}
+            </Text>
+            {/* <Text style={styles.socialAuditValue}>_________________</Text> */}
+          </View>
+        </View>
+
+        {/* Signature Section */}
+        <View style={styles.signatureSection}>
+          <View style={styles.signatureContainer}>
+            <View style={styles.signatureBox}>
+              <Text style={styles.signatureLabel}>(ಸಹಿ)</Text>
+              <View style={styles.signatureLineContainer}>
+                <View style={styles.signatureLineRow}>
+                  <View style={styles.signatureLine}></View>
+                  <View style={styles.signatureText}>
+                    <Text style={styles.signatureTextOnly}>ರವರಿಂದ ದೃಢೀಕರಣ</Text>
                   </View>
                 </View>
               </View>
+            </View>
 
-              <View style={styles.signatureBox}>
-                <View style={styles.signatureLineContainer}>
-                  {/* <View style={styles.signatureLine}></View> */}
-                  <Text style={styles.signatureTextOnly}>
-                    ಅಧಿಕೃತ ಅಧಿಕಾರಿಯ ಸಹಿ
-                  </Text>
-                </View>
+            <View style={styles.signatureBox}>
+              <View style={styles.signatureLineContainer}>
+                {/* <View style={styles.signatureLine}></View> */}
+                <Text style={styles.signatureTextOnly}>
+                  ಅಧಿಕೃತ ಅಧಿಕಾರಿಯ ಸಹಿ
+                </Text>
               </View>
             </View>
           </View>
         </View>
-      </Page>
-    </Document>
+      </View>
+    </Page>
   );
 };
 

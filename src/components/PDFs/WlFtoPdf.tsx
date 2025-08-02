@@ -1,5 +1,4 @@
 import {
-  Document,
   Page,
   Text,
   View,
@@ -184,7 +183,6 @@ const WLFTOPdf: React.FC<wlftoData> = ({ wlfto }) => {
   const { gramPanchayat, taluka, district, ftoData = [] } = wlfto;
 
   return (
-    <Document>
       <Page size="A4" style={styles.page} orientation="landscape" wrap>
         <View style={styles.container}>
           {/* Header */}
@@ -315,7 +313,6 @@ const WLFTOPdf: React.FC<wlftoData> = ({ wlfto }) => {
           </View>
         </View>
       </Page>
-    </Document>
   );
 };
 

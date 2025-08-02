@@ -274,18 +274,18 @@ const ComparativeStatementPDF: React.FC<ComparativeStatementProps> = ({
   vendorWithVendorQuotation
 }) => {
   // Format dates from ISO strings to readable format
-  const formatDate = (isoString: string) => {
-    const date = new Date(isoString);
-    return date
-      .toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric"
-      })
-      .replace(/\//g, "/");
-  };
+  // const formatDate = (isoString: string) => {
+  //   const date = new Date(isoString);
+  //   return date
+  //     .toLocaleDateString("en-GB", {
+  //       day: "2-digit",
+  //       month: "2-digit",
+  //       year: "numeric"
+  //     })
+  //     .replace(/\//g, "/");
+  // };
 
-  const formattedTenderPublishDate = formatDate(tenderPublishDate);
+  // const formattedTenderPublishDate = formatDate(tenderPublishDate);
 
   // Contractor details from vendorDetails object
   const contractor1 = {
@@ -370,9 +370,7 @@ const ComparativeStatementPDF: React.FC<ComparativeStatementProps> = ({
                 <Text style={styles.referenceNumber}>
                   ಕ್ರ.ಸಂ/ಗ್ರಾ.ಪಂ./ಮ.ರಾ.ಗ್ರಾ.ಉ.ಖಾ.ಯೋ/ದ.ಪ.ಅ.ತು.ಪ/{year}
                 </Text>
-                <Text style={styles.date}>
-                  ದಿನಾಂಕ: {formattedTenderPublishDate}
-                </Text>
+                <Text style={styles.date}>ದಿನಾಂಕ: {tenderPublishDate}</Text>
               </View>
 
               <Text style={styles.title}>ದರಪಟ್ಟಿಗಳ ತುಲನಾತ್ಮಕ ಪಟ್ಟಿ</Text>

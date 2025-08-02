@@ -1,13 +1,5 @@
 import { Base_Url } from "@/lib/constant";
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  Font,
-  Image
-} from "@react-pdf/renderer";
+import { Page, Text, View, StyleSheet, Font, Image } from "@react-pdf/renderer";
 
 // Register fonts
 Font.register({
@@ -28,6 +20,9 @@ type GPAbstractProps = {
   workStatus: string;
   sanctionedYear: string;
   workCode: string;
+  district: string;
+  block: string; //taluka
+  panchayat: string;
   workPurposeStatus: string;
   sanctionNoAndDate: string;
   includedInPerspectivePlan: string;
@@ -226,6 +221,9 @@ const GPAbstractPDF: React.FC<GPAbstractData> = ({ GpAbstractData }) => {
     approvedInAnnualPlan,
     estimatedCost,
     workStartDate,
+    district,
+    block, //taluka
+    panchayat,
     workCode,
     sanctionedYear,
     expenditureIncurred,
@@ -242,362 +240,362 @@ const GPAbstractPDF: React.FC<GPAbstractData> = ({ GpAbstractData }) => {
   const startLocation = "";
 
   return (
-    <Document>
-      <Page size="A4" style={styles.page}>
-        <View style={styles.container}>
-          {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.headerText}>Govt. of India</Text>
-            <Text style={styles.headerText}>Ministry of Rural Development</Text>
-            <Text style={styles.headerText}>
-              Department of Rural Development
+    <Page size="A4" style={styles.page}>
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.headerText}>Govt. of India</Text>
+          <Text style={styles.headerText}>Ministry of Rural Development</Text>
+          <Text style={styles.headerText}>Department of Rural Development</Text>
+          <View style={styles.redBanner}>
+            <Text style={styles.redBannerText}>
+              The Mahatma Gandhi National Rural Employment Guarantee Act
             </Text>
-            <View style={styles.redBanner}>
-              <Text style={styles.redBannerText}>
-                The Mahatma Gandhi National Rural Employment Guarantee Act
-              </Text>
-            </View>
-            <Text style={styles.dateText}>Wednesday, July 9, 2025</Text>
           </View>
+          <Text style={styles.dateText}>Wednesday, July 9, 2025</Text>
+        </View>
 
-          {/* Location Header */}
-          <View style={styles.locationTable}>
-            <View style={styles.locationRow}>
-              <Text style={styles.locationCell}>State : KARNATAKA</Text>
-              <Text style={styles.locationCell}>District : KALABURAGI</Text>
-              <Text style={styles.locationCell}>Block : JEVARGI</Text>
-              <Text style={styles.locationCell}>Panchayat : RANJANGI</Text>
-            </View>
-          </View>
-
-          {/* Work Details Table */}
-          <View style={styles.table}>
-            <View style={styles.tableRow}>
-              <Text style={[styles.tableHeaderCell, { width: "60%" }]}>
-                Work Name
-              </Text>
-              <View style={[styles.tableCell, { width: "40%" }]}>
-                <Text style={styles.workNameText}>
-                  <Text style={styles.englishText}>({workCode})</Text>{" "}
-                  <Text style={styles.kannadaText}>{workName}</Text>{" "}
-                  <Text style={styles.englishText}>({sanctionedYear})</Text>
-                </Text>
-              </View>
-            </View>
-            <View style={styles.tableRow}>
-              <Text style={[styles.tableHeaderCell, { width: "60%" }]}>
-                Nature of Work
-              </Text>
-              <Text style={[styles.tableCell, { width: "40%" }]}>
-                {natureOfWork}
-              </Text>
-            </View>
-            <View style={styles.tableRow}>
-              <Text style={[styles.tableHeaderCell, { width: "60%" }]}>
-                Work Status
-              </Text>
-              <Text style={[styles.tableCell, { width: "40%" }]}>
-                {workStatus}
-              </Text>
-            </View>
-            <View style={styles.tableRow}>
-              <Text style={[styles.tableHeaderCell, { width: "60%" }]}>
-                Work Purpose status
-              </Text>
-              <Text style={[styles.tableCell, { width: "40%" }]}>
-                {workPurposeStatus}
-              </Text>
-            </View>
-            <View style={styles.tableRow}>
-              <Text style={[styles.tableHeaderCell, { width: "20%" }]}>
-                Scope of Work
-              </Text>
-              <Text
-                style={[
-                  styles.tableHeaderCell,
-                  { width: "16.67%", textAlign: "center" }
-                ]}
-              >
-                Start Status
-              </Text>
-              <Text style={[styles.tableCell, { width: "23.3%" }]}>
-                {startStatus}
-              </Text>
-              <Text
-                style={[
-                  styles.tableHeaderCell,
-                  { width: "16.67%", textAlign: "center" }
-                ]}
-              >
-                End Status
-              </Text>
-              <Text style={[styles.tableCell, { width: "23.3%" }]}>
-                {endStatus}
-              </Text>
-            </View>
-            <View style={styles.tableRow}>
-              <Text style={[styles.tableHeaderCell, { width: "60%" }]}>
-                Sanction No. and Sanction Date : {sanctionNoAndDate}
-              </Text>
-
-              <Text style={[styles.tableHeaderCell, { width: "40%" }]}>
-                Whether Included in Five Year Perspective Plan :
-                {includedInPerspectivePlan}
-              </Text>
-            </View>
-            <View style={styles.tableRow}>
-              <Text style={[styles.tableHeaderCell, { width: "60%" }]}>
-                Whether Work Approved in Annual Plan : {approvedInAnnualPlan}
-              </Text>
-              <Text style={[styles.tableHeaderCell, { width: "40%" }]}>
-                Estimated Cost (In Lakhs) : {estimatedCost}
-              </Text>
-            </View>
-            <View style={styles.table}>
-              <View style={styles.tableRow}>
-                <Text style={[styles.tableHeaderCell, { width: "60%" }]}>
-                  Estimated Completion Time (in Months)
-                </Text>
-                <Text style={[styles.tableCell, { width: "40%" }]}>
-                  {estimatedCompletionTime}
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.tableRow}>
-              <Text style={[styles.tableHeaderCell, { width: "20%" }]}>
-                Location
-              </Text>
-              <Text style={[styles.tableHeaderCell, { width: "16.67%" }]}>
-                Start Location
-              </Text>
-              <Text style={[styles.tableCell, { width: "63.33%" }]}>
-                {startLocation}
-              </Text>
-            </View>
-          </View>
-
-          {/* Sanction and Planning Details */}
-
-          {/* Expenditure Incurred */}
-          <View style={styles.table}>
-            <Text style={styles.sectionHeader}>
-              Expenditure Incurred (in Rs.)
+        {/* Location Header */}
+        <View style={styles.locationTable}>
+          <View style={styles.locationRow}>
+            <Text style={styles.locationCell}>State : KARNATAKA</Text>
+            <Text style={styles.locationCell}>
+              District : {district.toUpperCase()}
             </Text>
-            <View style={styles.tableRowForExpenditure}>
-              <Text
-                style={[
-                  styles.tableHeaderCell,
-                  styles.tableCellCenter,
-                  { width: "16.67%" }
-                ]}
-              >
-                Unskilled
-              </Text>
-              <Text
-                style={[
-                  styles.tableHeaderCell,
-                  styles.tableCellCenter,
-                  { width: "16.67%" }
-                ]}
-              >
-                Semi-Skilled
-              </Text>
-              <Text
-                style={[
-                  styles.tableHeaderCell,
-                  styles.tableCellCenter,
-                  { width: "16.67%" }
-                ]}
-              >
-                Skilled
-              </Text>
-              <Text
-                style={[
-                  styles.tableHeaderCell,
-                  styles.tableCellCenter,
-                  { width: "16.67%" }
-                ]}
-              >
-                Material
-              </Text>
-              <Text
-                style={[
-                  styles.tableHeaderCell,
-                  styles.tableCellCenter,
-                  { width: "16.67%" }
-                ]}
-              >
-                Contingency
-              </Text>
-              <Text
-                style={[
-                  styles.tableHeaderCell,
-                  styles.tableCellCenter,
-                  { width: "16.65%" }
-                ]}
-              >
-                Total
-              </Text>
-            </View>
-            <View style={styles.tableRowForExpenditure}>
-              <Text style={[styles.tableCellCenter, { width: "16.67%" }]}>
-                {expenditureIncurred.unskilled}
-              </Text>
-              <Text style={[styles.tableCellCenter, { width: "16.67%" }]}>
-                {expenditureIncurred.semiSkilled}
-              </Text>
-              <Text style={[styles.tableCellCenter, { width: "16.67%" }]}>
-                {expenditureIncurred.skilled}
-              </Text>
-              <Text style={[styles.tableCellCenter, { width: "16.67%" }]}>
-                {expenditureIncurred.material}
-              </Text>
-              <Text style={[styles.tableCellCenter, { width: "16.67%" }]}>
-                {expenditureIncurred.contingency}
-              </Text>
-              <Text style={[styles.tableCellCenter, { width: "16.65%" }]}>
-                {expenditureIncurred.total}
+            <Text style={styles.locationCell}>
+              Block : {block.toUpperCase()}
+            </Text>
+            <Text style={styles.locationCell}>
+              Panchayat : {panchayat.toUpperCase()}
+            </Text>
+          </View>
+        </View>
+
+        {/* Work Details Table */}
+        <View style={styles.table}>
+          <View style={styles.tableRow}>
+            <Text style={[styles.tableHeaderCell, { width: "60%" }]}>
+              Work Name
+            </Text>
+            <View style={[styles.tableCell, { width: "40%" }]}>
+              <Text style={styles.workNameText}>
+                <Text style={styles.englishText}>({workCode})</Text>{" "}
+                <Text style={styles.kannadaText}>{workName}</Text>{" "}
+                <Text style={styles.englishText}>({sanctionedYear})</Text>
               </Text>
             </View>
           </View>
-
-          {/* Employment Generated */}
-          <View style={styles.table}>
-            <Text style={styles.sectionHeader}>Employment Generated</Text>
-            <View style={styles.tableRowForExpenditure}>
-              <Text
-                style={[styles.tableHeaderCell, { width: "33.33%" }]}
-              ></Text>
-              <Text
-                style={[
-                  styles.tableHeaderCell,
-                  styles.tableCellCenter,
-                  { width: "33.33%" }
-                ]}
-              >
-                Persondays
-              </Text>
-              <Text
-                style={[
-                  styles.tableHeaderCell,
-                  styles.tableCellCenter,
-                  { width: "33.34%" }
-                ]}
-              >
-                Total No. of Persons Given Work
-              </Text>
-            </View>
-            <View style={styles.tableRowForExpenditure}>
-              <Text style={[styles.tableHeaderCell, { width: "33.33%" }]}>
-                Unskilled
-              </Text>
-              <Text style={[styles.tableCellCenter, { width: "33.33%" }]}>
-                {employmentGenerated.unskilled.persondays}
-              </Text>
-              <Text style={[styles.tableCellCenter, { width: "33.34%" }]}>
-                {employmentGenerated.unskilled.totalPersons}
-              </Text>
-            </View>
-            <View style={styles.tableRowForExpenditure}>
-              <Text style={[styles.tableHeaderCell, { width: "33.33%" }]}>
-                Semi-Skilled
-              </Text>
-              <Text style={[styles.tableCellCenter, { width: "33.33%" }]}>
-                {employmentGenerated.semiSkilled.persondays}
-              </Text>
-              <Text style={[styles.tableCellCenter, { width: "33.34%" }]}>
-                {employmentGenerated.semiSkilled.totalPersons}
-              </Text>
-            </View>
-            <View style={styles.tableRowForExpenditure}>
-              <Text style={[styles.tableHeaderCell, { width: "33.33%" }]}>
-                Skilled
-              </Text>
-              <Text style={[styles.tableCellCenter, { width: "33.33%" }]}>
-                {employmentGenerated.skilled.persondays}
-              </Text>
-              <Text style={[styles.tableCellCenter, { width: "33.34%" }]}>
-                {employmentGenerated.skilled.totalPersons}
-              </Text>
-            </View>
+          <View style={styles.tableRow}>
+            <Text style={[styles.tableHeaderCell, { width: "60%" }]}>
+              Nature of Work
+            </Text>
+            <Text style={[styles.tableCell, { width: "40%" }]}>
+              {natureOfWork}
+            </Text>
           </View>
+          <View style={styles.tableRow}>
+            <Text style={[styles.tableHeaderCell, { width: "60%" }]}>
+              Work Status
+            </Text>
+            <Text style={[styles.tableCell, { width: "40%" }]}>
+              {workStatus}
+            </Text>
+          </View>
+          <View style={styles.tableRow}>
+            <Text style={[styles.tableHeaderCell, { width: "60%" }]}>
+              Work Purpose status
+            </Text>
+            <Text style={[styles.tableCell, { width: "40%" }]}>
+              {workPurposeStatus}
+            </Text>
+          </View>
+          <View style={styles.tableRow}>
+            <Text style={[styles.tableHeaderCell, { width: "20%" }]}>
+              Scope of Work
+            </Text>
+            <Text
+              style={[
+                styles.tableHeaderCell,
+                { width: "16.67%", textAlign: "center" }
+              ]}
+            >
+              Start Status
+            </Text>
+            <Text style={[styles.tableCell, { width: "23.3%" }]}>
+              {startStatus}
+            </Text>
+            <Text
+              style={[
+                styles.tableHeaderCell,
+                { width: "16.67%", textAlign: "center" }
+              ]}
+            >
+              End Status
+            </Text>
+            <Text style={[styles.tableCell, { width: "23.3%" }]}>
+              {endStatus}
+            </Text>
+          </View>
+          <View style={styles.tableRow}>
+            <Text style={[styles.tableHeaderCell, { width: "60%" }]}>
+              Sanction No. and Sanction Date : {sanctionNoAndDate}
+            </Text>
 
-          {/* Additional Details */}
+            <Text style={[styles.tableHeaderCell, { width: "40%" }]}>
+              Whether Included in Five Year Perspective Plan :
+              {includedInPerspectivePlan}
+            </Text>
+          </View>
+          <View style={styles.tableRow}>
+            <Text style={[styles.tableHeaderCell, { width: "60%" }]}>
+              Whether Work Approved in Annual Plan : {approvedInAnnualPlan}
+            </Text>
+            <Text style={[styles.tableHeaderCell, { width: "40%" }]}>
+              Estimated Cost (In Lakhs) : {estimatedCost}
+            </Text>
+          </View>
           <View style={styles.table}>
             <View style={styles.tableRow}>
-              <Text style={[styles.tableHeaderCell, { width: "50%" }]}>
-                Distinct Number of Muster Rolls used(Amount)
+              <Text style={[styles.tableHeaderCell, { width: "60%" }]}>
+                Estimated Completion Time (in Months)
               </Text>
-              <Text style={[styles.tableCell, { width: "50%" }]}>
-                {musterRollDetails}
-              </Text>
-            </View>
-            <View style={styles.tableRow}>
-              <Text style={[styles.tableHeaderCell, { width: "50%" }]}>
-                Work start date
-              </Text>
-              <Text style={[styles.tableCell, { width: "50%" }]}>
-                {workStartDate}
+              <Text style={[styles.tableCell, { width: "40%" }]}>
+                {estimatedCompletionTime}
               </Text>
             </View>
           </View>
 
-          {/* Photo Upload Section */}
-          <View style={styles.photoSection}>
-            <Text style={styles.sectionHeader}>Photo Uploaded of Work</Text>
-            <View style={styles.photoHeaderRow}>
-              <Text style={styles.photoHeaderCell}>
-                Before Start of Work(Work Site)
-              </Text>
-              <Text style={styles.photoHeaderCell}>
-                During Execution of Works
-              </Text>
+          <View style={styles.tableRow}>
+            <Text style={[styles.tableHeaderCell, { width: "20%" }]}>
+              Location
+            </Text>
+            <Text style={[styles.tableHeaderCell, { width: "16.67%" }]}>
+              Start Location
+            </Text>
+            <Text style={[styles.tableCell, { width: "63.33%" }]}>
+              {startLocation}
+            </Text>
+          </View>
+        </View>
+
+        {/* Sanction and Planning Details */}
+
+        {/* Expenditure Incurred */}
+        <View style={styles.table}>
+          <Text style={styles.sectionHeader}>
+            Expenditure Incurred (in Rs.)
+          </Text>
+          <View style={styles.tableRowForExpenditure}>
+            <Text
+              style={[
+                styles.tableHeaderCell,
+                styles.tableCellCenter,
+                { width: "16.67%" }
+              ]}
+            >
+              Unskilled
+            </Text>
+            <Text
+              style={[
+                styles.tableHeaderCell,
+                styles.tableCellCenter,
+                { width: "16.67%" }
+              ]}
+            >
+              Semi-Skilled
+            </Text>
+            <Text
+              style={[
+                styles.tableHeaderCell,
+                styles.tableCellCenter,
+                { width: "16.67%" }
+              ]}
+            >
+              Skilled
+            </Text>
+            <Text
+              style={[
+                styles.tableHeaderCell,
+                styles.tableCellCenter,
+                { width: "16.67%" }
+              ]}
+            >
+              Material
+            </Text>
+            <Text
+              style={[
+                styles.tableHeaderCell,
+                styles.tableCellCenter,
+                { width: "16.67%" }
+              ]}
+            >
+              Contingency
+            </Text>
+            <Text
+              style={[
+                styles.tableHeaderCell,
+                styles.tableCellCenter,
+                { width: "16.65%" }
+              ]}
+            >
+              Total
+            </Text>
+          </View>
+          <View style={styles.tableRowForExpenditure}>
+            <Text style={[styles.tableCellCenter, { width: "16.67%" }]}>
+              {expenditureIncurred.unskilled}
+            </Text>
+            <Text style={[styles.tableCellCenter, { width: "16.67%" }]}>
+              {expenditureIncurred.semiSkilled}
+            </Text>
+            <Text style={[styles.tableCellCenter, { width: "16.67%" }]}>
+              {expenditureIncurred.skilled}
+            </Text>
+            <Text style={[styles.tableCellCenter, { width: "16.67%" }]}>
+              {expenditureIncurred.material}
+            </Text>
+            <Text style={[styles.tableCellCenter, { width: "16.67%" }]}>
+              {expenditureIncurred.contingency}
+            </Text>
+            <Text style={[styles.tableCellCenter, { width: "16.65%" }]}>
+              {expenditureIncurred.total}
+            </Text>
+          </View>
+        </View>
+
+        {/* Employment Generated */}
+        <View style={styles.table}>
+          <Text style={styles.sectionHeader}>Employment Generated</Text>
+          <View style={styles.tableRowForExpenditure}>
+            <Text style={[styles.tableHeaderCell, { width: "33.33%" }]}></Text>
+            <Text
+              style={[
+                styles.tableHeaderCell,
+                styles.tableCellCenter,
+                { width: "33.33%" }
+              ]}
+            >
+              Persondays
+            </Text>
+            <Text
+              style={[
+                styles.tableHeaderCell,
+                styles.tableCellCenter,
+                { width: "33.34%" }
+              ]}
+            >
+              Total No. of Persons Given Work
+            </Text>
+          </View>
+          <View style={styles.tableRowForExpenditure}>
+            <Text style={[styles.tableHeaderCell, { width: "33.33%" }]}>
+              Unskilled
+            </Text>
+            <Text style={[styles.tableCellCenter, { width: "33.33%" }]}>
+              {employmentGenerated.unskilled.persondays}
+            </Text>
+            <Text style={[styles.tableCellCenter, { width: "33.34%" }]}>
+              {employmentGenerated.unskilled.totalPersons}
+            </Text>
+          </View>
+          <View style={styles.tableRowForExpenditure}>
+            <Text style={[styles.tableHeaderCell, { width: "33.33%" }]}>
+              Semi-Skilled
+            </Text>
+            <Text style={[styles.tableCellCenter, { width: "33.33%" }]}>
+              {employmentGenerated.semiSkilled.persondays}
+            </Text>
+            <Text style={[styles.tableCellCenter, { width: "33.34%" }]}>
+              {employmentGenerated.semiSkilled.totalPersons}
+            </Text>
+          </View>
+          <View style={styles.tableRowForExpenditure}>
+            <Text style={[styles.tableHeaderCell, { width: "33.33%" }]}>
+              Skilled
+            </Text>
+            <Text style={[styles.tableCellCenter, { width: "33.33%" }]}>
+              {employmentGenerated.skilled.persondays}
+            </Text>
+            <Text style={[styles.tableCellCenter, { width: "33.34%" }]}>
+              {employmentGenerated.skilled.totalPersons}
+            </Text>
+          </View>
+        </View>
+
+        {/* Additional Details */}
+        <View style={styles.table}>
+          <View style={styles.tableRow}>
+            <Text style={[styles.tableHeaderCell, { width: "50%" }]}>
+              Distinct Number of Muster Rolls used(Amount)
+            </Text>
+            <Text style={[styles.tableCell, { width: "50%" }]}>
+              {musterRollDetails}
+            </Text>
+          </View>
+          <View style={styles.tableRow}>
+            <Text style={[styles.tableHeaderCell, { width: "50%" }]}>
+              Work start date
+            </Text>
+            <Text style={[styles.tableCell, { width: "50%" }]}>
+              {workStartDate}
+            </Text>
+          </View>
+        </View>
+
+        {/* Photo Upload Section */}
+        <View style={styles.photoSection}>
+          <Text style={styles.sectionHeader}>Photo Uploaded of Work</Text>
+          <View style={styles.photoHeaderRow}>
+            <Text style={styles.photoHeaderCell}>
+              Before Start of Work(Work Site)
+            </Text>
+            <Text style={styles.photoHeaderCell}>
+              During Execution of Works
+            </Text>
+          </View>
+          <View style={styles.photoRow}>
+            <View style={styles.photoCell}>
+              {beforeWorkPhoto ? (
+                //   <Image style={styles.photoImage} src={beforeWorkPhoto} />
+                <Image
+                  style={styles.photoImage}
+                  src={`${Base_Url}/proxy-image?url=${encodeURIComponent(
+                    beforeWorkPhoto
+                  )}`}
+                  cache={false}
+                />
+              ) : (
+                <View style={styles.photoPlaceholder}>
+                  <View style={styles.photoPlaceholderBox}></View>
+                  <Text style={styles.photoPlaceholderText}>
+                    Photo Not Available
+                  </Text>
+                </View>
+              )}
             </View>
-            <View style={styles.photoRow}>
-              <View style={styles.photoCell}>
-                {beforeWorkPhoto ? (
-                  //   <Image style={styles.photoImage} src={beforeWorkPhoto} />
-                  <Image
-                    style={styles.photoImage}
-                    src={`${Base_Url}/proxy-image?url=${encodeURIComponent(
-                      beforeWorkPhoto
-                    )}`}
-                    cache={false}
-                  />
-                ) : (
-                  <View style={styles.photoPlaceholder}>
-                    <View style={styles.photoPlaceholderBox}></View>
-                    <Text style={styles.photoPlaceholderText}>
-                      Photo Not Available
-                    </Text>
-                  </View>
-                )}
-              </View>
-              <View style={styles.photoCell}>
-                {duringWorkPhoto ? (
-                  <Image
-                    style={styles.photoImage}
-                    src={`${Base_Url}/proxy-image?url=${encodeURIComponent(
-                      duringWorkPhoto
-                    )}`}
-                    cache={false}
-                  />
-                ) : (
-                  //   <Image style={styles.photoImage} src={duringWorkPhoto} />
-                  <View style={styles.photoPlaceholder}>
-                    <View style={styles.photoPlaceholderBox}></View>
-                    <Text style={styles.photoPlaceholderText}>
-                      Photo Not Available
-                    </Text>
-                  </View>
-                )}
-              </View>
+            <View style={styles.photoCell}>
+              {duringWorkPhoto ? (
+                <Image
+                  style={styles.photoImage}
+                  src={`${Base_Url}/proxy-image?url=${encodeURIComponent(
+                    duringWorkPhoto
+                  )}`}
+                  cache={false}
+                />
+              ) : (
+                //   <Image style={styles.photoImage} src={duringWorkPhoto} />
+                <View style={styles.photoPlaceholder}>
+                  <View style={styles.photoPlaceholderBox}></View>
+                  <Text style={styles.photoPlaceholderText}>
+                    Photo Not Available
+                  </Text>
+                </View>
+              )}
             </View>
           </View>
         </View>
-      </Page>
-    </Document>
+      </View>
+    </Page>
   );
 };
 
