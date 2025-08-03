@@ -49,6 +49,13 @@ import { useFetchMaterialSupplyRegister } from "@/services/MaterialSupplyRegiste
 import MaterialSupplyRegisterPDF from "./PDFs/MaterialSupplyRegisterPdf";
 import BlankNMRPDF from "./PDFs/BlankNmrPdf";
 import { addDays } from "@/utils/addDays";
+import { useWorkStore } from "@/stores/workStore";
+import {
+  fetchInvoiceDetails,
+  fetchMaterialMisDataForInvoice,
+  transformMaterialData
+} from "@/services/invoiceService";
+import InvoicePDF from "./PDFs/InvoicePdf";
 
 // PDF Action buttons data
 const pdfButtons = [
@@ -71,7 +78,8 @@ const pdfButtons = [
   { id: "materialSupplyRegister", name: "Material Supply Register" },
   { id: "paperNotification", name: "Paper Notification" },
   { id: "quotationCallForm", name: "Quotation Call Form" },
-  { id: "stageWiseGeoTagging", name: "Stage wise Geo tagging" }
+  { id: "stageWiseGeoTagging", name: "Stage wise Geo tagging" },
+  { id: "invoice", name: "Invoice" }
 ];
 
 interface WorkData {
@@ -157,6 +165,70 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
     } catch (error) {
       console.error("Checklist Error:", error);
       toast.error("Failed to download Checklist PDF");
+    } finally {
+      setCurrentDownloading(null);
+    }
+  };
+
+  const handleInvoice = async () => {
+    setCurrentDownloading("invoice");
+    try {
+      const { workDetail } = useWorkStore.getState(); // if inside function scope
+      const id = workDetail?.id;
+
+      if (!id) {
+        toast.error("No work code found.");
+        return;
+      }
+
+      const response = await fetchMaterialMisDataForInvoice(id);
+
+      if (!response.success || !response.data) {
+        toast.error(response.message || "Failed to fetch Material MIS data.");
+        return;
+      }
+
+      const transformedData = transformMaterialData(response.data);
+      const workCode = transformedData.workCode;
+      const workName = transformedData.workName;
+
+      const workDataResponse = await fetchInvoiceDetails(id);
+      const gst = workDataResponse.data?.vendorDetails?.vendorGstOne || "";
+      const vendorName =
+        workDataResponse.data?.vendorDetails?.vendorNameOne || "";
+      const block = workDataResponse.data?.workDetails.block || "";
+      const district = workDataResponse.data?.workDetails.district || "";
+      const panchayat = workDataResponse.data?.workDetails.panchayat || "";
+
+      if (!workDataResponse.success || !workDataResponse.data) {
+        toast.error(response.message || "Failed to Invoice data.");
+        return;
+      }
+      const doc = (
+        <Document>
+          {transformedData.bills.map((bill) => (
+            <InvoicePDF
+              key={bill.billNo}
+              bill={bill}
+              workCode={workCode}
+              workName={workName}
+              vendorGstOne={gst}
+              vendorNameOne={vendorName}
+              block={block}
+              district={district}
+              panchayat={panchayat}
+            />
+          ))}
+        </Document>
+      );
+
+      const blob = await pdf(doc).toBlob();
+
+      saveAs(blob, "Invoice.pdf");
+      toast.success("Invoice PDF downloaded successfully!");
+    } catch (error) {
+      console.error("Invoice Download Error:", error);
+      toast.error("Failed to download Invoice PDF.");
     } finally {
       setCurrentDownloading(null);
     }
@@ -863,25 +935,10 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
     materialSupplyRegister: handleMaterialSupplyRegister,
     paperNotification: handlePaperNotification,
     quotationCallForm: handleQuotationCallForm,
-    stageWiseGeoTagging: handleStageWiseGeoTagging
+    stageWiseGeoTagging: handleStageWiseGeoTagging,
+    invoice: handleInvoice
   };
 
-  // const handleDownloadAll = async () => {
-  //   if (!workData) {
-  //     toast.error("Missing Information", {
-  //       description: "Please submit work code data first."
-  //     });
-  //     return;
-  //   }
-
-  //   setIsDownloading(true);
-  //   await new Promise((resolve) => setTimeout(resolve, 3000));
-  //   setIsDownloading(false);
-
-  //   toast.success("Download Complete", {
-  //     description: "All PDFs have been generated and downloaded successfully."
-  //   });
-  // };
   const handleDownloadAll = async () => {
     if (!workData) {
       toast.error("Missing Information", {
@@ -1357,24 +1414,6 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
           </div>
 
           <div className="flex justify-center pt-4 border-t">
-            {/* <Button
-              size="lg"
-              onClick={handleDownloadAll}
-              disabled={!workData || isAnyButtonLoading}
-              className="px-8 py-4 text-lg font-semibold bg-blue-600 hover:bg-blue-700"
-            >
-              {isDownloading ? (
-                <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Generating PDFs...
-                </>
-              ) : (
-                <>
-                  <Download className="w-5 h-5 mr-2" />
-                  Download All PDFs
-                </>
-              )}
-            </Button> */}
             <Button
               size="lg"
               onClick={handleDownloadAll}

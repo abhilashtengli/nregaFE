@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { saveAs } from "file-saver";
-import { pdf } from "@react-pdf/renderer";
+import { Document, pdf } from "@react-pdf/renderer";
 import PDFPreviewer from "./components/PdfViewer";
 import { toast } from "sonner";
 
@@ -9,6 +9,13 @@ import {
   type MaterialSupplyRegisterData
 } from "./services/MaterialSupplyRegisterService";
 import MaterialSupplyRegisterPDF from "./components/PDFs/MaterialSupplyRegisterPdf";
+import { useWorkStore } from "./stores/workStore";
+import {
+  fetchInvoiceDetails,
+  fetchMaterialMisDataForInvoice,
+  transformMaterialData
+} from "./services/invoiceService";
+import InvoicePDF from "./components/PDFs/InvoicePdf";
 
 const SimpleTestComponent = () => {
   const [showPreview, setShowPreview] = useState(false);
@@ -17,6 +24,66 @@ const SimpleTestComponent = () => {
   const [pdfData, setPdfData] = useState<MaterialSupplyRegisterData | null>(
     null
   );
+  const handleInvoice = async () => {
+    try {
+      const { workDetail } = useWorkStore.getState(); // if inside function scope
+      const id = workDetail?.id;
+
+      if (!id) {
+        toast.error("No work code found.");
+        return;
+      }
+
+      const response = await fetchMaterialMisDataForInvoice(id);
+
+      if (!response.success || !response.data) {
+        toast.error(response.message || "Failed to fetch Material MIS data.");
+        return;
+      }
+
+      const transformedData = transformMaterialData(response.data);
+      const workCode = transformedData.workCode;
+      const workName = transformedData.workName;
+
+      const workDataResponse = await fetchInvoiceDetails(id);
+      const gst = workDataResponse.data?.vendorDetails?.vendorGstOne || "";
+      const vendorName =
+        workDataResponse.data?.vendorDetails?.vendorNameOne || "";
+      const block = workDataResponse.data?.workDetails.block || "";
+      const district = workDataResponse.data?.workDetails.district || "";
+      const panchayat = workDataResponse.data?.workDetails.panchayat || "";
+
+      if (!workDataResponse.success || !workDataResponse.data) {
+        toast.error(response.message || "Failed to Invoice data.");
+        return;
+      }
+      const doc = (
+        <Document>
+          {transformedData.bills.map((bill) => (
+            <InvoicePDF
+              key={bill.billNo}
+              bill={bill}
+              workCode={workCode}
+              workName={workName}
+              vendorGstOne={gst}
+              vendorNameOne={vendorName}
+              block={block}
+              district={district}
+              panchayat={panchayat}
+            />
+          ))}
+        </Document>
+      );
+
+      const blob = await pdf(doc).toBlob();
+
+      saveAs(blob, "Invoice.pdf");
+      toast.success("Invoice PDF downloaded successfully!");
+    } catch (error) {
+      console.error("Invoice Download Error:", error);
+      toast.error("Failed to download Invoice PDF.");
+    }
+  };
 
   const fetchMaterialSupplyRegisteryData = useFetchMaterialSupplyRegister();
 
@@ -106,6 +173,22 @@ const SimpleTestComponent = () => {
           }}
         >
           {loading ? "Downloading..." : "Download PDF"}
+        </button>
+        <button
+          onClick={handleInvoice}
+          disabled={loading}
+          style={{
+            padding: "10px 20px",
+            fontSize: "16px",
+            marginRight: "10px",
+            backgroundColor: loading ? "#ccc" : "#007bff",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: loading ? "not-allowed" : "pointer"
+          }}
+        >
+          {loading ? "logingg..." : "Log data "}
         </button>
 
         <button
