@@ -1,3 +1,5 @@
+"use client";
+
 import type React from "react";
 import { useEffect, useState } from "react";
 import { z } from "zod";
@@ -30,7 +32,8 @@ const signupValidation = z.object({
     .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, {
       message:
         "Password must contain uppercase, lowercase, number and special character"
-    })
+    }),
+  panchayatCode: z.string().min(1, { message: "Panchayat code is required" })
 });
 
 interface FormErrors {
@@ -43,6 +46,8 @@ interface SignupResponse {
     id: string;
     name: string;
     email: string;
+    role: string;
+    panchayatCode: string;
   };
   message: string;
   code?: string;
@@ -66,14 +71,14 @@ interface FetchError extends Error {
 export default function SignupPage() {
   const navigate = useNavigate();
   const location = useLocation();
-
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    password: ""
+    password: "",
+    panchayatCode: ""
   });
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const { isAuthenticated } = useAuthStore();
@@ -129,7 +134,6 @@ export default function SignupPage() {
     if (data?.message) {
       return data.message;
     }
-
     const status = error.response?.status || error.status;
     if (status === 409) {
       return "User already exists with this email address.";
@@ -147,6 +151,41 @@ export default function SignupPage() {
       return "Network error. Please check your internet connection.";
     }
     return "An unexpected error occurred. Please try again.";
+  };
+
+  const handleApiError = (data: ApiError): void => {
+    switch (data.code) {
+      case "VALIDATION_ERROR":
+        toast.error("Validation Error", {
+          description: "Please check all fields and try again."
+        });
+        break;
+      case "INVALID":
+        toast.error("User Already Exists", {
+          description: "An account with this email already exists."
+        });
+        break;
+      case "INVALID_PANCHAYAT_CODE":
+        toast.error("Invalid Panchayat Code", {
+          description: "Please enter a valid panchayat code."
+        });
+        break;
+      case "EMAIL_SEND_FAILED":
+        toast.warning("Account Created", {
+          description:
+            "Account created but verification email failed. Please contact support."
+        });
+        break;
+      case "SIGNUP_FAILED":
+        toast.error("Signup Failed", {
+          description: "Unable to create account. Please try again later."
+        });
+        break;
+      default:
+        toast.error("Signup Failed", {
+          description: data.message || "An unexpected error occurred."
+        });
+    }
   };
 
   const handleSubmit = async (
@@ -167,7 +206,8 @@ export default function SignupPage() {
         {
           name: formData.name.trim(),
           email: formData.email.trim(),
-          password: formData.password
+          password: formData.password,
+          panchayatCode: formData.panchayatCode.trim()
         },
         {
           timeout: 15000, // 15 second timeout
@@ -178,37 +218,46 @@ export default function SignupPage() {
         }
       );
 
-      const data: SignupResponse = await response.data;
+      const data: SignupResponse = response.data;
 
       if (data.success && data.data) {
-        toast.success("Account created successfully!", {
+        toast.success("Account Created Successfully!", {
           description: "Please check your email for verification code."
         });
 
         // Navigate to verification page with email
         navigate(`/verify-email?email=${encodeURIComponent(formData.email)}`);
       } else {
-        setFormError(data.message || "Signup failed. Please try again.");
+        const errorMessage = data.message || "Signup failed. Please try again.";
+        setFormError(errorMessage);
 
-        if (data.code === "VALIDATION_ERROR") {
-          toast.error("Validation Error", {
-            description: "Please check all fields and try again."
+        if (data.code) {
+          handleApiError({
+            success: false,
+            message: data.message,
+            code: data.code
           });
-        } else if (data.code === "INVALID") {
-          toast.error("User Already Exists", {
-            description: "An account with this email already exists."
+        } else {
+          toast.error("Signup Failed", {
+            description: errorMessage
           });
         }
       }
     } catch (error) {
       console.error("Signup error:", error);
       const fetchError = error as FetchError;
-      const errorMessage = getErrorMessage(fetchError);
-      setFormError(errorMessage);
+      const apiError = fetchError.response?.data;
 
-      toast.error("Signup Failed", {
-        description: errorMessage
-      });
+      if (apiError && apiError.code) {
+        handleApiError(apiError);
+        setFormError(apiError.message);
+      } else {
+        const errorMessage = getErrorMessage(fetchError, apiError);
+        setFormError(errorMessage);
+        toast.error("Signup Failed", {
+          description: errorMessage
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -228,7 +277,6 @@ export default function SignupPage() {
             Fill in the details to create your account
           </CardDescription>
         </CardHeader>
-
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             {formError && (
@@ -277,6 +325,32 @@ export default function SignupPage() {
               {formErrors.email && (
                 <p className="text-sm text-red-500">{formErrors.email}</p>
               )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="panchayatCode">
+                Panchayat Code <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="panchayatCode"
+                name="panchayatCode"
+                type="text"
+                placeholder="Enter your panchayat code"
+                value={formData.panchayatCode}
+                onChange={handleInputChange}
+                disabled={isLoading}
+                className={formErrors.panchayatCode ? "border-red-500" : ""}
+                required
+                autoComplete="off"
+              />
+              {formErrors.panchayatCode && (
+                <p className="text-sm text-red-500">
+                  {formErrors.panchayatCode}
+                </p>
+              )}
+              <p className="text-[11px] tracking-wide text-gray-500">
+                Enter the valid panchayat code provided to you
+              </p>
             </div>
 
             <div className="space-y-2">
