@@ -40,7 +40,6 @@ import StageWisePhotosPDF from "./PDFs/StageWiseGeoTaggingPdf";
 import { useFetchComparativeStatement } from "@/services/ComparativeStatementService";
 import QuotationCallPDF from "./PDFs/ComparativeStatement/QuotationCallPdf";
 import ComparativeStatementPDF from "./PDFs/ComparativeStatement/ComparativePdf";
-import ContractorQuotationPDF from "./PDFs/ComparativeStatement/ContractorQuotation";
 import SupplyOrderPDF from "./PDFs/ComparativeStatement/SupplyOrderPdf";
 import { useFetchBlankNMRData } from "@/services/BlankNmrService";
 import { useFetchFilledNMRData } from "@/services/FilledNmrService";
@@ -56,6 +55,9 @@ import {
   transformMaterialData
 } from "@/services/invoiceService";
 import InvoicePDF from "./PDFs/InvoicePdf";
+import Contractor1QuotationPDF from "./PDFs/ComparativeStatement/Contractor1Quotation";
+import Contractor2QuotationPDF from "./PDFs/ComparativeStatement/Contractor2Quotation";
+import Contractor3QuotationPDF from "./PDFs/ComparativeStatement/Contractor3Quotation";
 
 // PDF Action buttons data
 const pdfButtons = [
@@ -801,7 +803,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
             vendorDetails={data.vendorDetails}
             vendorWithVendorQuotation={data.vendorWithVendorQuotation}
           />
-          <ContractorQuotationPDF
+          <Contractor1QuotationPDF
             gramPanchayat={data.gramPanchayat}
             taluka={data.taluka}
             district={data.district}
@@ -819,7 +821,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
             }
             vendorWithVendorQuotation={data.vendorWithVendorQuotation}
           />
-          <ContractorQuotationPDF
+          <Contractor2QuotationPDF
             gramPanchayat={data.gramPanchayat}
             taluka={data.taluka}
             district={data.district}
@@ -837,7 +839,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
             }
             vendorWithVendorQuotation={data.vendorWithVendorQuotation}
           />
-          <ContractorQuotationPDF
+          <Contractor3QuotationPDF
             gramPanchayat={data.gramPanchayat}
             taluka={data.taluka}
             district={data.district}
@@ -1289,28 +1291,79 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
           }
         ];
 
-        contractors.forEach((contractor, index) => {
-          addComponent(
-            <ContractorQuotationPDF
-              key={`contractor-${index}`}
-              gramPanchayat={quotationData.gramPanchayat}
-              taluka={quotationData.taluka}
-              district={quotationData.district}
-              year={quotationData.year}
-              workCode={quotationData.workCode}
-              workName={quotationData.workName}
-              tenderPublishDate={contractor.date}
-              contractorNumber={contractor.number}
-              contractorName={contractor.name}
-              contractorGst={contractor.gst}
-              quotationSubmissionDate={contractor.date}
-              vendorWithVendorQuotation={
-                quotationData.vendorWithVendorQuotation
-              }
-            />,
-            `Contractor ${contractor.number} Quotation`
-          );
-        });
+        // contractors.forEach((contractor, index) => {
+        //   addComponent(
+        //     <ContractorQuotationPDF
+        //       key={`contractor-${index}`}
+        //       gramPanchayat={quotationData.gramPanchayat}
+        //       taluka={quotationData.taluka}
+        //       district={quotationData.district}
+        //       year={quotationData.year}
+        //       workCode={quotationData.workCode}
+        //       workName={quotationData.workName}
+        //       tenderPublishDate={contractor.date}
+        //       contractorNumber={contractor.number}
+        //       contractorName={contractor.name}
+        //       contractorGst={contractor.gst}
+        //       quotationSubmissionDate={contractor.date}
+        //       vendorWithVendorQuotation={
+        //         quotationData.vendorWithVendorQuotation
+        //       }
+        //     />,
+        //     `Contractor ${contractor.number} Quotation`
+        //   );
+        // });
+        addComponent(
+          <Contractor1QuotationPDF
+            gramPanchayat={quotationData.gramPanchayat}
+            taluka={quotationData.taluka}
+            district={quotationData.district}
+            year={quotationData.year}
+            workCode={quotationData.workCode}
+            workName={quotationData.workName}
+            tenderPublishDate={contractors[0].date}
+            contractorNumber={1}
+            contractorName={contractors[0].name}
+            contractorGst={contractors[0].gst}
+            quotationSubmissionDate={contractors[0].date}
+            vendorWithVendorQuotation={quotationData.vendorWithVendorQuotation}
+          />,
+          `Contractor ${contractors[0].number} Quotation`
+        );
+        addComponent(
+          <Contractor2QuotationPDF
+            gramPanchayat={quotationData.gramPanchayat}
+            taluka={quotationData.taluka}
+            district={quotationData.district}
+            year={quotationData.year}
+            workCode={quotationData.workCode}
+            workName={quotationData.workName}
+            tenderPublishDate={contractors[1].date}
+            contractorNumber={2}
+            contractorName={contractors[1].name}
+            contractorGst={contractors[1].gst}
+            quotationSubmissionDate={contractors[1].date}
+            vendorWithVendorQuotation={quotationData.vendorWithVendorQuotation}
+          />,
+          `Contractor ${contractors[1].number} Quotation`
+        );
+        addComponent(
+          <Contractor3QuotationPDF
+            gramPanchayat={quotationData.gramPanchayat}
+            taluka={quotationData.taluka}
+            district={quotationData.district}
+            year={quotationData.year}
+            workCode={quotationData.workCode}
+            workName={quotationData.workName}
+            tenderPublishDate={contractors[2].date}
+            contractorNumber={3}
+            contractorName={contractors[2].name}
+            contractorGst={contractors[2].gst}
+            quotationSubmissionDate={contractors[2].date}
+            vendorWithVendorQuotation={quotationData.vendorWithVendorQuotation}
+          />,
+          `Contractor ${contractors[2].number} Quotation`
+        );
 
         addComponent(
           <SupplyOrderPDF

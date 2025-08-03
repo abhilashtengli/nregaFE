@@ -288,6 +288,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textDecoration: "underline"
   },
+  address: {
+    fontWeight: "bold"
+  },
   signatureTitle: {
     fontSize: 10, // Reduced font size
     fontFamily: "NotoSansKannada",
@@ -313,8 +316,7 @@ const SupplyOrderPDF: React.FC<SupplyOrderProps> = ({
   winnerContractorName,
   winnerContractorGst,
   winnerQuotationSubmissionDate,
-  vendorWithVendorQuotation,
-  address = ""
+  vendorWithVendorQuotation
 }) => {
   return (
     <Page size="A4" style={styles.page}>
@@ -443,7 +445,9 @@ const SupplyOrderPDF: React.FC<SupplyOrderProps> = ({
             </Text>
             <Text style={styles.footerText}>
               <Text style={styles.footerLabel}>ವಿಳಾಸ :-</Text>{" "}
-              <Text style={styles.highlight}>{address}</Text>
+              <Text style={styles.address}>
+                {gramPanchayat}, {taluka}, {district}
+              </Text>
             </Text>
           </View>
           <View style={styles.rightFooter}>

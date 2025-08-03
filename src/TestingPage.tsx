@@ -1,139 +1,77 @@
 import { useState } from "react";
-import { saveAs } from "file-saver";
-import { Document, pdf } from "@react-pdf/renderer";
+// import { saveAs } from "file-saver";
+import { Document } from "@react-pdf/renderer";
 import PDFPreviewer from "./components/PdfViewer";
 import { toast } from "sonner";
 
+import QuotationCallPDF from "./components/PDFs/ComparativeStatement/QuotationCallPdf";
+import ComparativeStatementPDF from "./components/PDFs/ComparativeStatement/ComparativePdf";
+import SupplyOrderPDF from "./components/PDFs/ComparativeStatement/SupplyOrderPdf";
 import {
-  useFetchMaterialSupplyRegister,
-  type MaterialSupplyRegisterData
-} from "./services/MaterialSupplyRegisterService";
-import MaterialSupplyRegisterPDF from "./components/PDFs/MaterialSupplyRegisterPdf";
-import { useWorkStore } from "./stores/workStore";
-import {
-  fetchInvoiceDetails,
-  fetchMaterialMisDataForInvoice,
-  transformMaterialData
-} from "./services/invoiceService";
-import InvoicePDF from "./components/PDFs/InvoicePdf";
+  useFetchComparativeStatement,
+  type CombinedPDFData
+} from "./services/ComparativeStatementService";
+import Contractor1QuotationPDF from "./components/PDFs/ComparativeStatement/Contractor1Quotation";
+import Contractor2QuotationPDF from "./components/PDFs/ComparativeStatement/Contractor2Quotation";
+import Contractor3QuotationPDF from "./components/PDFs/ComparativeStatement/Contractor3Quotation";
 
 const SimpleTestComponent = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [pdfData, setPdfData] = useState<MaterialSupplyRegisterData | null>(
-    null
-  );
-  const handleInvoice = async () => {
-    try {
-      const { workDetail } = useWorkStore.getState(); // if inside function scope
-      const id = workDetail?.id;
+  const [data, setPdfData] = useState<CombinedPDFData | null>(null);
 
-      if (!id) {
-        toast.error("No work code found.");
-        return;
-      }
+  const fetchAllQuotationPdfData = useFetchComparativeStatement();
 
-      const response = await fetchMaterialMisDataForInvoice(id);
+  // const handleDownload = async () => {
+  //   setLoading(true);
+  //   console.log("Starting download...");
 
-      if (!response.success || !response.data) {
-        toast.error(response.message || "Failed to fetch Material MIS data.");
-        return;
-      }
+  //   try {
+  //     const data = await fetchMaterialSupplyRegisteryData();
 
-      const transformedData = transformMaterialData(response.data);
-      const workCode = transformedData.workCode;
-      const workName = transformedData.workName;
+  //     if (!data) {
+  //       toast.error("No data found for download.");
+  //       return;
+  //     }
+  //     console.log("DATA : ", data);
 
-      const workDataResponse = await fetchInvoiceDetails(id);
-      const gst = workDataResponse.data?.vendorDetails?.vendorGstOne || "";
-      const vendorName =
-        workDataResponse.data?.vendorDetails?.vendorNameOne || "";
-      const block = workDataResponse.data?.workDetails.block || "";
-      const district = workDataResponse.data?.workDetails.district || "";
-      const panchayat = workDataResponse.data?.workDetails.panchayat || "";
+  //     // Prepare the document with multiple NMRs
+  //     const doc = (
+  //       <MaterialSupplyRegisterPDF
+  //         workCode={data.workCode}
+  //         workName={data.workName}
+  //         vendorName={data.vendorName}
+  //         materialData={data.materialData}
+  //       />
+  //     );
 
-      if (!workDataResponse.success || !workDataResponse.data) {
-        toast.error(response.message || "Failed to Invoice data.");
-        return;
-      }
-      const doc = (
-        <Document>
-          {transformedData.bills.map((bill) => (
-            <InvoicePDF
-              key={bill.billNo}
-              bill={bill}
-              workCode={workCode}
-              workName={workName}
-              vendorGstOne={gst}
-              vendorNameOne={vendorName}
-              block={block}
-              district={district}
-              panchayat={panchayat}
-            />
-          ))}
-        </Document>
-      );
+  //     const blob = await pdf(doc).toBlob();
 
-      const blob = await pdf(doc).toBlob();
-
-      saveAs(blob, "Invoice.pdf");
-      toast.success("Invoice PDF downloaded successfully!");
-    } catch (error) {
-      console.error("Invoice Download Error:", error);
-      toast.error("Failed to download Invoice PDF.");
-    }
-  };
-
-  const fetchMaterialSupplyRegisteryData = useFetchMaterialSupplyRegister();
-
-  const handleDownload = async () => {
-    setLoading(true);
-    console.log("Starting download...");
-
-    try {
-      const data = await fetchMaterialSupplyRegisteryData();
-
-      if (!data) {
-        toast.error("No data found for download.");
-        return;
-      }
-      console.log("DATA : ", data);
-
-      // Prepare the document with multiple NMRs
-      const doc = (
-        <MaterialSupplyRegisterPDF
-          workCode={data.workCode}
-          workName={data.workName}
-          vendorName={data.vendorName}
-          materialData={data.materialData}
-        />
-      );
-
-      const blob = await pdf(doc).toBlob();
-
-      saveAs(blob, "Material-supply-registery.pdf");
-      toast.success("Download started!");
-    } catch (error) {
-      console.error("Download Error:", error);
-      toast.error("Download failed!");
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     saveAs(blob, "Material-supply-registery.pdf");
+  //     toast.success("Download started!");
+  //   } catch (error) {
+  //     console.error("Download Error:", error);
+  //     toast.error("Download failed!");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const handleView = async () => {
     setLoading(true);
     setPreviewError(null);
 
     try {
-      const data = await fetchMaterialSupplyRegisteryData(); // data is FrontPageData | null
+      const data = await fetchAllQuotationPdfData(); // data is FrontPageData | null
       console.log("Data for preview:", data);
 
       if (!data) {
         toast.error("No data found for preview.");
         return;
       }
+      // const comparativeStatementDate = addDays(data.tenderPublishDate, 9);
+      //       const supplyOrderDate = addDays(data.tenderPublishDate, 10);
 
       setPdfData(data);
       setShowPreview(true);
@@ -158,7 +96,7 @@ const SimpleTestComponent = () => {
   return (
     <div>
       <div style={{ marginBottom: "20px" }}>
-        <button
+        {/* <button
           onClick={handleDownload}
           disabled={loading}
           style={{
@@ -173,23 +111,7 @@ const SimpleTestComponent = () => {
           }}
         >
           {loading ? "Downloading..." : "Download PDF"}
-        </button>
-        <button
-          onClick={handleInvoice}
-          disabled={loading}
-          style={{
-            padding: "10px 20px",
-            fontSize: "16px",
-            marginRight: "10px",
-            backgroundColor: loading ? "#ccc" : "#007bff",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: loading ? "not-allowed" : "pointer"
-          }}
-        >
-          {loading ? "logingg..." : "Log data "}
-        </button>
+        </button> */}
 
         <button
           onClick={handleView}
@@ -229,17 +151,106 @@ const SimpleTestComponent = () => {
         </div>
       )}
 
-      {showPreview && pdfData && (
+      {showPreview && data && (
         <div>
           <h3>PDF Preview</h3>
           <PDFPreviewer
             document={
-              <MaterialSupplyRegisterPDF
-                workCode={pdfData.workCode}
-                workName={pdfData.workName}
-                vendorName={pdfData.vendorName}
-                materialData={pdfData.materialData}
-              />
+              <Document>
+                <QuotationCallPDF
+                  gramPanchayat={data.gramPanchayat}
+                  taluka={data.taluka}
+                  district={data.district}
+                  year={data.year}
+                  administrativeSanction={data.administrativeSanction}
+                  workCode={data.workCode}
+                  workName={data.workName}
+                  tenderPublishDate={data.tenderPublishDate}
+                  tenderSubmissionDate={data.tenderSubmissionDate}
+                  materialData={data.materialData}
+                />
+                <ComparativeStatementPDF
+                  gramPanchayat={data.gramPanchayat}
+                  taluka={data.taluka}
+                  district={data.district}
+                  year={data.year}
+                  workCode={data.workCode}
+                  workName={data.workName}
+                  tenderPublishDate={""}
+                  vendorDetails={data.vendorDetails}
+                  vendorWithVendorQuotation={data.vendorWithVendorQuotation}
+                />
+                <Contractor1QuotationPDF
+                  gramPanchayat={data.gramPanchayat}
+                  taluka={data.taluka}
+                  district={data.district}
+                  year={data.year}
+                  workCode={data.workCode}
+                  workName={data.workName}
+                  tenderPublishDate={
+                    data.vendorDetails.VendorOneQuotationSubmissiondate
+                  }
+                  contractorNumber={1}
+                  contractorName={data.vendorDetails.vendorNameOne}
+                  contractorGst={data.vendorDetails.vendorGstOne}
+                  quotationSubmissionDate={
+                    data.vendorDetails.VendorOneQuotationSubmissiondate
+                  }
+                  vendorWithVendorQuotation={data.vendorWithVendorQuotation}
+                />
+                <Contractor2QuotationPDF
+                  gramPanchayat={data.gramPanchayat}
+                  taluka={data.taluka}
+                  district={data.district}
+                  year={data.year}
+                  workCode={data.workCode}
+                  workName={data.workName}
+                  tenderPublishDate={
+                    data.vendorDetails.vendorTwoQuotationSubmissiondate
+                  }
+                  contractorNumber={2}
+                  contractorName={data.vendorDetails.vendorNameTwo}
+                  contractorGst={data.vendorDetails.vendorGstTwo}
+                  quotationSubmissionDate={
+                    data.vendorDetails.vendorTwoQuotationSubmissiondate
+                  }
+                  vendorWithVendorQuotation={data.vendorWithVendorQuotation}
+                />
+                <Contractor3QuotationPDF
+                  gramPanchayat={data.gramPanchayat}
+                  taluka={data.taluka}
+                  district={data.district}
+                  year={data.year}
+                  workCode={data.workCode}
+                  workName={data.workName}
+                  tenderPublishDate={
+                    data.vendorDetails.vendorThreeQuotationSubmissiondate
+                  }
+                  contractorNumber={3}
+                  contractorName={data.vendorDetails.vendorNameThree}
+                  contractorGst={data.vendorDetails.vendorGstThree}
+                  quotationSubmissionDate={
+                    data.vendorDetails.vendorThreeQuotationSubmissiondate
+                  }
+                  vendorWithVendorQuotation={data.vendorWithVendorQuotation}
+                />
+                <SupplyOrderPDF
+                  gramPanchayat={data.gramPanchayat}
+                  taluka={data.taluka}
+                  district={data.district}
+                  year={data.year}
+                  workCode={data.workCode}
+                  workName={data.workName}
+                  tenderPublishDate={""}
+                  winnerContractorName={data.vendorDetails.vendorNameOne}
+                  winnerContractorGst={data.vendorDetails.vendorGstOne}
+                  winnerQuotationSubmissionDate={
+                    data.vendorDetails.VendorOneQuotationSubmissiondate
+                  }
+                  vendorWithVendorQuotation={data.vendorWithVendorQuotation}
+                  address=""
+                />
+              </Document>
             }
             onClose={handleClosePreview}
           />
@@ -247,10 +258,10 @@ const SimpleTestComponent = () => {
       )}
 
       {/* Debug Info */}
-      {process.env.NODE_ENV === "development" && pdfData && (
+      {process.env.NODE_ENV === "development" && data && (
         <details style={{ marginTop: "20px", fontSize: "12px" }}>
           <summary>Debug: PDF Data</summary>
-          <pre>{JSON.stringify(pdfData, null, 2)}</pre>
+          <pre>{JSON.stringify(data, null, 2)}</pre>
         </details>
       )}
     </div>

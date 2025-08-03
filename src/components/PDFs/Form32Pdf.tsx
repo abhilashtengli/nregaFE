@@ -1,10 +1,4 @@
-import {
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  Font
-} from "@react-pdf/renderer";
+import { Page, Text, View, StyleSheet, Font } from "@react-pdf/renderer";
 
 // Font registration
 Font.register({
@@ -131,29 +125,31 @@ const styles = StyleSheet.create({
   },
   tableRow: {
     flexDirection: "row",
-    minHeight: 20,
-    width: "100%"
+    width: "100%",
+    minHeight: 20
   },
   tableCell: {
     borderRight: "1px solid black",
     borderBottom: "1px solid black",
     padding: 1,
-    fontSize: 5,
+    fontSize: 6,
     textAlign: "center",
     fontFamily: "Helvetica",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
+    lineHeight: 1.3
   },
   tableHeaderCell: {
     borderRight: "1px solid black",
     borderBottom: "1px solid black",
     padding: 1,
-    fontSize: 5,
+    fontSize: 6,
     textAlign: "center",
     fontWeight: "bold",
     fontFamily: "Helvetica",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
+    lineHeight: 1.3
   },
   // Column widths matching the original layout
   col1: { width: "8%" },
@@ -416,7 +412,11 @@ const Form32PDF: React.FC<Form32Data> = ({ form32Data }) => {
 
               {/* Table Data Rows for current page */}
               {chunk.map((item, index) => (
-                <View key={`${pageIndex}-${index}`} style={styles.tableRow}>
+                <View
+                  key={`${pageIndex}-${index}`}
+                  style={styles.tableRow}
+                  wrap={false}
+                >
                   <Text style={[styles.tableCell, styles.col1]}></Text>
                   <Text style={[styles.tableCell, styles.col2]}>
                     {item.material}
@@ -447,7 +447,7 @@ const Form32PDF: React.FC<Form32Data> = ({ form32Data }) => {
 
               {/* Total Row - only on last page */}
               {pageIndex === dataChunks.length - 1 && (
-                <View style={styles.tableRow}>
+                <View style={styles.tableRow} wrap={false}>
                   <Text style={[styles.tableCell, styles.col1]}></Text>
                   <Text style={[styles.tableCell, styles.col2]}></Text>
                   <Text style={[styles.tableCell, styles.col3]}></Text>

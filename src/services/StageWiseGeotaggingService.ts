@@ -28,7 +28,7 @@ const fetchStagewiseGeoTagging = async (
     if (!apiData) {
       return {
         success: false,
-        message: "No data found for the provided ID"
+        message: "No data found for the provided ID",
       };
     }
 
@@ -41,12 +41,12 @@ const fetchStagewiseGeoTagging = async (
       gramPanchayat: apiData.gramPanchayat,
       beforeStageImageUrl: apiData.beforeStageImageUrl,
       duringStageImageUrl: apiData.duringStageImageUrl,
-      afterStageImageUrl: apiData.afterStageImageUrl
+      afterStageImageUrl: apiData.afterStageImageUrl,
     };
 
     return {
       success: true,
-      data: formattedData
+      data: formattedData,
     };
   } catch (error: unknown) {
     let message = "Failed to fetch stage-wise geo tagging data.";
@@ -57,7 +57,7 @@ const fetchStagewiseGeoTagging = async (
 
     return {
       success: false,
-      message
+      message,
     };
   }
 };
@@ -71,7 +71,7 @@ export const useFetchStagewiseGeoTagging = () => {
 
     if (!id) {
       toast.error("No work ID found", {
-        description: "Please refresh and try again"
+        description: "Please refresh and try again",
       });
       return null;
     }

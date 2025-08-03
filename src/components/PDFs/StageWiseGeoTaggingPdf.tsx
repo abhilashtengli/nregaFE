@@ -252,11 +252,7 @@ const StageWisePhotosPDF: React.FC<StageWiseGTProp> = ({ sWGTData }) => {
         <View style={styles.stageContainer}>
           <Text style={styles.stageTitle}>Before Stage</Text>
           <View style={styles.photoContainer}>
-            {renderPhoto(
-              beforeStageImageUrl,
-              "Before Stage",
-              "Before Stage Image Placeholder"
-            )}
+            {renderPhoto(beforeStageImageUrl, "Before Stage")}
           </View>
         </View>
 
@@ -264,11 +260,7 @@ const StageWisePhotosPDF: React.FC<StageWiseGTProp> = ({ sWGTData }) => {
         <View style={styles.stageContainer}>
           <Text style={styles.stageTitle}>During Stage</Text>
           <View style={styles.photoContainer}>
-            {renderPhoto(
-              duringStageImageUrl,
-              "During Stage",
-              "During Stage Image Placeholder"
-            )}
+            {renderPhoto(duringStageImageUrl, "During Stage")}
           </View>
         </View>
 

@@ -226,10 +226,45 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: "NotoSansKannada",
     marginBottom: 4
+  },
+  TopHeader: {
+    borderBottom: "1px solid black",
+    paddingVertical: 4,
+    paddingBottom: 8,
+    marginBottom: 10
+  },
+  firstRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    fontSize: 12,
+    paddingBottom: 12
+  },
+  secondRow: {
+    textAlign: "center",
+    fontSize: 16,
+    color: "red",
+    paddingBottom: 20,
+    font: "bold",
+    fontStyle : "italic"
+  },
+  thirdRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    fontSize: 12,
+    paddingHorizontal: 32,
+    fontFamily: "NotoSansKannada"
+  },
+  address: {
+    paddingHorizontal: 5
+  },
+  cellNo: {
+    paddingRight: 64
   }
 });
 
-const ContractorQuotationPDF: React.FC<ContractorQuotationProps> = ({
+const Contractor1QuotationPDF: React.FC<ContractorQuotationProps> = ({
   gramPanchayat,
   taluka,
   district,
@@ -247,6 +282,20 @@ const ContractorQuotationPDF: React.FC<ContractorQuotationProps> = ({
     <Page size="A4" style={styles.page}>
       <View style={styles.container}>
         {/* Header */}
+        <View style={styles.TopHeader}>
+          <View style={styles.firstRow}>
+            <Text>GSt No. {contractorGst}</Text>
+            <Text style={styles.cellNo}>Cell no. :</Text>
+          </View>
+          <View style={styles.secondRow}>
+            <Text>{contractorName.toUpperCase()}</Text>
+          </View>
+          <View style={styles.thirdRow}>
+            <Text style={styles.address}>At Post : {gramPanchayat}</Text>
+            <Text style={styles.address}>TQ : {taluka}</Text>
+            <Text style={styles.address}>Dist : {district}</Text>
+          </View>
+        </View>
         <View style={styles.headerSection}>
           <Text style={styles.addressLine}>ಗೆ,</Text>
           <Text style={styles.addressLine}>
@@ -280,7 +329,7 @@ const ContractorQuotationPDF: React.FC<ContractorQuotationProps> = ({
         <Text style={styles.mainContent}>
           ಈ ಮೇಲ್ಕಂಡಿಸಿದ ವಿಷಯ ಹಾಗೂ ಉಲ್ಲೇಖಕ್ಕೆ ಸಂಬಂಧಿಸಿದಂತೆ ನಾನು GST ಅಡಿ ನೋಂದಾಯಿತ
           ಸಾಮಗ್ರಿ ಸರಬರಾಜುದಾರನಾಗಿದ್ದು, {year} ನೇ ಸಾಲಿನ ಮಹಾತ್ಮ ಗಾಂಧಿ ರಾಷ್ಟ್ರೀಯ
-          ಗ್ರಾಮೀಣ ಉದ್ಯೋಗ ಖಾತ್ರಿ ಯೋಜನೆಡಿ ಕೈಗೊಳ್ಳಲಾಗುವ {workName}({workCode})
+          ಗ್ರಾಮೀಣ ಉದ್ಯೋಗ ಖಾತ್ರಿ ಯೋಜನೆಡಿ ಕೈಗೊಳ್ಳಲಾಗುವ {workName} ({workCode})
           ಕಾಮಗಾರಿಗೆ ಅವಶ್ಯವಿರುವ ಸಾಮಗ್ರಿಗಳಿಗೆ ತಾವು ವಿಧಿಸಿರುವ ಷರತ್ತುಗಳಿಗೆ ಬದ್ಧನಾಗಿ
           ಈ ಕೆಳಗಿನಂತೆ ದರಪಟ್ಟಿಯನ್ನು ಸಲ್ಲಿಸುತ್ತಿದ್ದು, ನನ್ನ ದರಪಟ್ಟಿಯನ್ನು
           ಅಂಗೀಕರಿಸಿಸಾಮಗ್ರಿ ಸರಬರಾಜು ಆದೇಶ ನೀಡಬೇಕಾಗಿ ತಮ್ಮಲ್ಲಿ ಕೋರುತ್ತೇನೆ.
@@ -296,6 +345,9 @@ const ContractorQuotationPDF: React.FC<ContractorQuotationProps> = ({
               ಸಾಮಗ್ರಿ ಹೆಸರು
             </Text>
             <Text style={[styles.tableCellHeading, styles.quantityCell]}>
+              ಮಾಪನ ಘಟಕ
+            </Text>
+            <Text style={[styles.tableCellHeading, styles.quantityCell]}>
               ಪ್ರಮಾಣ
             </Text>
             <Text style={[styles.tableCellHeading, styles.srRateCell]}>
@@ -305,7 +357,7 @@ const ContractorQuotationPDF: React.FC<ContractorQuotationProps> = ({
               ದರ (ಅಂಕಿಗಳಲ್ಲಿ)
             </Text>
             <Text style={[styles.tableCellHeading, styles.rateWordsCell]}>
-              ದರ (ಅಕ್ಷರಗಳಲ್ಲಿ)
+              ಒಟ್ಟು ಮೊತ್ತ {"  "}
             </Text>
           </View>
           {vendorWithVendorQuotation.map((item, index) => {
@@ -324,6 +376,9 @@ const ContractorQuotationPDF: React.FC<ContractorQuotationProps> = ({
                   {item.materialName}
                 </Text>
                 <Text style={[styles.tableCell, styles.quantityCell]}>
+                  {item.unit}
+                </Text>
+                <Text style={[styles.tableCell, styles.quantityCell]}>
                   {item.quantity}
                 </Text>
                 <Text style={[styles.tableCell, styles.srRateCell]}>
@@ -332,7 +387,12 @@ const ContractorQuotationPDF: React.FC<ContractorQuotationProps> = ({
                 <Text style={[styles.tableCell, styles.quotedRateCell]}>
                   {contractorRate}
                 </Text>
-                <Text style={[styles.tableCell, styles.rateWordsCell]}></Text>
+                <Text style={[styles.tableCell, styles.rateWordsCell]}>
+                  {" "}
+                  {(Number(contractorRate) * Number(item.quantity)).toFixed(
+                    2
+                  )}{" "}
+                </Text>
               </View>
             );
           })}
@@ -360,5 +420,5 @@ const ContractorQuotationPDF: React.FC<ContractorQuotationProps> = ({
   );
 };
 
-export default ContractorQuotationPDF;
+export default Contractor1QuotationPDF;
 export type { VendorQuotationData };
