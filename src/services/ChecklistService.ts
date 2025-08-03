@@ -18,7 +18,12 @@ export const fetchCheckListData = async (
   id: string
 ): Promise<ServiceResponse<ChecklistWorkData>> => {
   try {
-    const response = await axios.get(`${Base_Url}/get-checklist/${id}`);
+    const response = await axios.get(`${Base_Url}/get-checklist/${id}`, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
     const apiData = response.data?.data;
 
     if (!apiData) {

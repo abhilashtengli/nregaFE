@@ -138,7 +138,12 @@ export const fetchInvoiceDetails = async (
   id: string
 ): Promise<ServiceResponse<InvoiceApiResponse>> => {
   try {
-    const res = await axios.get(`${Base_Url}/invoice/${id}`);
+    const res = await axios.get(`${Base_Url}/invoice/${id}`,{
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
 
     const apiData = res.data?.data;
 

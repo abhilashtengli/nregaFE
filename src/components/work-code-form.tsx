@@ -273,7 +273,6 @@ export default function WorkCodeForm({
     }
 
     setIsSubmitting(true);
-
     const payload = {
       workCode: workCode.trim(),
       finYear: financialYear.trim()
@@ -290,68 +289,142 @@ export default function WorkCodeForm({
         `${Base_Url}/scrape-by-workcode`,
         payload,
         {
+          withCredentials: true,
           headers: {
             "Content-Type": "application/json"
           }
         }
       );
 
-      if (!response.data.success) {
+      // Handle API success response
+      if (response.data.success) {
+        // Transform and validate response
+        const workData = transformApiResponse(response.data);
+
+        if (!workData.workDetail.workCode) {
+          throw new Error("Invalid work data received from server");
+        }
+
+        // Save to Zustand store
+        setWork({
+          vendorName: workData.vendorName,
+          vendorGstNo: workData.vendorGstNo,
+          workDetail: workData.workDetail
+        });
+
+        // Notify parent component
+        notifyParent(workData);
+
+        toast.success("Work data retrieved successfully!", {
+          description: `Work: ${workData.workDetail.workName.substring(
+            0,
+            50
+          )}...`,
+          duration: 5000,
+          id: "scraping-toast"
+        });
+      } else {
+        // Handle API error response (success: false)
         throw new Error(
           response.data.error || "API returned unsuccessful response"
         );
       }
-
-      // Transform and validate response
-      const workData = transformApiResponse(response.data);
-
-      if (!workData.workDetail.workCode) {
-        throw new Error("Invalid work data received from server");
-      }
-
-      // Save to Zustand store
-      setWork({
-        vendorName: workData.vendorName,
-        vendorGstNo: workData.vendorGstNo,
-        workDetail: workData.workDetail
-      });
-
-      // Notify parent component
-      notifyParent(workData);
-
-      toast.success("Work data retrieved successfully!", {
-        description: `Work: ${workData.workDetail.workName.substring(
-          0,
-          50
-        )}...`,
-        duration: 5000,
-        id: "scraping-toast"
-      });
     } catch (error: unknown) {
       console.error("Error submitting work code:", error);
-
       let errorMessage = "Please try again or contact support";
+      let errorDescription = "";
 
-      // Handle different types of errors
+      // Handle Axios errors
       if (axios.isAxiosError(error)) {
         if (error.code === "ECONNABORTED") {
-          errorMessage = "Request timeout. Please try again.";
+          errorMessage = "Request timeout";
+          errorDescription = "The request took too long. Please try again.";
         } else if (error.response) {
           // Server responded with error status
-          errorMessage =
-            error.response.data?.error ||
-            `Server error: ${error.response.status}`;
+          const statusCode = error.response.status;
+          const responseData = error.response.data;
+
+          switch (statusCode) {
+            case 400:
+              // Bad Request - validation errors
+              errorMessage = "Invalid request";
+              if (responseData?.error) {
+                if (responseData.error.includes("Work code is required")) {
+                  errorDescription =
+                    "Work code is required and must be a valid string";
+                } else if (responseData.error.includes("Financial year")) {
+                  errorDescription =
+                    "Financial year is required and must be a valid string";
+                } else if (
+                  responseData.error.includes("Invalid work code format")
+                ) {
+                  errorDescription =
+                    "Work code must be in format: PANCHAYAT_CODE/WC/WORK_ID";
+                } else if (responseData.error.includes("no Work Details")) {
+                  errorDescription = "No work details found for this work code";
+                } else {
+                  errorDescription = responseData.error;
+                }
+              }
+              break;
+
+            case 403:
+              // Forbidden - panchayat access denied
+              errorMessage = "Access denied";
+              if (responseData?.code === "NOT_ALLOWED_PANCHAYATCODE") {
+                errorDescription =
+                  responseData.message ||
+                  "You don't have permission to access this panchayat data";
+              } else {
+                errorDescription =
+                  "You don't have permission to perform this action";
+              }
+              break;
+
+            case 404:
+              // Not Found
+              errorMessage = "Data not found";
+              if (responseData?.error) {
+                if (responseData.error.includes("Panchayat data not found")) {
+                  errorDescription =
+                    "Panchayat not found. Please contact support to add this panchayat.";
+                } else if (responseData?.code === "WORK_DOCUMENT_NOT_FOUND") {
+                  errorDescription = "Work document not found in database";
+                } else {
+                  errorDescription = responseData.error;
+                }
+              }
+              break;
+
+            case 500:
+              // Internal Server Error
+              errorMessage = "Server error";
+              errorDescription =
+                responseData?.error ||
+                "An internal server error occurred. Please try again later.";
+              break;
+
+            default:
+              errorMessage = `Server error (${statusCode})`;
+              errorDescription =
+                responseData?.error ||
+                responseData?.message ||
+                "An unexpected server error occurred";
+          }
         } else if (error.request) {
           // Request was made but no response received
-          errorMessage = "Network error. Please check your connection.";
+          errorMessage = "Network error";
+          errorDescription =
+            "Please check your internet connection and try again";
         }
       } else if (error instanceof Error) {
-        // Something else happened
-        errorMessage = error.message || "An unexpected error occurred.";
+        // Other JavaScript errors
+        errorMessage = "Application error";
+        errorDescription = error.message || "An unexpected error occurred";
       }
 
-      toast.error("Failed to retrieve work data", {
-        description: errorMessage,
+      toast.error(errorMessage, {
+        description: errorDescription,
         duration: 6000,
         id: "scraping-toast"
       });
@@ -375,7 +448,12 @@ export default function WorkCodeForm({
         return;
       }
 
-      const response = await axios.delete(`${Base_Url}/work/${id}`);
+      const response = await axios.delete(`${Base_Url}/work/${id}`, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
 
       if (response.status === 200 && response.data.success) {
         clearWork();

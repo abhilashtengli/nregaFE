@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   separatorLine: {
     textAlign: "center",
     fontSize: 10,
-    marginBottom: 16
+    marginBottom: 4
   },
   // Main content styles
   mainContent: {

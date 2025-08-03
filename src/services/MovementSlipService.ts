@@ -32,7 +32,12 @@ const fetchMovementSlip = async (
   id: string
 ): Promise<ServiceResponse<MovementSlipData>> => {
   try {
-    const response = await axios.get(`${Base_Url}/movement-slip/${id}`); // replace with correct endpoint if needed
+    const response = await axios.get(`${Base_Url}/movement-slip/${id}`,{
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }); // replace with correct endpoint if needed
 
     const apiData = response.data?.data;
 

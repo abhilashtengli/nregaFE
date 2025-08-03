@@ -50,7 +50,12 @@ const fetchGPAbstract = async (
   id: string
 ): Promise<ServiceResponse<GPAbstractData>> => {
   try {
-    const response = await axios.get(`${Base_Url}/gp-abstract/${id}`);
+    const response = await axios.get(`${Base_Url}/gp-abstract/${id}`, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
     const apiData = response.data?.data;
 
     if (!apiData) {

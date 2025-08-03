@@ -41,7 +41,12 @@ export type BlankNMRResponse = {
 
 const fetchBlankNMR = async (id: string): Promise<BlankNMRResponse> => {
   try {
-    const response = await axios.get(`${Base_Url}/get-blanknmr/${id}`);
+    const response = await axios.get(`${Base_Url}/get-blanknmr/${id}`, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
     const apiData = response.data?.data;
 
     if (!apiData) {

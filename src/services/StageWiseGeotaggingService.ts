@@ -22,7 +22,12 @@ const fetchStagewiseGeoTagging = async (
   id: string
 ): Promise<ServiceResponse<StagewiseGeoTaggingData>> => {
   try {
-    const response = await axios.get(`${Base_Url}/get-stage-wise-photos/${id}`);
+    const response = await axios.get(`${Base_Url}/get-stage-wise-photos/${id}`,{
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
     const apiData = response.data?.data;
 
     if (!apiData) {

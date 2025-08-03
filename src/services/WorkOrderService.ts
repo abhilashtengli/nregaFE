@@ -17,14 +17,19 @@ const fetchWorkOrder = async (
   id: string
 ): Promise<ServiceResponse<WorkOrderData>> => {
   try {
-    const response = await axios.get(`${Base_Url}/work-order/${id}`);
+    const response = await axios.get(`${Base_Url}/work-order/${id}`, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
 
     const apiData = response.data?.data;
 
     if (!apiData) {
       return {
         success: false,
-        message: "No data found for the provided ID",
+        message: "No data found for the provided ID"
       };
     }
 
@@ -34,12 +39,12 @@ const fetchWorkOrder = async (
       panchayat: apiData.panchayat,
       block: apiData.block,
       estimatedCost: apiData.estimatedCost,
-      date: apiData.date,
+      date: apiData.date
     };
 
     return {
       success: true,
-      data: formattedData,
+      data: formattedData
     };
   } catch (error: unknown) {
     let message = "Failed to fetch work order data.";
@@ -50,7 +55,7 @@ const fetchWorkOrder = async (
 
     return {
       success: false,
-      message,
+      message
     };
   }
 };
@@ -63,7 +68,7 @@ export const useFetchWorkOrderData = () => {
 
     if (!id) {
       toast.error("No work Id", {
-        description: "Please refresh",
+        description: "Please refresh"
       });
       return null;
     }

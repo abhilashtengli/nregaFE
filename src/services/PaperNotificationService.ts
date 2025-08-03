@@ -24,7 +24,12 @@ const fetchPaperNotification = async (
 ): Promise<ServiceResponse<PaperNotificationData>> => {
   try {
     const response = await axios.get(
-      `${Base_Url}/get-paper-notification/${id}`
+      `${Base_Url}/get-paper-notification/${id}`,{
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
     );
 
     const apiData = response.data?.data;

@@ -32,7 +32,12 @@ const fetchForm32 = async (
   id: string
 ): Promise<ServiceResponse<Form32Props>> => {
   try {
-    const response = await axios.get(`${Base_Url}/form-32/${id}`);
+    const response = await axios.get(`${Base_Url}/form-32/${id}`, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
 
     const apiData = response.data?.data;
 

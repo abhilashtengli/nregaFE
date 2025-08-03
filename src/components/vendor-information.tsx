@@ -149,7 +149,13 @@ export default function VendorInformation() {
         `${Base_Url}/material-vendor-data-version2/${workDetail.id}`
       );
       const response = await axios.get<MaterialApiResponse>(
-        `${Base_Url}/material-vendor-data-version2/${workDetail.id}`
+        `${Base_Url}/material-vendor-data-version2/${workDetail.id}`,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
       );
 
       if (response.data.success) {
@@ -208,7 +214,13 @@ export default function VendorInformation() {
   const fetchVendorOptions = async () => {
     try {
       const response = await axios.get<VendorApiResponse>(
-        `${Base_Url}/vendors/kalaburagi`
+        `${Base_Url}/vendors/kalaburagi`,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
       );
       if (response.data.success) {
         setVendorOptions(response.data.data);
@@ -250,7 +262,13 @@ export default function VendorInformation() {
         try {
           // Re-fetch the latest data to get vendor information
           const response = await axios.get<MaterialApiResponse>(
-            `${Base_Url}/material-vendor-data-version2/${workDetail?.id}`
+            `${Base_Url}/material-vendor-data-version2/${workDetail?.id}`,
+            {
+              withCredentials: true,
+              headers: {
+                "Content-Type": "application/json"
+              }
+            }
           );
 
           if (response.data.success && response.data.data.vendorData) {
@@ -413,7 +431,13 @@ export default function VendorInformation() {
       try {
         const response = await axios.post(
           `${Base_Url}/update-vendor-material-data`,
-          submitData
+          submitData,
+          {
+            withCredentials: true,
+            headers: {
+              "Content-Type": "application/json"
+            }
+          }
         );
 
         if (response.data.success) {

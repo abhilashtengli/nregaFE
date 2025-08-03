@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Shield, LogOut, User, ChevronDown, Home, Loader2 } from "lucide-react";
+import { Shield, LogOut, ChevronDown, Home, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 import { useAuthStore } from "@/stores/userAuthStore";
@@ -233,11 +233,6 @@ export default function Navbar() {
                     </Link>
                   </DropdownMenuItem>
                 )}
-
-                <DropdownMenuItem className="flex items-center space-x-2 cursor-pointer">
-                  <User className="h-4 w-4" />
-                  <span>Profile Settings</span>
-                </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
 

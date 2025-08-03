@@ -41,7 +41,12 @@ const fetchFrontPageData = async (
   id: string
 ): Promise<ServiceResponse<FrontPageData>> => {
   try {
-    const response = await axios.get(`${Base_Url}/get-frontpage-data/${id}`);
+    const response = await axios.get(`${Base_Url}/get-frontpage-data/${id}`, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
     const apiData = response.data?.data;
 
     if (!apiData) {

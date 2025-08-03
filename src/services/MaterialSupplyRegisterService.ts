@@ -22,7 +22,12 @@ const fetchMaterialSupplyRegister = async (
   id: string
 ): Promise<ServiceResponse<MaterialSupplyRegisterData>> => {
   try {
-    const response = await axios.get(`${Base_Url}/material-supply/${id}`);
+    const response = await axios.get(`${Base_Url}/material-supply/${id}`,{
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
 
     const apiData = response.data?.data;
 

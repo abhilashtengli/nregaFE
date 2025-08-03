@@ -36,7 +36,12 @@ export type Form8Data = {
 // Fetch function
 const fetchForm8 = async (id: string): Promise<ServiceResponse<Form8Data>> => {
   try {
-    const response = await axios.get(`${Base_Url}/get-form6/${id}`); // Change URL if different
+    const response = await axios.get(`${Base_Url}/get-form6/${id}`, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }); // Change URL if different
     const apiData = response.data?.data;
 
     if (!apiData) {

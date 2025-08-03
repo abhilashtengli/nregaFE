@@ -32,7 +32,12 @@ const fetchForm6Data = async (
   id: string
 ): Promise<ServiceResponse<Form6Data>> => {
   try {
-    const response = await axios.get(`${Base_Url}/get-form6/${id}`);
+    const response = await axios.get(`${Base_Url}/get-form6/${id}`, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
 
     const apiData = response.data?.data;
 

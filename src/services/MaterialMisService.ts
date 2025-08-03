@@ -35,7 +35,12 @@ export const fetchMaterialMisData = async (
   id: string
 ): Promise<ServiceResponse<MaterialMisData>> => {
   try {
-    const res = await axios.get(`${Base_Url}/material-mis-perfect/${id}`);
+    const res = await axios.get(`${Base_Url}/material-mis-perfect/${id}`,{
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
 
     const apiData = res.data?.data;
 

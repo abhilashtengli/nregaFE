@@ -63,7 +63,12 @@ const fetchComparativeStatement = async (
   id: string
 ): Promise<ServiceResponse<CombinedPDFData>> => {
   try {
-    const response = await axios.get(`${Base_Url}/comparative-statement/${id}`);
+    const response = await axios.get(`${Base_Url}/comparative-statement/${id}`, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
 
     const apiData = response.data?.data;
 

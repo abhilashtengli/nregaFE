@@ -34,7 +34,12 @@ export type Form9Data = {
 // API Fetcher
 const fetchForm9 = async (id: string): Promise<ServiceResponse<Form9Data>> => {
   try {
-    const response = await axios.get(`${Base_Url}/get-form6/${id}`); // Replace with correct endpoint if different
+    const response = await axios.get(`${Base_Url}/get-form6/${id}`, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }); // Replace with correct endpoint if different
 
     const apiData = response.data?.data;
 

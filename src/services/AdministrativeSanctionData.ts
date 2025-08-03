@@ -25,7 +25,12 @@ const fetchAdministrativeSanction = async (
   id: string
 ): Promise<ServiceResponse<AdministrativeSanctionData>> => {
   try {
-    const response = await axios.get(`${Base_Url}/get-ts-copy/${id}`);
+    const response = await axios.get(`${Base_Url}/get-ts-copy/${id}`, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
 
     const apiData = response.data?.data;
 

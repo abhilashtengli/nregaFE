@@ -23,7 +23,12 @@ const fetchWorkCompletionData = async (
   id: string
 ): Promise<ServiceResponse<WorkCompletion>> => {
   try {
-    const response = await axios.get(`${Base_Url}/work-completion/${id}`);
+    const response = await axios.get(`${Base_Url}/work-completion/${id}`,{
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
     const apiData = response.data?.data;
 
     if (!apiData) {
