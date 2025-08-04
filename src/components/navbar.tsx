@@ -11,7 +11,14 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Shield, LogOut, ChevronDown, Home, Loader2 } from "lucide-react";
+import {
+  Shield,
+  LogOut,
+  ChevronDown,
+  Home,
+  Loader2,
+  FileText
+} from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 import { useAuthStore } from "@/stores/userAuthStore";
@@ -31,7 +38,7 @@ interface ApiError {
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const { user, logout: logoutFromStore } = useAuthStore();
+  const { user, logout: logoutFromStore, isAuthenticated } = useAuthStore();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
@@ -136,121 +143,140 @@ export default function Navbar() {
               className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
             >
               <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                <Home className="h-5 w-5 text-white" />
+                <FileText className="h-6 w-6 text-white" />
               </div>
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 font-serif">
+              <h1 className="text-sm sm:text-2xl font-bold text-gray-900 font-serif">
                 ಗ್ರಾಮ ಪಂಚಾಯತ
               </h1>
             </Link>
           </div>
 
           {/* Right side - Admin Panel + User Menu */}
-          <div className="flex items-center space-x-4">
-            {/* Admin Panel Button - Only visible for admin users */}
-            {user.role === "admin" && (
-              <Link to="/admin-panel">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="hidden sm:flex cursor-pointer items-center space-x-2 border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300 bg-transparent"
-                >
-                  <Shield className="h-4 w-4" />
-                  <span>Admin Panel</span>
-                </Button>
-              </Link>
-            )}
+          {isAuthenticated ? (
+            <div className="flex items-center space-x-4">
+              {/* Admin Panel Button - Only visible for admin users */}
+              {user.role === "admin" && (
+                <Link to="/admin-panel">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="hidden sm:flex cursor-pointer items-center space-x-2 border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300 bg-transparent"
+                  >
+                    <Shield className="h-4 w-4" />
+                    <span>Admin Panel</span>
+                  </Button>
+                </Link>
+              )}
 
-            {/* Mobile Admin Panel Button */}
-            {user.role === "admin" && (
-              <Link to="/admin-panel" className="sm:hidden">
-                <Button variant="outline" size="sm">
-                  <Shield className="h-4 w-4" />
-                </Button>
-              </Link>
-            )}
+              {/* Mobile Admin Panel Button */}
+              {user.role === "admin" && (
+                <Link to="/admin-panel" className="sm:hidden">
+                  <Button variant="outline" size="sm">
+                    <Shield className="h-4 w-4" />
+                  </Button>
+                </Link>
+              )}
 
-            {/* User Dropdown Menu */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="flex items-center cursor-pointer space-x-2 hover:bg-gray-50 px-3 py-2 rounded-lg"
-                  disabled={isLoggingOut}
-                >
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-sm font-medium">
-                      {getInitials(user.name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="hidden sm:block text-left">
-                    <p className="text-sm font-medium text-gray-900">Welcome</p>
-                    <p className="text-xs text-gray-500 truncate max-w-32">
+              {/* User Dropdown Menu */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="flex items-center cursor-pointer space-x-2 hover:bg-gray-50 px-3 py-2 rounded-lg"
+                    disabled={isLoggingOut}
+                  >
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-sm font-medium">
+                        {getInitials(user.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="hidden sm:block text-left">
+                      <p className="text-sm font-medium text-gray-900">
+                        Welcome
+                      </p>
+                      <p className="text-xs text-gray-500 truncate max-w-32">
+                        {user.name.split(" ")[0]}
+                      </p>
+                    </div>
+                    <ChevronDown className="h-4 w-4 text-gray-500" />
+                  </Button>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="px-3 py-2">
+                    <p className="text-sm font-medium text-gray-900">
                       {user.name}
                     </p>
-                  </div>
-                  <ChevronDown className="h-4 w-4 text-gray-500" />
-                </Button>
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent align="end" className="w-56">
-                <div className="px-3 py-2">
-                  <p className="text-sm font-medium text-gray-900">
-                    {user.name}
-                  </p>
-                  <p className="text-xs text-gray-500 truncate">{user.email}</p>
-                  <div className="flex items-center space-x-2 mt-1">
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                      {user.role}
-                    </span>
-                    {user.isVerifiedEmail && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        Verified
+                    <p className="text-xs text-gray-500 truncate">
+                      {user.email}
+                    </p>
+                    <div className="flex items-center space-x-2 mt-1">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {user.role}
                       </span>
-                    )}
+                      {user.isVerifiedEmail && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          Verified
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                <DropdownMenuSeparator />
+                  <DropdownMenuSeparator />
 
-                <DropdownMenuItem asChild>
-                  <Link
-                    to="/dashboard"
-                    className="flex items-center space-x-2 cursor-pointer"
-                  >
-                    <Home className="h-4 w-4" />
-                    <span>Dashboard</span>
-                  </Link>
-                </DropdownMenuItem>
-
-                {user.role === "admin" && (
                   <DropdownMenuItem asChild>
                     <Link
-                      to="/admin-panel"
+                      to="/dashboard"
                       className="flex items-center space-x-2 cursor-pointer"
                     >
-                      <Shield className="h-4 w-4" />
-                      <span>Admin Panel</span>
+                      <Home className="h-4 w-4" />
+                      <span>Dashboard</span>
                     </Link>
                   </DropdownMenuItem>
-                )}
 
-                <DropdownMenuSeparator />
-
-                <DropdownMenuItem
-                  onClick={handleLogout}
-                  disabled={isLoggingOut}
-                  className="flex items-center space-x-2 cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
-                >
-                  {isLoggingOut ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <LogOut className="h-4 w-4" />
+                  {user.role === "admin" && (
+                    <DropdownMenuItem asChild>
+                      <Link
+                        to="/admin-panel"
+                        className="flex items-center space-x-2 cursor-pointer"
+                      >
+                        <Shield className="h-4 w-4" />
+                        <span>Admin Panel</span>
+                      </Link>
+                    </DropdownMenuItem>
                   )}
-                  <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                    className="flex items-center space-x-2 cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
+                  >
+                    {isLoggingOut ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <LogOut className="h-4 w-4" />
+                    )}
+                    <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-4">
+              <Link to="/signin">
+                <Button variant="ghost" className="cursor-pointer">
+                  Sign In
+                </Button>
+              </Link>
+              <Link to="/signup">
+                <Button className="cursor-pointer bg-blue-600 hover:bg-blue-700">
+                  Get Started
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </header>

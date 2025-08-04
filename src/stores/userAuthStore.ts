@@ -40,7 +40,7 @@ export const useAuthStore = create<AuthState>()(
         set({
           user,
           isAuthenticated: true,
-          error: null,
+          error: null
         }),
 
       fetchUser: async () => {
@@ -49,9 +49,9 @@ export const useAuthStore = create<AuthState>()(
           const data = await fetchloggedInUser();
           set({
             user: data,
-              isAuthenticated: true,
-            
-            error: null,
+            isAuthenticated: true,
+
+            error: null
           });
         } catch (error) {
           const errorMessage =
@@ -63,7 +63,7 @@ export const useAuthStore = create<AuthState>()(
           set({
             user: null,
             isAuthenticated: false,
-            error: errorMessage,
+            error: errorMessage
           });
         } finally {
           set({ isLoading: false });
@@ -85,7 +85,7 @@ export const useAuthStore = create<AuthState>()(
         set({
           user: null,
           isAuthenticated: false,
-          error: null,
+          error: null
         });
 
         // Clear additional localStorage items
@@ -93,11 +93,11 @@ export const useAuthStore = create<AuthState>()(
         localStorage.removeItem("project-storage");
         toast.dismiss(toastLoading);
         toast.success("Logged out successfully", {
-          description: "You have been logged out. See you again soon!",
+          description: "You have been logged out. See you again soon!"
         });
         // Redirect
         setTimeout(() => {
-          window.location.href = `${window.location.origin}/admin/signin`;
+          window.location.href = `${window.location.origin}/`;
         }, 1000);
       },
       handleAuthError: async (errorMessage?: string) => {
@@ -112,7 +112,7 @@ export const useAuthStore = create<AuthState>()(
         set({
           user: null,
           isAuthenticated: false,
-          error: errorMessage || "Authentication error",
+          error: errorMessage || "Authentication error"
         });
 
         // Clear auth-related localStorage
@@ -121,18 +121,18 @@ export const useAuthStore = create<AuthState>()(
 
         // Redirect to signin page
         setTimeout(() => {
-          window.location.href = `${window.location.origin}/admin/signin`;
+          window.location.href = `${window.location.origin}/`;
         }, 1000);
       },
-      clearError: () => set({ error: null }),
+      clearError: () => set({ error: null })
     }),
     {
       name: "auth-storage", // key in localStorage
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         user: state.user,
-        isAuthenticated: state.isAuthenticated,
-      }), // only persist `user`
+        isAuthenticated: state.isAuthenticated
+      }) // only persist `user`
     }
   )
 );

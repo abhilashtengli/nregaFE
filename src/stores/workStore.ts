@@ -26,13 +26,11 @@ type WorkStoreType = {
   vendorName: string | null;
   vendorGstNo: string | null;
   workDetail: WorkDetail | null;
-  setWork: (
-    data: {
-      vendorName: string;
-      vendorGstNo: string;
-      workDetail: WorkDetail;
-    }
-  ) => void;
+  setWork: (data: {
+    vendorName: string;
+    vendorGstNo: string;
+    workDetail: WorkDetail;
+  }) => void;
   clearWork: () => void;
 };
 
@@ -42,7 +40,7 @@ export const useWorkStore = create<WorkStoreType>()(
       vendorName: null,
       vendorGstNo: null,
       workDetail: null,
-      setWork: data => {
+      setWork: (data) => {
         if (get().workDetail) {
           console.warn("A work task is already active. Please clear it first.");
           return;
@@ -62,7 +60,7 @@ export const useWorkStore = create<WorkStoreType>()(
     }),
     {
       name: "work-store",
-      partialize: state => ({
+      partialize: (state) => ({
         vendorName: state.vendorName,
         vendorGstNo: state.vendorGstNo,
         workDetail: state.workDetail

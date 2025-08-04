@@ -19,6 +19,7 @@ import axios from "axios";
 import { useWorkStore } from "@/stores/workStore";
 import { Base_Url } from "@/lib/constant";
 import MaterialDataSkeleton from "./shimmer/materialDataShimmer";
+import { useVendorUpdateStore } from "@/stores/useVendorUpdateStore";
 
 // API Response Types
 interface MaterialData {
@@ -113,6 +114,7 @@ export default function VendorInformation() {
 
   // Get work data from store
   const { workDetail } = useWorkStore();
+  const { setVendorUpdate } = useVendorUpdateStore();
 
   // Helper function to format date for input field
   const formatDateForInput = (dateString: string) => {
@@ -441,16 +443,19 @@ export default function VendorInformation() {
         );
 
         if (response.data.success) {
+          setVendorUpdate(true);
           toast.success("Materials Submitted Successfully", {
             description: `${selectedMaterials.size} materials submitted with vendor information.`
           });
         } else {
+          setVendorUpdate(false);
           toast.error("Submission Failed", {
             description: response.data.message || "Failed to submit materials"
           });
         }
       } catch (error: unknown) {
         console.error("API Error:", error);
+        setVendorUpdate(false);
         // Type guard for axios error
         if (axios.isAxiosError(error)) {
           if (error.response?.status === 400) {
@@ -555,7 +560,7 @@ export default function VendorInformation() {
                         type="date"
                         value={fromDate}
                         onChange={(e) => setFromDate(e.target.value)}
-                        className="w-full"
+                        className="md:w-full w-fit"
                         required
                       />
                     </div>
@@ -572,7 +577,7 @@ export default function VendorInformation() {
                         type="date"
                         value={toDate}
                         onChange={(e) => setToDate(e.target.value)}
-                        className="w-full"
+                        className="md:w-full w-fit"
                         required
                       />
                     </div>

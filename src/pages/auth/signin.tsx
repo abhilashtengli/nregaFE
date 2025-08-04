@@ -21,6 +21,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import axios from "axios";
 import { useAuthStore } from "@/stores/userAuthStore";
 import { Base_Url } from "@/lib/constant";
+import Header from "@/components/Header";
 
 // Form validation schema
 const signinSchema = z.object({
@@ -233,128 +234,131 @@ export default function SigninPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-violet-100 to-white flex items-center justify-center p-4">
-      <Card className="w-full max-w-md b pb-14">
-        <CardHeader className="space-y-1 pt-8">
-          <div className="flex items-center justify-center mb-2">
-            <LogIn className="h-8 w-8 text-blue-600" />
-          </div>
-          <CardTitle className="text-2xl font-bold text-center">
-            Sign In
-          </CardTitle>
-          <CardDescription className="text-center">
-            Enter your credentials to access your account
-          </CardDescription>
-        </CardHeader>
-
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4 ">
-            {formError && (
-              <Alert variant="destructive">
-                <AlertDescription>{formError}</AlertDescription>
-              </Alert>
-            )}
-
-            <div className="space-y-2">
-              <Label htmlFor="email">
-                Email <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={handleInputChange}
-                disabled={isLoading}
-                className={formErrors.email ? "border-red-500" : ""}
-                required
-                autoComplete="email"
-              />
-              {formErrors.email && (
-                <p className="text-sm text-red-500">{formErrors.email}</p>
-              )}
+    <div className="h-screen  bg-gradient-to-r from-blue-100 via-violet-50 to-white px-2">
+      <Header />
+      <div className="h-[80%] flex items-center justify-center">
+        <Card className="w-full max-w-md b pb-14">
+          <CardHeader className="space-y-1 pt-8">
+            <div className="flex items-center justify-center mb-2">
+              <LogIn className="h-8 w-8 text-blue-600" />
             </div>
+            <CardTitle className="text-2xl font-bold text-center">
+              Sign In
+            </CardTitle>
+            <CardDescription className="text-center">
+              Enter your credentials to access your account
+            </CardDescription>
+          </CardHeader>
 
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">
-                  Password <span className="text-red-500">*</span>
+          <form onSubmit={handleSubmit}>
+            <CardContent className="space-y-4 ">
+              {formError && (
+                <Alert variant="destructive">
+                  <AlertDescription>{formError}</AlertDescription>
+                </Alert>
+              )}
+
+              <div className="space-y-2">
+                <Label htmlFor="email">
+                  Email <span className="text-red-500">*</span>
                 </Label>
-                <Link
-                  to="/forget-password"
-                  className="text-xs text-blue-600 hover:text-blue-700"
-                >
-                  Forgot password?
-                </Link>
-              </div>
-              <div className="relative">
                 <Input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
-                  value={formData.password}
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={formData.email}
                   onChange={handleInputChange}
                   disabled={isLoading}
-                  className={formErrors.password ? "border-red-500" : ""}
+                  className={formErrors.email ? "border-red-500" : ""}
                   required
-                  autoComplete="current-password"
+                  autoComplete="email"
                 />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-0 cursor-pointer top-0 h-full px-3 py-2 hover:bg-transparent"
-                  onClick={() => setShowPassword(!showPassword)}
-                  disabled={isLoading}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4 text-gray-500" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-gray-500" />
-                  )}
-                </Button>
+                {formErrors.email && (
+                  <p className="text-sm text-red-500">{formErrors.email}</p>
+                )}
               </div>
-              {formErrors.password && (
-                <p className="text-sm text-red-500">{formErrors.password}</p>
-              )}
-            </div>
-          </CardContent>
 
-          <CardFooter className="flex flex-col space-y-4">
-            <Button
-              type="submit"
-              className="w-full mt-10 cursor-pointer bg-blue-600 hover:bg-blue-700"
-              disabled={isLoading}
-            >
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isLoading ? "Signing in..." : "Sign In"}
-            </Button>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">
+                    Password <span className="text-red-500">*</span>
+                  </Label>
+                  <Link
+                    to="/forget-password"
+                    className="text-xs text-blue-600 hover:text-blue-700"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    disabled={isLoading}
+                    className={formErrors.password ? "border-red-500" : ""}
+                    required
+                    autoComplete="current-password"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 cursor-pointer top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={isLoading}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-500" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-500" />
+                    )}
+                  </Button>
+                </div>
+                {formErrors.password && (
+                  <p className="text-sm text-red-500">{formErrors.password}</p>
+                )}
+              </div>
+            </CardContent>
 
-            <div className="text-center space-y-2">
-              <p className="text-sm text-gray-600">
-                {"Don't have an account? "}
-                <Link
-                  to="/signup"
-                  className="font-medium text-blue-600 hover:text-blue-700"
-                >
-                  Sign up
-                </Link>
-              </p>
-              <p className="text-sm text-gray-600">
-                Account not verified?{" "}
-                <Link
-                  to="/request-verify-email"
-                  className="font-medium text-blue-600 hover:text-blue-700"
-                >
-                  Verify account
-                </Link>
-              </p>
-            </div>
-          </CardFooter>
-        </form>
-      </Card>
+            <CardFooter className="flex flex-col space-y-4">
+              <Button
+                type="submit"
+                className="w-full mt-10 cursor-pointer bg-blue-600 hover:bg-blue-700"
+                disabled={isLoading}
+              >
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isLoading ? "Signing in..." : "Sign In"}
+              </Button>
+
+              <div className="text-center space-y-2">
+                <p className="text-sm text-gray-600">
+                  {"Don't have an account? "}
+                  <Link
+                    to="/signup"
+                    className="font-medium text-blue-600 hover:text-blue-700"
+                  >
+                    Sign up
+                  </Link>
+                </p>
+                <p className="text-sm text-gray-600">
+                  Account not verified?{" "}
+                  <Link
+                    to="/request-verify-email"
+                    className="font-medium text-blue-600 hover:text-blue-700"
+                  >
+                    Verify account
+                  </Link>
+                </p>
+              </div>
+            </CardFooter>
+          </form>
+        </Card>
+      </div>
     </div>
   );
 }

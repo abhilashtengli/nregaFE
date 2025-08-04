@@ -19,6 +19,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import axios from "axios";
 import { Base_Url } from "@/lib/constant";
 import { useAuthStore } from "@/stores/userAuthStore";
+import Header from "@/components/Header";
 
 // Form validation schema
 const requestVerifyEmailSchema = z.object({
@@ -211,93 +212,96 @@ export default function RequestVerifyEmailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-violet-100 to-white flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1 pt-8">
-          <div className="flex items-center justify-center mb-2">
-            <Mail className="h-8 w-8 text-blue-600" />
-          </div>
-          <CardTitle className="text-2xl font-bold text-center">
-            Request Verification Code
-          </CardTitle>
-          <CardDescription className="text-center">
-            Enter your email address to receive a verification code
-          </CardDescription>
-        </CardHeader>
-
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            {formError && (
-              <Alert variant="destructive">
-                <AlertDescription>{formError}</AlertDescription>
-              </Alert>
-            )}
-
-            <div className="space-y-2">
-              <Label htmlFor="email">
-                Email Address <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="Enter your email address"
-                value={formData.email}
-                onChange={handleInputChange}
-                disabled={isLoading}
-                className={formErrors.email ? "border-red-500" : ""}
-                required
-                autoComplete="email"
-              />
-              {formErrors.email && (
-                <p className="text-sm text-red-500">{formErrors.email}</p>
-              )}
-              <p className="text-[11px] tracking-wide text-gray-500">
-                We'll send a 6-digit verification code to this email address
-              </p>
+    <div className="h-screen  bg-gradient-to-r from-blue-100 via-violet-50 to-white px-2">
+      <Header />
+      <div className="h-[80%] flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="space-y-1 pt-8">
+            <div className="flex items-center justify-center mb-2">
+              <Mail className="h-8 w-8 text-blue-600" />
             </div>
-          </CardContent>
+            <CardTitle className="text-2xl font-bold text-center">
+              Request Verification Code
+            </CardTitle>
+            <CardDescription className="text-center">
+              Enter your email address to receive a verification code
+            </CardDescription>
+          </CardHeader>
 
-          <CardFooter className="flex flex-col space-y-4">
-            <Button
-              type="submit"
-              className="w-full mt-7 cursor-pointer bg-blue-600 hover:bg-blue-700"
-              disabled={isLoading}
-            >
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isLoading ? "Sending Code..." : "Send Verification Code"}
-            </Button>
+          <form onSubmit={handleSubmit}>
+            <CardContent className="space-y-4">
+              {formError && (
+                <Alert variant="destructive">
+                  <AlertDescription>{formError}</AlertDescription>
+                </Alert>
+              )}
 
-            <div className="text-center space-y-2">
-              <p className="text-sm text-gray-600">
-                Remember your password?{" "}
+              <div className="space-y-2">
+                <Label htmlFor="email">
+                  Email Address <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Enter your email address"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  disabled={isLoading}
+                  className={formErrors.email ? "border-red-500" : ""}
+                  required
+                  autoComplete="email"
+                />
+                {formErrors.email && (
+                  <p className="text-sm text-red-500">{formErrors.email}</p>
+                )}
+                <p className="text-[11px] tracking-wide text-gray-500">
+                  We'll send a 6-digit verification code to this email address
+                </p>
+              </div>
+            </CardContent>
+
+            <CardFooter className="flex flex-col space-y-4">
+              <Button
+                type="submit"
+                className="w-full mt-7 cursor-pointer bg-blue-600 hover:bg-blue-700"
+                disabled={isLoading}
+              >
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isLoading ? "Sending Code..." : "Send Verification Code"}
+              </Button>
+
+              <div className="text-center space-y-2">
+                <p className="text-sm text-gray-600">
+                  Remember your password?{" "}
+                  <Link
+                    to="/signin"
+                    className="font-medium text-blue-600 hover:text-blue-700"
+                  >
+                    Sign in
+                  </Link>
+                </p>
+                <p className="text-sm text-gray-600">
+                  {"Don't have an account? "}
+                  <Link
+                    to="/signup"
+                    className="font-medium text-blue-600 hover:text-blue-700"
+                  >
+                    Sign up
+                  </Link>
+                </p>
                 <Link
                   to="/signin"
-                  className="font-medium text-blue-600 hover:text-blue-700"
+                  className="inline-flex items-center text-sm text-blue-600 hover:text-blue-700"
                 >
-                  Sign in
+                  <ArrowLeft className="mr-1 h-4 w-4" />
+                  Back to Sign In
                 </Link>
-              </p>
-              <p className="text-sm text-gray-600">
-                {"Don't have an account? "}
-                <Link
-                  to="/signup"
-                  className="font-medium text-blue-600 hover:text-blue-700"
-                >
-                  Sign up
-                </Link>
-              </p>
-              <Link
-                to="/signin"
-                className="inline-flex items-center text-sm text-blue-600 hover:text-blue-700"
-              >
-                <ArrowLeft className="mr-1 h-4 w-4" />
-                Back to Sign In
-              </Link>
-            </div>
-          </CardFooter>
-        </form>
-      </Card>
+              </div>
+            </CardFooter>
+          </form>
+        </Card>
+      </div>
     </div>
   );
 }

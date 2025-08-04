@@ -21,6 +21,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import axios from "axios";
 import { Base_Url } from "@/lib/constant";
 import { useAuthStore } from "@/stores/userAuthStore";
+import Header from "@/components/Header";
 
 // Form validation schema matching backend
 const signupValidation = z.object({
@@ -264,170 +265,173 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-violet-100 to-white flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1 pt-8">
-          <div className="flex items-center justify-center mb-2">
-            <UserPlus className="h-8 w-8 text-blue-600" />
-          </div>
-          <CardTitle className="text-2xl font-bold text-center">
-            Create Account
-          </CardTitle>
-          <CardDescription className="text-center">
-            Fill in the details to create your account
-          </CardDescription>
-        </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            {formError && (
-              <Alert variant="destructive">
-                <AlertDescription>{formError}</AlertDescription>
-              </Alert>
-            )}
-
-            <div className="space-y-2">
-              <Label htmlFor="name">
-                Full Name <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="name"
-                name="name"
-                type="text"
-                placeholder="Enter your full name"
-                value={formData.name}
-                onChange={handleInputChange}
-                disabled={isLoading}
-                className={formErrors.name ? "border-red-500" : ""}
-                required
-                autoComplete="name"
-              />
-              {formErrors.name && (
-                <p className="text-sm text-red-500">{formErrors.name}</p>
-              )}
+    <div className="h-screen  bg-gradient-to-l from-blue-100 via-violet-50 to-white px-2">
+      <Header/>
+      <div className="h-[80%]  flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="space-y-1 pt-8">
+            <div className="flex items-center justify-center mb-2">
+              <UserPlus className="h-8 w-8 text-blue-600" />
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email">
-                Email Address <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="Enter your email address"
-                value={formData.email}
-                onChange={handleInputChange}
-                disabled={isLoading}
-                className={formErrors.email ? "border-red-500" : ""}
-                required
-                autoComplete="email"
-              />
-              {formErrors.email && (
-                <p className="text-sm text-red-500">{formErrors.email}</p>
+            <CardTitle className="text-2xl font-bold text-center">
+              Create Account
+            </CardTitle>
+            <CardDescription className="text-center">
+              Fill in the details to create your account
+            </CardDescription>
+          </CardHeader>
+          <form onSubmit={handleSubmit}>
+            <CardContent className="space-y-4">
+              {formError && (
+                <Alert variant="destructive">
+                  <AlertDescription>{formError}</AlertDescription>
+                </Alert>
               )}
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="panchayatCode">
-                Panchayat Code <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="panchayatCode"
-                name="panchayatCode"
-                type="text"
-                placeholder="Enter your panchayat code"
-                value={formData.panchayatCode}
-                onChange={handleInputChange}
-                disabled={isLoading}
-                className={formErrors.panchayatCode ? "border-red-500" : ""}
-                required
-                autoComplete="off"
-              />
-              {formErrors.panchayatCode && (
-                <p className="text-sm text-red-500">
-                  {formErrors.panchayatCode}
-                </p>
-              )}
-              <p className="text-[11px] tracking-wide text-gray-500">
-                Enter the valid panchayat code provided to you
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password">
-                Password <span className="text-red-500">*</span>
-              </Label>
-              <div className="relative">
+              <div className="space-y-2">
+                <Label htmlFor="name">
+                  Full Name <span className="text-red-500">*</span>
+                </Label>
                 <Input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter a strong password"
-                  value={formData.password}
+                  id="name"
+                  name="name"
+                  type="text"
+                  placeholder="Enter your full name"
+                  value={formData.name}
                   onChange={handleInputChange}
                   disabled={isLoading}
-                  className={formErrors.password ? "border-red-500" : ""}
+                  className={formErrors.name ? "border-red-500" : ""}
                   required
-                  autoComplete="new-password"
+                  autoComplete="name"
                 />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-0 cursor-pointer top-0 h-full px-3 py-2 hover:bg-transparent"
-                  onClick={() => setShowPassword(!showPassword)}
-                  disabled={isLoading}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4 text-gray-500" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-gray-500" />
-                  )}
-                </Button>
+                {formErrors.name && (
+                  <p className="text-sm text-red-500">{formErrors.name}</p>
+                )}
               </div>
-              {formErrors.password && (
-                <p className="text-sm text-red-500">{formErrors.password}</p>
-              )}
-              <p className="text-[11px] tracking-wide text-gray-500">
-                Password must contain uppercase, lowercase, number and special
-                character
-              </p>
-            </div>
-          </CardContent>
 
-          <CardFooter className="flex flex-col space-y-4">
-            <Button
-              type="submit"
-              className="w-full mt-6 cursor-pointer bg-blue-600 hover:bg-blue-700"
-              disabled={isLoading}
-            >
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isLoading ? "Creating Account..." : "Create Account"}
-            </Button>
+              <div className="space-y-2">
+                <Label htmlFor="email">
+                  Email Address <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Enter your email address"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  disabled={isLoading}
+                  className={formErrors.email ? "border-red-500" : ""}
+                  required
+                  autoComplete="email"
+                />
+                {formErrors.email && (
+                  <p className="text-sm text-red-500">{formErrors.email}</p>
+                )}
+              </div>
 
-            <div className="text-center space-y-2">
-              <p className="text-sm text-gray-600">
-                Already have an account?{" "}
-                <Link
-                  to="/signin"
-                  className="font-medium text-blue-600 hover:text-blue-700"
-                >
-                  Sign in
-                </Link>
-              </p>
-              <p className="text-sm text-gray-600">
-                Need to verify your email?{" "}
-                <Link
-                  to="/request-verify-email"
-                  className="font-medium text-blue-600 hover:text-blue-700"
-                >
-                  Request verification code
-                </Link>
-              </p>
-            </div>
-          </CardFooter>
-        </form>
-      </Card>
+              <div className="space-y-2">
+                <Label htmlFor="panchayatCode">
+                  Panchayat Code <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="panchayatCode"
+                  name="panchayatCode"
+                  type="text"
+                  placeholder="Enter your panchayat code"
+                  value={formData.panchayatCode}
+                  onChange={handleInputChange}
+                  disabled={isLoading}
+                  className={formErrors.panchayatCode ? "border-red-500" : ""}
+                  required
+                  autoComplete="off"
+                />
+                {formErrors.panchayatCode && (
+                  <p className="text-sm text-red-500">
+                    {formErrors.panchayatCode}
+                  </p>
+                )}
+                <p className="text-[11px] tracking-wide text-gray-500">
+                  Enter the valid panchayat code provided to you
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password">
+                  Password <span className="text-red-500">*</span>
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter a strong password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    disabled={isLoading}
+                    className={formErrors.password ? "border-red-500" : ""}
+                    required
+                    autoComplete="new-password"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 cursor-pointer top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={isLoading}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-500" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-500" />
+                    )}
+                  </Button>
+                </div>
+                {formErrors.password && (
+                  <p className="text-sm text-red-500">{formErrors.password}</p>
+                )}
+                <p className="text-[11px] tracking-wide text-gray-500">
+                  Password must contain uppercase, lowercase, number and special
+                  character
+                </p>
+              </div>
+            </CardContent>
+
+            <CardFooter className="flex flex-col space-y-4">
+              <Button
+                type="submit"
+                className="w-full mt-6 cursor-pointer bg-blue-600 hover:bg-blue-700"
+                disabled={isLoading}
+              >
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isLoading ? "Creating Account..." : "Create Account"}
+              </Button>
+
+              <div className="text-center space-y-2">
+                <p className="text-sm text-gray-600">
+                  Already have an account?{" "}
+                  <Link
+                    to="/signin"
+                    className="font-medium text-blue-600 hover:text-blue-700"
+                  >
+                    Sign in
+                  </Link>
+                </p>
+                <p className="text-sm text-gray-600">
+                  Need to verify your email?{" "}
+                  <Link
+                    to="/request-verify-email"
+                    className="font-medium text-blue-600 hover:text-blue-700"
+                  >
+                    Request verification code
+                  </Link>
+                </p>
+              </div>
+            </CardFooter>
+          </form>
+        </Card>
+      </div>
     </div>
   );
 }

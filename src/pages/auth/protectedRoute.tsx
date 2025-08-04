@@ -41,9 +41,7 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
 
   // If user is not authenticated, redirect to signin with return URL
   if (!isAuthenticated || !user) {
-    return (
-      <Navigate to="/signin" state={{ from: location.pathname }} replace />
-    );
+    return <Navigate to="/" state={{ from: location.pathname }} replace />;
   }
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     return (

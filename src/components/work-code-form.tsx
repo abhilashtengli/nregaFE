@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import { useWorkStore } from "@/stores/workStore";
 import { Base_Url } from "@/lib/constant";
+import { useVendorUpdateStore } from "@/stores/useVendorUpdateStore";
 
 // API Response Types
 interface ApiWorkDetail {
@@ -69,11 +70,12 @@ interface ApiResponse {
 
 // Financial years data
 const financialYears = [
-  "2021-2022",
-  "2022-2023",
-  "2023-2024",
+  "2025-2027",
+  "2025-2026",
   "2024-2025",
-  "2025-2026"
+  "2023-2024",
+  "2022-2023",
+  "2021-2022"
 ];
 
 interface WorkData {
@@ -148,6 +150,7 @@ export default function WorkCodeForm({
   // Zustand store
   const { vendorName, vendorGstNo, workDetail, setWork, clearWork } =
     useWorkStore();
+  const { setVendorUpdate } = useVendorUpdateStore();
 
   // Use ref to track if we've already notified parent to prevent infinite loops
   const hasNotifiedParent = useRef(false);
@@ -256,6 +259,7 @@ export default function WorkCodeForm({
 
   // Handle form submission with direct API call
   const handleSubmitWorkCode = async () => {
+    setVendorUpdate(false);
     // Clear previous work data before new submission
     if (workDetail) {
       handleClearData(workDetail.id);
@@ -440,6 +444,8 @@ export default function WorkCodeForm({
   const handleClearData = async (id: string) => {
     try {
       setClearData(true);
+      setVendorUpdate(false);
+
       if (!id) {
         toast.error("Invalid request", {
           description: "Missing work ID for deletion.",
@@ -515,10 +521,10 @@ export default function WorkCodeForm({
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Work Code Input */}
-              <div className="space-y-2">
-                <Label htmlFor="workCode">
+              <div className="space-y-2 text-[10px]">
+                <Label htmlFor="workCode ">
                   Work Code *
-                  <span className="text-xs text-gray-500 ml-2">
+                  <span className="text-[11px]  text-gray-500 ml-2">
                     (Format: PANCHAYAT_CODE/WC/WORK_ID)
                   </span>
                 </Label>
@@ -541,7 +547,7 @@ export default function WorkCodeForm({
               </div>
 
               {/* Financial Year Select */}
-              <div className="space-y-2">
+              <div className="space-y-2 text-[10px]">
                 <Label htmlFor="financialYear">Financial Year *</Label>
                 <Select
                   value={financialYear}
@@ -641,7 +647,7 @@ export default function WorkCodeForm({
                   <Label className="text-sm font-medium text-gray-600">
                     Material Supplier Name
                   </Label>
-                  <p className="text-lg font-semibold">
+                  <p className="md:text-lg text-md font-semibold">
                     {vendorName || "Not Available"}
                   </p>
                 </div>
@@ -649,7 +655,7 @@ export default function WorkCodeForm({
                   <Label className="text-sm font-medium text-gray-600">
                     Material Supplier GST Number
                   </Label>
-                  <p className="text-lg font-semibold">
+                  <p className="md:text-lg text-md  font-semibold">
                     {vendorGstNo || "Not Available"}
                   </p>
                 </div>
@@ -657,25 +663,27 @@ export default function WorkCodeForm({
                   <Label className="text-sm font-medium text-gray-600">
                     Work Code
                   </Label>
-                  <p className="text-lg font-semibold">{workDetail.workCode}</p>
+                  <p className="md:text-lg text-md  font-semibold">
+                    {workDetail.workCode}
+                  </p>
                 </div>
                 <div>
                   <Label className="text-sm font-medium text-gray-600">
                     District
                   </Label>
-                  <p className="text-lg">{workDetail.district}</p>
+                  <p className="md:text-lg text-md ">{workDetail.district}</p>
                 </div>
                 <div>
                   <Label className="text-sm font-medium text-gray-600">
                     Block
                   </Label>
-                  <p className="text-lg">{workDetail.block}</p>
+                  <p className="md:text-lg text-md ">{workDetail.block}</p>
                 </div>
                 <div>
                   <Label className="text-sm font-medium text-gray-600">
                     Panchayat
                   </Label>
-                  <p className="text-lg">{workDetail.panchayat}</p>
+                  <p className="md:text-lg text-md ">{workDetail.panchayat}</p>
                 </div>
               </div>
 
@@ -684,19 +692,21 @@ export default function WorkCodeForm({
                   <Label className="text-xs font-medium text-gray-600">
                     Work Name
                   </Label>
-                  <p className="text-lg">{workDetail.workName}</p>
+                  <p className="md:text-lg text-md ">{workDetail.workName}</p>
                 </div>
                 <div>
                   <Label className="text-sm font-medium text-gray-600">
                     Work Category
                   </Label>
-                  <p className="text-lg">{workDetail.workCategory}</p>
+                  <p className="md:text-lg text-md ">
+                    {workDetail.workCategory}
+                  </p>
                 </div>
                 <div>
                   <Label className="text-sm font-medium text-gray-600">
                     Work Status
                   </Label>
-                  <p className="text-lg font-semibold text-blue-600">
+                  <p className="md:text-lg text-md  font-semibold text-blue-600">
                     {workDetail.workStatus}
                   </p>
                 </div>
@@ -704,7 +714,7 @@ export default function WorkCodeForm({
                   <Label className="text-sm font-medium text-gray-600">
                     Estimated Cost
                   </Label>
-                  <p className="text-lg font-semibold text-green-600">
+                  <p className="md:text-lg text-md  font-semibold text-green-600">
                     ₹{workDetail.estimatedCost.toLocaleString()}
                   </p>
                 </div>
@@ -712,7 +722,7 @@ export default function WorkCodeForm({
                   <Label className="text-sm font-medium text-gray-600">
                     Actual Expenditure
                   </Label>
-                  <p className="text-lg font-semibold text-orange-600">
+                  <p className="md:text-lg text-md  font-semibold text-orange-600">
                     ₹{workDetail.actualExpenditure.toLocaleString()}
                   </p>
                 </div>
@@ -720,7 +730,9 @@ export default function WorkCodeForm({
                   <Label className="text-sm font-medium text-gray-600">
                     Financial Year
                   </Label>
-                  <p className="text-lg">{workDetail.financialYear}</p>
+                  <p className="md:text-lg text-md ">
+                    {workDetail.financialYear}
+                  </p>
                 </div>
               </div>
             </div>

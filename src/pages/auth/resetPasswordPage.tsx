@@ -20,6 +20,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import axios from "axios";
 import { Base_Url } from "@/lib/constant";
+import Header from "@/components/Header";
 
 // Form validation schema
 const resetPasswordSchema = z.object({
@@ -315,150 +316,156 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-violet-100 to-white flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1 pt-8">
-          <div className="flex items-center justify-center mb-2">
-            <Lock className="h-8 w-8 text-blue-600" />
-          </div>
-          <CardTitle className="text-2xl font-bold text-center">
-            Reset Password
-          </CardTitle>
-          <CardDescription className="text-center">
-            Enter the verification code and your new password
-          </CardDescription>
-        </CardHeader>
+    <div className="h-screen  bg-gradient-to-r from-blue-100 via-violet-50 to-white px-2">
+      <Header />
 
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            {formError && (
-              <Alert variant="destructive">
-                <AlertDescription>{formError}</AlertDescription>
-              </Alert>
-            )}
-
-            <div className="space-y-2">
-              <Label htmlFor="email">
-                Email Address <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={handleInputChange}
-                disabled={isLoading}
-                className={formErrors.email ? "border-red-500" : ""}
-                required
-                autoComplete="email"
-              />
-              {formErrors.email && (
-                <p className="text-sm text-red-500">{formErrors.email}</p>
-              )}
+      <div className="h-[80%] flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="space-y-1 pt-8">
+            <div className="flex items-center justify-center mb-2">
+              <Lock className="h-8 w-8 text-blue-600" />
             </div>
+            <CardTitle className="text-2xl font-bold text-center">
+              Reset Password
+            </CardTitle>
+            <CardDescription className="text-center">
+              Enter the verification code and your new password
+            </CardDescription>
+          </CardHeader>
 
-            <div className="space-y-2">
-              <Label htmlFor="code">
-                Verification Code <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="code"
-                name="code"
-                type="text"
-                placeholder="Enter 6-digit code"
-                value={formData.code}
-                onChange={handleInputChange}
-                disabled={isLoading}
-                className={`text-center text-lg tracking-widest ${
-                  formErrors.code ? "border-red-500" : ""
-                }`}
-                required
-                maxLength={6}
-                autoComplete="one-time-code"
-              />
-              {formErrors.code && (
-                <p className="text-sm text-red-500">{formErrors.code}</p>
+          <form onSubmit={handleSubmit}>
+            <CardContent className="space-y-4">
+              {formError && (
+                <Alert variant="destructive">
+                  <AlertDescription>{formError}</AlertDescription>
+                </Alert>
               )}
-              <p className="text-xs text-gray-500 text-center">
-                Check your email for the 6-digit reset code
-              </p>
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="newPassword">
-                New Password <span className="text-red-500">*</span>
-              </Label>
-              <div className="relative">
+              <div className="space-y-2">
+                <Label htmlFor="email">
+                  Email Address <span className="text-red-500">*</span>
+                </Label>
                 <Input
-                  id="newPassword"
-                  name="newPassword"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter your new password"
-                  value={formData.newPassword}
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={formData.email}
                   onChange={handleInputChange}
                   disabled={isLoading}
-                  className={formErrors.newPassword ? "border-red-500" : ""}
+                  className={formErrors.email ? "border-red-500" : ""}
                   required
-                  autoComplete="new-password"
+                  autoComplete="email"
                 />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute cursor-pointer right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                  onClick={() => setShowPassword(!showPassword)}
-                  disabled={isLoading}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4 text-gray-500" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-gray-500" />
-                  )}
-                </Button>
+                {formErrors.email && (
+                  <p className="text-sm text-red-500">{formErrors.email}</p>
+                )}
               </div>
-              {formErrors.newPassword && (
-                <p className="text-sm text-red-500">{formErrors.newPassword}</p>
-              )}
-              <p className="text-[11px] tracking-wide text-gray-500">
-                Password must contain uppercase, lowercase, number and special
-                character
-              </p>
-            </div>
-          </CardContent>
 
-          <CardFooter className="flex flex-col space-y-4">
-            <Button
-              type="submit"
-              className="w-full mt-6 bg-blue-600 hover:bg-blue-700 cursor-pointer"
-              disabled={isLoading}
-            >
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isLoading ? "Resetting Password..." : "Reset Password"}
-            </Button>
+              <div className="space-y-2">
+                <Label htmlFor="code">
+                  Verification Code <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="code"
+                  name="code"
+                  type="text"
+                  placeholder="Enter 6-digit code"
+                  value={formData.code}
+                  onChange={handleInputChange}
+                  disabled={isLoading}
+                  className={`text-center text-lg tracking-widest ${
+                    formErrors.code ? "border-red-500" : ""
+                  }`}
+                  required
+                  maxLength={6}
+                  autoComplete="one-time-code"
+                />
+                {formErrors.code && (
+                  <p className="text-sm text-red-500">{formErrors.code}</p>
+                )}
+                <p className="text-xs text-gray-500 text-center">
+                  Check your email for the 6-digit reset code
+                </p>
+              </div>
 
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full bg-transparent cursor-pointer"
-              onClick={handleResendCode}
-              disabled={resendCodeLoader}
-            >
-              {resendCodeLoader ? "Sending..." : "Resend Reset Code"}
-            </Button>
+              <div className="space-y-2">
+                <Label htmlFor="newPassword">
+                  New Password <span className="text-red-500">*</span>
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="newPassword"
+                    name="newPassword"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your new password"
+                    value={formData.newPassword}
+                    onChange={handleInputChange}
+                    disabled={isLoading}
+                    className={formErrors.newPassword ? "border-red-500" : ""}
+                    required
+                    autoComplete="new-password"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute cursor-pointer right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={isLoading}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-500" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-500" />
+                    )}
+                  </Button>
+                </div>
+                {formErrors.newPassword && (
+                  <p className="text-sm text-red-500">
+                    {formErrors.newPassword}
+                  </p>
+                )}
+                <p className="text-[11px] tracking-wide text-gray-500">
+                  Password must contain uppercase, lowercase, number and special
+                  character
+                </p>
+              </div>
+            </CardContent>
 
-            <div className="text-center space-y-2">
-              <Link
-                to="/signin"
-                className="inline-flex items-center text-sm text-blue-600 hover:text-blue-700"
+            <CardFooter className="flex flex-col space-y-4">
+              <Button
+                type="submit"
+                className="w-full mt-6 bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                disabled={isLoading}
               >
-                <ArrowLeft className="mr-1 h-4 w-4" />
-                Back to Sign In
-              </Link>
-            </div>
-          </CardFooter>
-        </form>
-      </Card>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isLoading ? "Resetting Password..." : "Reset Password"}
+              </Button>
+
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full bg-transparent cursor-pointer"
+                onClick={handleResendCode}
+                disabled={resendCodeLoader}
+              >
+                {resendCodeLoader ? "Sending..." : "Resend Reset Code"}
+              </Button>
+
+              <div className="text-center space-y-2">
+                <Link
+                  to="/signin"
+                  className="inline-flex items-center text-sm text-blue-600 hover:text-blue-700"
+                >
+                  <ArrowLeft className="mr-1 h-4 w-4" />
+                  Back to Sign In
+                </Link>
+              </div>
+            </CardFooter>
+          </form>
+        </Card>
+      </div>
     </div>
   );
 }

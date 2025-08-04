@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
@@ -58,6 +58,7 @@ import InvoicePDF from "./PDFs/InvoicePdf";
 import Contractor1QuotationPDF from "./PDFs/ComparativeStatement/Contractor1Quotation";
 import Contractor2QuotationPDF from "./PDFs/ComparativeStatement/Contractor2Quotation";
 import Contractor3QuotationPDF from "./PDFs/ComparativeStatement/Contractor3Quotation";
+import { useVendorUpdateStore } from "@/stores/useVendorUpdateStore";
 
 // PDF Action buttons data
 const pdfButtons = [
@@ -118,9 +119,8 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
   const [currentDownloading, setCurrentDownloading] = useState<string | null>(
     null
   );
-  //   const [asPdfData, setAsPdfData] = useState<AdministrativeSanctionData | null>(
-  //     null
-  //   );
+  const { hasVendorUpdate } = useVendorUpdateStore();
+  useEffect(() => {}, [hasVendorUpdate]);
 
   const fetchASCopyData = useFetchASCopyData();
   const fetchCheckListDataData = useFetchCheckListData();
@@ -1438,6 +1438,18 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
   return (
     <Card>
       <CardHeader>
+        <div className="text-center text-red-500">
+          {!hasVendorUpdate && (
+            <h1>
+              Please update the vendor details before downloading the PDF by
+              clicking the{" "}
+              <b className="border px-2 py-1 rounded-lg text-black">
+                Manage Vendor Materials
+              </b>{" "}
+              button.
+            </h1>
+          )}
+        </div>
         <CardTitle>Actions</CardTitle>
         <p className="text-sm text-gray-600">
           Generate reports and manage vendor operations
@@ -1454,7 +1466,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
                 onClick={() =>
                   buttonHandlers[button.id as keyof typeof buttonHandlers]()
                 }
-                disabled={!workData || isAnyButtonLoading}
+                disabled={!workData || isAnyButtonLoading || !hasVendorUpdate}
                 className="h-auto cursor-pointer py-3 px-2 text-xs font-medium text-center whitespace-normal"
               >
                 {currentDownloading === button.id ? (
@@ -1470,7 +1482,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
             <Button
               size="lg"
               onClick={handleDownloadAll}
-              disabled={!workData || isAnyButtonLoading}
+              disabled={!workData || isAnyButtonLoading || !hasVendorUpdate}
               className="px-8 py-4 text-lg cursor-pointer font-semibold bg-blue-600 hover:bg-blue-700"
             >
               {isDownloading ? (

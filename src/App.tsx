@@ -14,6 +14,7 @@ import FallbackRedirect from "./pages/auth/fallbackRedirect";
 import ForgotPasswordPage from "./pages/auth/forgetPasswordPage";
 import ResetPasswordPage from "./pages/auth/resetPasswordPage";
 import AdminPanelPage from "./pages/admin/adminPanel";
+import LandingPage from "./pages/LandingPage";
 
 function App() {
   const { isAuthenticated, fetchUser } = useAuthStore();
@@ -29,6 +30,7 @@ function App() {
         <Toaster position="top-right" richColors closeButton duration={3000} />
         <Routes>
           <Route path="/" element={<Body />}>
+            <Route index element={<LandingPage />} />
             <Route path="/test" element={<SimpleTestComponent />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/signin" element={<SigninPage />} />
