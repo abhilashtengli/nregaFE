@@ -112,11 +112,13 @@ const validateWorkCode = (workCode: string): string | null => {
   if (!workCode || workCode.trim().length === 0) {
     return "Work code is required";
   }
-  // Check work code format: PANCHAYAT_CODE/WC/WORK_ID or PANCHAYAT_CODE/RC/WORK_ID
-  const workCodePattern = /^\d{10}\/(WC|RC)\/\d+$/;
+  // Updated pattern: 10 digits / uppercase letters / digits
+  const workCodePattern = /^\d{10}\/[A-Z]+\/\d+$/;
+
   if (!workCodePattern.test(workCode.trim())) {
-    return "Invalid work code format. Expected format: PANCHAYAT_CODE/WC/WORK_ID or PANCHAYAT_CODE/RC/WORK_ID";
+    return "Invalid work code format. Expected format: PANCHAYAT_CODE/TYPE/WORK_ID (e.g. 1234567890/WC/1234)";
   }
+
   return null;
 };
 

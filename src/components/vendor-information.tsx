@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -98,6 +99,13 @@ export default function VendorInformation() {
     vendor3: null as SelectedVendor | null
   });
 
+  // ADD: Manual vendor input fields state
+  const [manualVendorInputs, setManualVendorInputs] = useState({
+    vendor1: { name: "", gst: "" },
+    vendor2: { name: "", gst: "" },
+    vendor3: { name: "", gst: "" }
+  });
+
   // Material units (editable)
   const [materialUnits, setMaterialUnits] = useState<{
     [materialId: number]: string;
@@ -189,11 +197,9 @@ export default function VendorInformation() {
         // Handle vendor data if it exists (second time opening)
         if (response.data.data.vendorData) {
           const vendorData = response.data.data.vendorData;
-
           // Set dates
           setFromDate(formatDateForInput(vendorData.fromDate));
           setToDate(formatDateForInput(vendorData.toDate));
-
           // Wait for vendor options to be loaded before setting selected vendors
           // This will be handled in the useEffect that watches vendorOptions
         }
@@ -224,6 +230,7 @@ export default function VendorInformation() {
           }
         }
       );
+
       if (response.data.success) {
         setVendorOptions(response.data.data);
       } else {
@@ -249,6 +256,12 @@ export default function VendorInformation() {
         vendor1: null,
         vendor2: null,
         vendor3: null
+      });
+      // UPDATED: Reset manual vendor inputs
+      setManualVendorInputs({
+        vendor1: { name: "", gst: "" },
+        vendor2: { name: "", gst: "" },
+        vendor3: { name: "", gst: "" }
       });
 
       fetchMaterialData();
@@ -294,6 +307,22 @@ export default function VendorInformation() {
               vendor1: vendor1,
               vendor2: vendor2,
               vendor3: vendor3
+            });
+
+            // UPDATED: Also populate manual inputs with API data
+            setManualVendorInputs({
+              vendor1: {
+                name: vendorData.vendorNameOne || "",
+                gst: vendorData.vendorGstOne || ""
+              },
+              vendor2: {
+                name: vendorData.vendorNameTwo || "",
+                gst: vendorData.vendorGstTwo || ""
+              },
+              vendor3: {
+                name: vendorData.vendorNameThree || "",
+                gst: vendorData.vendorGstThree || ""
+              }
             });
 
             console.log("Set vendors from API data:", {
@@ -350,6 +379,7 @@ export default function VendorInformation() {
     }));
   };
 
+  // UPDATED: Enhanced vendor select handler
   const handleVendorSelect = (
     vendorColumn: "vendor1" | "vendor2" | "vendor3",
     vendorData: VendorData | null
@@ -364,6 +394,46 @@ export default function VendorInformation() {
     setSelectedVendors((prev) => ({
       ...prev,
       [vendorColumn]: selectedVendor
+    }));
+
+    // UPDATED: Also update manual inputs when vendor is selected from combobox
+    setManualVendorInputs((prev) => ({
+      ...prev,
+      [vendorColumn]: {
+        name: vendorData?.vendorName || "",
+        gst: vendorData?.gstNo || ""
+      }
+    }));
+  };
+
+  // NEW: Handle manual vendor input changes
+  const handleManualVendorChange = (
+    vendorColumn: "vendor1" | "vendor2" | "vendor3",
+    field: "name" | "gst",
+    value: string
+  ) => {
+    setManualVendorInputs((prev) => ({
+      ...prev,
+      [vendorColumn]: {
+        ...prev[vendorColumn],
+        [field]: value
+      }
+    }));
+
+    // Update selectedVendors with manual input data
+    setSelectedVendors((prev) => ({
+      ...prev,
+      [vendorColumn]: {
+        vendorName:
+          field === "name"
+            ? value
+            : prev[vendorColumn]?.vendorName ||
+              manualVendorInputs[vendorColumn].name,
+        gstNo:
+          field === "gst"
+            ? value
+            : prev[vendorColumn]?.gstNo || manualVendorInputs[vendorColumn].gst
+      }
     }));
   };
 
@@ -381,23 +451,31 @@ export default function VendorInformation() {
   };
 
   const handleSubmitMaterials = async () => {
-    // Validation
+    // UPDATED: Validation using manual inputs
     if (!fromDate || !toDate) {
       toast.error("Please select both from and to dates");
       return;
     }
-
     if (selectedMaterials.size === 0) {
       toast.error("Please select at least one material");
       return;
     }
 
-    if (
-      !selectedVendors.vendor1 ||
-      !selectedVendors.vendor2 ||
-      !selectedVendors.vendor3
-    ) {
-      toast.error("Please select all three vendors");
+    // Check manual inputs instead of selectedVendors
+    const hasValidVendor1 =
+      manualVendorInputs.vendor1.name.trim() &&
+      manualVendorInputs.vendor1.gst.trim();
+    const hasValidVendor2 =
+      manualVendorInputs.vendor2.name.trim() &&
+      manualVendorInputs.vendor2.gst.trim();
+    const hasValidVendor3 =
+      manualVendorInputs.vendor3.name.trim() &&
+      manualVendorInputs.vendor3.gst.trim();
+
+    if (!hasValidVendor1 || !hasValidVendor2 || !hasValidVendor3) {
+      toast.error(
+        "Please provide vendor name and GST number for all three vendors"
+      );
       return;
     }
 
@@ -414,15 +492,25 @@ export default function VendorInformation() {
           vendor1Rate: editableQuotedData[material.slNo]?.vendor1?.price || "0"
         }));
 
+      // UPDATED: Use manual inputs for vendor data
       const submitData = {
         workId: workDetail?.id,
         workDocumentId: workDetail?.workDocumentId,
         fromDate,
         toDate,
         vendors: {
-          vendor1: selectedVendors.vendor1,
-          vendor2: selectedVendors.vendor2,
-          vendor3: selectedVendors.vendor3
+          vendor1: {
+            vendorName: manualVendorInputs.vendor1.name.trim(),
+            gstNo: manualVendorInputs.vendor1.gst.trim()
+          },
+          vendor2: {
+            vendorName: manualVendorInputs.vendor2.name.trim(),
+            gstNo: manualVendorInputs.vendor2.gst.trim()
+          },
+          vendor3: {
+            vendorName: manualVendorInputs.vendor3.name.trim(),
+            gstNo: manualVendorInputs.vendor3.gst.trim()
+          }
         },
         materials: selectedMaterialsData
       };
@@ -540,7 +628,6 @@ export default function VendorInformation() {
               <DialogHeader>
                 <DialogTitle>Material & Vendor Management</DialogTitle>
               </DialogHeader>
-
               {isLoading ? (
                 <MaterialDataSkeleton />
               ) : (
@@ -645,6 +732,33 @@ export default function VendorInformation() {
                                     emptyText="No vendor found."
                                   />
                                 </div>
+                                {/* NEW: Manual input fields for Vendor 1 */}
+                                <div className="space-y-1">
+                                  <Input
+                                    placeholder="Vendor Name"
+                                    value={manualVendorInputs.vendor1.name}
+                                    onChange={(e) =>
+                                      handleManualVendorChange(
+                                        "vendor1",
+                                        "name",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="text-xs h-7 w-full"
+                                  />
+                                  <Input
+                                    placeholder="GST Number"
+                                    value={manualVendorInputs.vendor1.gst}
+                                    onChange={(e) =>
+                                      handleManualVendorChange(
+                                        "vendor1",
+                                        "gst",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="text-xs h-7 w-full"
+                                  />
+                                </div>
                                 <div className="mt-2">
                                   <Label className="text-xs text-gray-600">
                                     Price (Editable)
@@ -682,6 +796,33 @@ export default function VendorInformation() {
                                     emptyText="No vendor found."
                                   />
                                 </div>
+                                {/* NEW: Manual input fields for Vendor 2 */}
+                                <div className="space-y-1">
+                                  <Input
+                                    placeholder="Vendor Name"
+                                    value={manualVendorInputs.vendor2.name}
+                                    onChange={(e) =>
+                                      handleManualVendorChange(
+                                        "vendor2",
+                                        "name",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="text-xs h-7 w-full"
+                                  />
+                                  <Input
+                                    placeholder="GST Number"
+                                    value={manualVendorInputs.vendor2.gst}
+                                    onChange={(e) =>
+                                      handleManualVendorChange(
+                                        "vendor2",
+                                        "gst",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="text-xs h-7 w-full"
+                                  />
+                                </div>
                                 <div className="mt-2">
                                   <Label className="text-xs text-gray-600">
                                     Price (Auto)
@@ -717,6 +858,33 @@ export default function VendorInformation() {
                                     }
                                     placeholder="Search vendors..."
                                     emptyText="No vendor found."
+                                  />
+                                </div>
+                                {/* NEW: Manual input fields for Vendor 3 */}
+                                <div className="space-y-1">
+                                  <Input
+                                    placeholder="Vendor Name"
+                                    value={manualVendorInputs.vendor3.name}
+                                    onChange={(e) =>
+                                      handleManualVendorChange(
+                                        "vendor3",
+                                        "name",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="text-xs h-7 w-full"
+                                  />
+                                  <Input
+                                    placeholder="GST Number"
+                                    value={manualVendorInputs.vendor3.gst}
+                                    onChange={(e) =>
+                                      handleManualVendorChange(
+                                        "vendor3",
+                                        "gst",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="text-xs h-7 w-full"
                                   />
                                 </div>
                                 <div className="mt-2">
@@ -827,9 +995,12 @@ export default function VendorInformation() {
                         selectedMaterials.size === 0 ||
                         !fromDate ||
                         !toDate ||
-                        !selectedVendors.vendor1 ||
-                        !selectedVendors.vendor2 ||
-                        !selectedVendors.vendor3 ||
+                        !manualVendorInputs.vendor1.name.trim() ||
+                        !manualVendorInputs.vendor1.gst.trim() ||
+                        !manualVendorInputs.vendor2.name.trim() ||
+                        !manualVendorInputs.vendor2.gst.trim() ||
+                        !manualVendorInputs.vendor3.name.trim() ||
+                        !manualVendorInputs.vendor3.gst.trim() ||
                         isSubmitting
                       }
                       className="px-8 py-2 cursor-pointer"
