@@ -61,20 +61,25 @@ export const fetchMaterialMisDataForInvoice = async (
   id: string
 ): Promise<ServiceResponse<ApiResponse["data"]>> => {
   try {
-    const res = await axios.get(`${Base_Url}/material-mis-perfect/${id}`);
+    const res = await axios.get(`${Base_Url}/material-mis-perfect/${id}`, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
 
     const apiData = res.data?.data;
 
     if (!apiData) {
       return {
         success: false,
-        message: "No material MIS data found.",
+        message: "No material MIS data found."
       };
     }
 
     return {
       success: true,
-      data: apiData,
+      data: apiData
     };
   } catch (error: unknown) {
     let message = "Failed to fetch material MIS data.";
@@ -85,7 +90,7 @@ export const fetchMaterialMisDataForInvoice = async (
 
     return {
       success: false,
-      message,
+      message
     };
   }
 };
@@ -115,7 +120,7 @@ export const transformMaterialData = (
       billMap[item.billNo] = {
         billNo: item.billNo,
         billDate: item.billDate,
-        materialData: [],
+        materialData: []
       };
     }
 
@@ -123,14 +128,14 @@ export const transformMaterialData = (
       material: item.material,
       unitPrice: item.unitPrice,
       quantity: item.quantity,
-      amount: item.amount,
+      amount: item.amount
     });
   }
 
   return {
     workCode,
     workName,
-    bills: Object.values(billMap),
+    bills: Object.values(billMap)
   };
 };
 
@@ -138,25 +143,25 @@ export const fetchInvoiceDetails = async (
   id: string
 ): Promise<ServiceResponse<InvoiceApiResponse>> => {
   try {
-    const res = await axios.get(`${Base_Url}/invoice/${id}`,{
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
+    const res = await axios.get(`${Base_Url}/invoice/${id}`, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
 
     const apiData = res.data?.data;
 
     if (!apiData) {
       return {
         success: false,
-        message: "No invoice data found.",
+        message: "No invoice data found."
       };
     }
 
     return {
       success: true,
-      data: apiData,
+      data: apiData
     };
   } catch (error: unknown) {
     let message = "Failed to fetch invoice data.";
@@ -167,7 +172,7 @@ export const fetchInvoiceDetails = async (
 
     return {
       success: false,
-      message,
+      message
     };
   }
 };

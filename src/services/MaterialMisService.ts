@@ -35,19 +35,19 @@ export const fetchMaterialMisData = async (
   id: string
 ): Promise<ServiceResponse<MaterialMisData>> => {
   try {
-    const res = await axios.get(`${Base_Url}/material-mis-perfect/${id}`,{
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
+    const res = await axios.get(`${Base_Url}/material-mis-perfect/${id}`, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
 
     const apiData = res.data?.data;
 
     if (!apiData) {
       return {
         success: false,
-        message: "No material MIS data found.",
+        message: "No material MIS data found."
       };
     }
 
@@ -64,17 +64,17 @@ export const fetchMaterialMisData = async (
         billNo: item.billNo,
         billAmount: item.billAmount,
         billDate: item.billDate,
-        dateOfPayment: item.dateOfPayment,
+        dateOfPayment: item.dateOfPayment
       })),
       materialVoucherInfo: {
         vendorName: apiData.vendorName,
-        financialYear: apiData.financialYear,
-      },
+        financialYear: apiData.financialYear
+      }
     };
 
     return {
       success: true,
-      data: formattedData,
+      data: formattedData
     };
   } catch (error: unknown) {
     let message = "Failed to fetch material MIS data.";
@@ -85,7 +85,7 @@ export const fetchMaterialMisData = async (
 
     return {
       success: false,
-      message,
+      message
     };
   }
 };
