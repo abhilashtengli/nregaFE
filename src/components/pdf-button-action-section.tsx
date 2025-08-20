@@ -1,3 +1,7 @@
+"use client";
+
+import type React from "react";
+
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,7 +20,6 @@ import GPAbstractPDF from "./PDFs/GpAbstractPdf";
 import { useFetchWorkOrderData } from "@/services/WorkOrderService";
 import WorkOrderPDF from "./PDFs/WorkOrderPdf";
 import TechnicalSanctionPDF from "./PDFs/TsCopy";
-import { useFetchTSCopyData } from "@/services/TsCopyService";
 import { useFetchForm6Data } from "@/services/Form6Service";
 import Form6PDF from "./PDFs/Form6Pdf";
 import { useFetchForm8Data } from "@/services/Form8Service";
@@ -59,6 +62,8 @@ import Contractor1QuotationPDF from "./PDFs/ComparativeStatement/Contractor1Quot
 import Contractor2QuotationPDF from "./PDFs/ComparativeStatement/Contractor2Quotation";
 import Contractor3QuotationPDF from "./PDFs/ComparativeStatement/Contractor3Quotation";
 import { useVendorUpdateStore } from "@/stores/useVendorUpdateStore";
+import { PDFDocument } from "pdf-lib";
+import { useFetchTSCopyData } from "@/services/TsCopyService";
 
 // PDF Action buttons data
 const pdfButtons = [
@@ -953,10 +958,6 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
     setDownloadProgress("Fetching data...");
 
     try {
-      // Create an array to track successful components
-      const successfulComponents: string[] = [];
-      const failedComponents: string[] = [];
-
       // Helper function to safely fetch data
       const safeFetch = async <T,>(
         fetchFn: () => Promise<T | null>,
@@ -965,18 +966,14 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
         try {
           setDownloadProgress(`Fetching ${name}...`);
           const data = await fetchFn();
-          if (data) {
-            successfulComponents.push(name);
-          }
           return data;
         } catch (error) {
           console.error(`Failed to fetch ${name}:`, error);
-          failedComponents.push(name);
           return null;
         }
       };
 
-      // Fetch all data with progress updates
+      // Fetch all data
       const [
         asData,
         checklistData,
@@ -1035,188 +1032,221 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
         }, "Invoice Details")
       ]);
 
-      setDownloadProgress("Generating PDFs...");
+      setDownloadProgress("Starting PDF generation...");
 
-      // Create an array to hold all PDF components
-      const allPdfComponents: React.ReactElement[] = [];
+      const masterPDF = await PDFDocument.create();
+      const results = { successful: [] as string[], failed: [] as string[] };
 
-      // Helper to add component with error handling
-      const addComponent = (component: React.ReactElement, name: string) => {
+      // Helper function to generate and merge individual PDFs
+      const generateAndMerge = async (
+        component: React.ReactElement,
+        name: string
+      ) => {
         try {
-          allPdfComponents.push(component);
+          console.log(`Generating ${name}...`);
+          setDownloadProgress(`Generating ${name}...`);
+
+          const singleDoc = <Document>{component}</Document>;
+          const blob = await pdf(singleDoc).toBlob();
+
+          const arrayBuffer = await blob.arrayBuffer();
+          const pdfDoc = await PDFDocument.load(arrayBuffer);
+          const pages = await masterPDF.copyPages(
+            pdfDoc,
+            pdfDoc.getPageIndices()
+          );
+
+          pages.forEach((page) => masterPDF.addPage(page));
+
+          console.log(`✅ Successfully added ${name}`);
+          results.successful.push(name);
+          return true;
         } catch (error) {
-          console.error(`Failed to add ${name} component:`, error);
-          failedComponents.push(name);
+          console.error(`❌ Failed to generate ${name}:`, error);
+          results.failed.push(name);
+          return false;
         }
       };
 
-      // Add all components (same as before, but with error handling)
-      if (checklistData)
-        addComponent(
-          <ChecklistPDF key="checklist" checklistData={checklistData} />,
+      // Generate basic documents first
+      if (checklistData) {
+        await generateAndMerge(
+          <ChecklistPDF checklistData={checklistData} />,
           "Checklist"
         );
-      if (frontPageData)
-        addComponent(
-          <FrontPagePDF key="frontpage" frontPageData={frontPageData} />,
+      }
+
+      if (frontPageData) {
+        await generateAndMerge(
+          <FrontPagePDF frontPageData={frontPageData} />,
           "Front Page"
         );
-      if (gpAbstractData)
-        addComponent(
-          <GPAbstractPDF key="gpabstract" GpAbstractData={gpAbstractData} />,
+      }
+
+      if (gpAbstractData) {
+        await generateAndMerge(
+          <GPAbstractPDF GpAbstractData={gpAbstractData} />,
           "GP Abstract"
         );
-      if (workOrderData)
-        addComponent(
-          <WorkOrderPDF key="workorder" workOrderData={workOrderData} />,
+      }
+
+      if (workOrderData) {
+        await generateAndMerge(
+          <WorkOrderPDF workOrderData={workOrderData} />,
           "Work Order"
         );
-      if (tsData)
-        addComponent(
-          <TechnicalSanctionPDF key="tscopy" tsData={tsData} />,
+      }
+
+      if (tsData) {
+        await generateAndMerge(
+          <TechnicalSanctionPDF tsData={tsData} />,
           "TS Copy"
         );
-      if (asData)
-        addComponent(
-          <AdministrativeSanctionPDF key="ascopy" asData={asData} />,
+      }
+
+      if (asData) {
+        await generateAndMerge(
+          <AdministrativeSanctionPDF asData={asData} />,
           "AS Copy"
         );
-      if (form6Data)
-        addComponent(<Form6PDF key="form6" form6Data={form6Data} />, "Form 6");
-      if (form8Data)
-        addComponent(
-          <Form8PDF key="form8" form8Data={form8Data.form8Data} />,
+      }
+
+      if (form6Data) {
+        await generateAndMerge(<Form6PDF form6Data={form6Data} />, "Form 6");
+      }
+
+      if (form8Data) {
+        await generateAndMerge(
+          <Form8PDF form8Data={form8Data.form8Data} />,
           "Form 8"
         );
-      if (form9Data)
-        addComponent(
-          <Form9PDF key="form9" form9Data={form9Data.form9Data} />,
+      }
+
+      if (form9Data) {
+        await generateAndMerge(
+          <Form9PDF form9Data={form9Data.form9Data} />,
           "Form 9"
         );
-
-      // Handle multiple page documents
-      if (blankNMRData?.workerData) {
-        blankNMRData.workerData.forEach(
-          (
-            musterRoll: {
-              mustrollNo: string;
-              workers: {
-                slNo: number;
-                jobCardNo: string;
-                familyHeadName: string;
-                requestLetterFrom: string;
-                accountNo: string;
-              }[];
-            },
-            index: number
-          ) => {
-            addComponent(
-              <BlankNMRPDF
-                key={`blanknmr-${index}`}
-                district={blankNMRData.district}
-                taluka={blankNMRData.taluka}
-                gramPanchayat={blankNMRData.gramPanchayat}
-                financialYear={blankNMRData.financialYear}
-                workCode={blankNMRData.workCode}
-                workName={blankNMRData.workName}
-                fromDate={blankNMRData.fromDate}
-                toDate={blankNMRData.toDate}
-                technicalSanctionNo={blankNMRData.technicalSanctionNo}
-                technicalSanctionDate={blankNMRData.technicalSanctionDate}
-                financialSanctionNo={blankNMRData.financialSanctionNo}
-                financialSanctionDate={blankNMRData.financialSanctionDate}
-                musterRollNo={musterRoll.mustrollNo}
-                workerData={musterRoll.workers}
-              />,
-              `Blank NMR ${index + 1}`
-            );
-          }
-        );
       }
 
-      if (filledNMRData?.workersData) {
-        filledNMRData.workersData.forEach(
-          (
-            musterRoll: {
-              musterRollNo: string | undefined;
-              fromDate: string | undefined;
-              toDate: string | undefined;
-              data: {
-                slNo: number;
-                name: string;
-                jobCardNo: string;
-                totalAttendance: number;
-                oneDayWage: number;
-                pendingAmountByAttendance: number;
-                totalCashPayment: number;
-                bankName: string;
-                wagelistNo: string;
-                creditedDate: string;
-                signature: string;
-                attendanceBy: string;
-              }[];
-            },
-            index: number
-          ) => {
-            addComponent(
-              <FilledENmrPDF
-                key={`fillednmr-${index}`}
-                district={filledNMRData.district}
-                taluka={filledNMRData.taluka}
-                panchayat={filledNMRData.panchayat}
-                approvalNo={filledNMRData.approvalNo}
-                approvalDate={filledNMRData.approvalDate}
-                workCode={filledNMRData.workCode}
-                workName={filledNMRData.workName}
-                financialYear={filledNMRData.financialYear}
-                totalWage={filledNMRData.totalWage}
-                wage={filledNMRData.wage}
-                totalAttendanceCount={filledNMRData.totalAttendanceCount}
-                musterRollNo={musterRoll.musterRollNo}
-                fromDate={musterRoll.fromDate}
-                toDate={musterRoll.toDate}
-                workersData={musterRoll.data}
-              />,
-              `Filled NMR ${index + 1}`
-            );
-          }
+      // Handle Blank NMR documents individually
+      if (blankNMRData?.workerData && Array.isArray(blankNMRData.workerData)) {
+        console.log(
+          `Processing ${blankNMRData.workerData.length} Blank NMR documents...`
         );
+
+        for (let index = 0; index < blankNMRData.workerData.length; index++) {
+          const musterRoll = blankNMRData.workerData[index];
+
+          if (!musterRoll?.mustrollNo) {
+            console.warn(`Skipping invalid Blank NMR at index ${index}`);
+            continue;
+          }
+
+          await generateAndMerge(
+            <BlankNMRPDF
+              district={blankNMRData.district}
+              taluka={blankNMRData.taluka}
+              gramPanchayat={blankNMRData.gramPanchayat}
+              financialYear={blankNMRData.financialYear}
+              workCode={blankNMRData.workCode}
+              workName={blankNMRData.workName}
+              fromDate={blankNMRData.fromDate}
+              toDate={blankNMRData.toDate}
+              technicalSanctionNo={blankNMRData.technicalSanctionNo}
+              technicalSanctionDate={blankNMRData.technicalSanctionDate}
+              financialSanctionNo={blankNMRData.financialSanctionNo}
+              financialSanctionDate={blankNMRData.financialSanctionDate}
+              musterRollNo={musterRoll.mustrollNo}
+              workerData={musterRoll.workers}
+            />,
+            `Blank NMR ${index + 1}`
+          );
+
+          // Small delay to prevent memory pressure
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        }
       }
 
-      // Add remaining components...
-      if (movementSlipData)
-        addComponent(
-          <MovementSlipPDF
-            key="movementslip"
-            movementSlipData={movementSlipData}
-          />,
+      // Handle Filled NMR documents individually
+      if (
+        filledNMRData?.workersData &&
+        Array.isArray(filledNMRData.workersData)
+      ) {
+        console.log(
+          `Processing ${filledNMRData.workersData.length} Filled NMR documents...`
+        );
+
+        for (let index = 0; index < filledNMRData.workersData.length; index++) {
+          const musterRoll = filledNMRData.workersData[index];
+
+          if (!musterRoll?.musterRollNo) {
+            console.warn(`Skipping invalid Filled NMR at index ${index}`);
+            continue;
+          }
+
+          await generateAndMerge(
+            <FilledENmrPDF
+              district={filledNMRData.district}
+              taluka={filledNMRData.taluka}
+              panchayat={filledNMRData.panchayat}
+              approvalNo={filledNMRData.approvalNo}
+              approvalDate={filledNMRData.approvalDate}
+              workCode={filledNMRData.workCode}
+              workName={filledNMRData.workName}
+              financialYear={filledNMRData.financialYear}
+              totalWage={filledNMRData.totalWage}
+              wage={filledNMRData.wage}
+              totalAttendanceCount={filledNMRData.totalAttendanceCount}
+              musterRollNo={musterRoll.musterRollNo}
+              fromDate={musterRoll.fromDate}
+              toDate={musterRoll.toDate}
+              workersData={musterRoll.data}
+            />,
+            `Filled NMR ${index + 1}`
+          );
+
+          // Small delay to prevent memory pressure
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+      }
+
+      // Continue with other documents...
+      if (movementSlipData) {
+        await generateAndMerge(
+          <MovementSlipPDF movementSlipData={movementSlipData} />,
           "Movement Slip"
         );
-      if (wlFtoData)
-        addComponent(<WLFTOPdf key="wlfto" wlfto={wlFtoData} />, "WL/FTO");
-      if (form32Data)
-        addComponent(
-          <Form32PDF key="form32" form32Data={form32Data} />,
+      }
+
+      if (wlFtoData) {
+        await generateAndMerge(<WLFTOPdf wlfto={wlFtoData} />, "WL/FTO");
+      }
+
+      if (form32Data) {
+        await generateAndMerge(
+          <Form32PDF form32Data={form32Data} />,
           "Form 32"
         );
-      if (materialMisData)
-        addComponent(
-          <MaterialMisPDF key="materialmis" data={materialMisData} />,
+      }
+
+      if (materialMisData) {
+        await generateAndMerge(
+          <MaterialMisPDF data={materialMisData} />,
           "Material MIS"
         );
-      if (workCompletionData)
-        addComponent(
-          <WorkCompletionPDF
-            key="workcompletion"
-            workCompletionData={workCompletionData}
-          />,
+      }
+
+      if (workCompletionData) {
+        await generateAndMerge(
+          <WorkCompletionPDF workCompletionData={workCompletionData} />,
           "Work Completion"
         );
+      }
 
       if (materialSupplyRegisterData) {
-        addComponent(
+        await generateAndMerge(
           <MaterialSupplyRegisterPDF
-            key="materialsupplyregister"
             workCode={materialSupplyRegisterData.workCode}
             workName={materialSupplyRegisterData.workName}
             vendorName={materialSupplyRegisterData.vendorName}
@@ -1227,31 +1257,24 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
       }
 
       if (paperNotificationData) {
-        addComponent(
+        await generateAndMerge(
           <PaperNotificationPDF
-            key="papernotification"
             paperNotificationData={paperNotificationData}
           />,
           "Paper Notification"
         );
       }
 
-      // Add quotation documents
+      // Handle quotation documents
       if (quotationData) {
         const comparativeStatementDate = addDays(
           quotationData.tenderPublishDate,
           9
         );
         const supplyOrderDate = addDays(quotationData.tenderPublishDate, 10);
-        console.log(
-          "comparativeStatementDate combine : ",
-          comparativeStatementDate
-        );
-        console.log("supplyOrderDate combine : ", supplyOrderDate);
 
-        addComponent(
+        await generateAndMerge(
           <QuotationCallPDF
-            key="quotationcall"
             gramPanchayat={quotationData.gramPanchayat}
             taluka={quotationData.taluka}
             district={quotationData.district}
@@ -1266,9 +1289,8 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
           "Quotation Call"
         );
 
-        addComponent(
+        await generateAndMerge(
           <ComparativeStatementPDF
-            key="comparativestatement"
             gramPanchayat={quotationData.gramPanchayat}
             taluka={quotationData.taluka}
             district={quotationData.district}
@@ -1283,51 +1305,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
         );
 
         // Add contractor quotations
-        const contractors = [
-          {
-            name: quotationData.vendorDetails.vendorNameOne,
-            gst: quotationData.vendorDetails.vendorGstOne,
-            date: quotationData.vendorDetails.VendorOneQuotationSubmissiondate,
-            number: 1
-          },
-          {
-            name: quotationData.vendorDetails.vendorNameTwo,
-            gst: quotationData.vendorDetails.vendorGstTwo,
-            date: quotationData.vendorDetails.vendorTwoQuotationSubmissiondate,
-            number: 2
-          },
-          {
-            name: quotationData.vendorDetails.vendorNameThree,
-            gst: quotationData.vendorDetails.vendorGstThree,
-            date: quotationData.vendorDetails
-              .vendorThreeQuotationSubmissiondate,
-            number: 3
-          }
-        ];
-
-        // contractors.forEach((contractor, index) => {
-        //   addComponent(
-        //     <ContractorQuotationPDF
-        //       key={`contractor-${index}`}
-        //       gramPanchayat={quotationData.gramPanchayat}
-        //       taluka={quotationData.taluka}
-        //       district={quotationData.district}
-        //       year={quotationData.year}
-        //       workCode={quotationData.workCode}
-        //       workName={quotationData.workName}
-        //       tenderPublishDate={contractor.date}
-        //       contractorNumber={contractor.number}
-        //       contractorName={contractor.name}
-        //       contractorGst={contractor.gst}
-        //       quotationSubmissionDate={contractor.date}
-        //       vendorWithVendorQuotation={
-        //         quotationData.vendorWithVendorQuotation
-        //       }
-        //     />,
-        //     `Contractor ${contractor.number} Quotation`
-        //   );
-        // });
-        addComponent(
+        await generateAndMerge(
           <Contractor1QuotationPDF
             gramPanchayat={quotationData.gramPanchayat}
             taluka={quotationData.taluka}
@@ -1335,16 +1313,21 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
             year={quotationData.year}
             workCode={quotationData.workCode}
             workName={quotationData.workName}
-            tenderPublishDate={contractors[0].date}
+            tenderPublishDate={
+              quotationData.vendorDetails.VendorOneQuotationSubmissiondate
+            }
             contractorNumber={1}
-            contractorName={contractors[0].name}
-            contractorGst={contractors[0].gst}
-            quotationSubmissionDate={contractors[0].date}
+            contractorName={quotationData.vendorDetails.vendorNameOne}
+            contractorGst={quotationData.vendorDetails.vendorGstOne}
+            quotationSubmissionDate={
+              quotationData.vendorDetails.VendorOneQuotationSubmissiondate
+            }
             vendorWithVendorQuotation={quotationData.vendorWithVendorQuotation}
           />,
-          `Contractor ${contractors[0].number} Quotation`
+          "Contractor 1 Quotation"
         );
-        addComponent(
+
+        await generateAndMerge(
           <Contractor2QuotationPDF
             gramPanchayat={quotationData.gramPanchayat}
             taluka={quotationData.taluka}
@@ -1352,16 +1335,21 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
             year={quotationData.year}
             workCode={quotationData.workCode}
             workName={quotationData.workName}
-            tenderPublishDate={contractors[1].date}
+            tenderPublishDate={
+              quotationData.vendorDetails.vendorTwoQuotationSubmissiondate
+            }
             contractorNumber={2}
-            contractorName={contractors[1].name}
-            contractorGst={contractors[1].gst}
-            quotationSubmissionDate={contractors[1].date}
+            contractorName={quotationData.vendorDetails.vendorNameTwo}
+            contractorGst={quotationData.vendorDetails.vendorGstTwo}
+            quotationSubmissionDate={
+              quotationData.vendorDetails.vendorTwoQuotationSubmissiondate
+            }
             vendorWithVendorQuotation={quotationData.vendorWithVendorQuotation}
           />,
-          `Contractor ${contractors[1].number} Quotation`
+          "Contractor 2 Quotation"
         );
-        addComponent(
+
+        await generateAndMerge(
           <Contractor3QuotationPDF
             gramPanchayat={quotationData.gramPanchayat}
             taluka={quotationData.taluka}
@@ -1369,19 +1357,22 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
             year={quotationData.year}
             workCode={quotationData.workCode}
             workName={quotationData.workName}
-            tenderPublishDate={contractors[2].date}
+            tenderPublishDate={
+              quotationData.vendorDetails.vendorThreeQuotationSubmissiondate
+            }
             contractorNumber={3}
-            contractorName={contractors[2].name}
-            contractorGst={contractors[2].gst}
-            quotationSubmissionDate={contractors[2].date}
+            contractorName={quotationData.vendorDetails.vendorNameThree}
+            contractorGst={quotationData.vendorDetails.vendorGstThree}
+            quotationSubmissionDate={
+              quotationData.vendorDetails.vendorThreeQuotationSubmissiondate
+            }
             vendorWithVendorQuotation={quotationData.vendorWithVendorQuotation}
           />,
-          `Contractor ${contractors[2].number} Quotation`
+          "Contractor 3 Quotation"
         );
 
-        addComponent(
+        await generateAndMerge(
           <SupplyOrderPDF
-            key="supplyorder"
             gramPanchayat={quotationData.gramPanchayat}
             taluka={quotationData.taluka}
             district={quotationData.district}
@@ -1402,78 +1393,72 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
       }
 
       if (swgData) {
-        addComponent(
-          <StageWisePhotosPDF key="stagewise" sWGTData={swgData} />,
+        await generateAndMerge(
+          <StageWisePhotosPDF sWGTData={swgData} />,
           "Stage-wise Photos"
         );
       }
+
       if (
-        invoiceData &&
-        invoiceDetailsData &&
-        invoiceData.success &&
-        invoiceDetailsData.success
+        invoiceData?.success &&
+        invoiceDetailsData?.success &&
+        invoiceData.data &&
+        invoiceDetailsData.data
       ) {
         try {
-          if (invoiceData.data && invoiceDetailsData.data) {
-            const transformedData = transformMaterialData(invoiceData.data);
-            const workCode = transformedData.workCode;
-            const workName = transformedData.workName;
-            const gst =
-              invoiceDetailsData.data?.vendorDetails?.vendorGstOne || "";
-            const vendorName =
-              invoiceDetailsData.data?.vendorDetails?.vendorNameOne || "";
-            const block = invoiceDetailsData.data?.workDetails.block || "";
-            const district =
-              invoiceDetailsData.data?.workDetails.district || "";
-            const panchayat =
-              invoiceDetailsData.data?.workDetails.panchayat || "";
+          const transformedData = transformMaterialData(invoiceData.data);
+          const workCode = transformedData.workCode;
+          const workName = transformedData.workName;
+          const gst =
+            invoiceDetailsData.data?.vendorDetails?.vendorGstOne || "";
+          const vendorName =
+            invoiceDetailsData.data?.vendorDetails?.vendorNameOne || "";
+          const block = invoiceDetailsData.data?.workDetails.block || "";
+          const district = invoiceDetailsData.data?.workDetails.district || "";
+          const panchayat =
+            invoiceDetailsData.data?.workDetails.panchayat || "";
 
-            transformedData.bills.forEach((bill, index) => {
-              addComponent(
-                <InvoicePDF
-                  key={`invoice-${index}`}
-                  bill={bill}
-                  workCode={workCode}
-                  workName={workName}
-                  vendorGstOne={gst}
-                  vendorNameOne={vendorName}
-                  block={block}
-                  district={district}
-                  panchayat={panchayat}
-                />,
-                `Invoice ${index + 1}`
-              );
-            });
+          for (let index = 0; index < transformedData.bills.length; index++) {
+            const bill = transformedData.bills[index];
+            await generateAndMerge(
+              <InvoicePDF
+                bill={bill}
+                workCode={workCode}
+                workName={workName}
+                vendorGstOne={gst}
+                vendorNameOne={vendorName}
+                block={block}
+                district={district}
+                panchayat={panchayat}
+              />,
+              `Invoice ${index + 1}`
+            );
           }
         } catch (error) {
           console.error("Failed to process invoice data:", error);
-          failedComponents.push("Invoice");
+          results.failed.push("Invoice");
         }
       }
 
-      // Check if we have any components to render
-      if (allPdfComponents.length === 0) {
-        toast.error("No data available to generate PDFs");
-        return;
-      }
+      // Generate final combined PDF
+      setDownloadProgress("Finalizing combined PDF...");
 
-      setDownloadProgress("Compiling document...");
+      const pdfBytes = await masterPDF.save();
+      const finalBlob = new Blob([new Uint8Array(pdfBytes)], {
+        type: "application/pdf"
+      });
 
-      // Generate the combined PDF with memory optimization
-      const document = <Document>{allPdfComponents}</Document>;
-
-      // Use toBlob with onUpdate for progress
-      const blob = await pdf(document).toBlob();
-
-      // Save the combined PDF
       const currentDate = new Date().toISOString().split("T")[0];
       const fileName = `${workData.workDetail.workCode}_Complete_Documentation_${currentDate}.pdf`;
-      saveAs(blob, fileName);
+      saveAs(finalBlob, fileName);
 
-      // Show detailed success message
-      let message = `Successfully generated ${successfulComponents.length} documents.`;
-      if (failedComponents.length > 0) {
-        message += ` Failed to generate: ${failedComponents.join(", ")}.`;
+      // Show results
+      const successCount = results.successful.length;
+      const failCount = results.failed.length;
+
+      let message = `Successfully generated ${successCount} documents.`;
+      if (failCount > 0) {
+        message += ` Failed: ${results.failed.join(", ")}.`;
       }
 
       toast.success("Download Complete", {
@@ -1481,7 +1466,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
         duration: 5000
       });
     } catch (error) {
-      console.error("Error downloading all PDFs:", error);
+      console.error("Error in combined PDF generation:", error);
       toast.error("Failed to generate complete PDF", {
         description:
           "Please try downloading individual documents or contact support."
@@ -1560,3 +1545,554 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
     </Card>
   );
 }
+
+// const handleDownloadAll = async () => {
+//   if (!workData) {
+//     toast.error("Missing Information", {
+//       description: "Please submit work code data first."
+//     });
+//     return;
+//   }
+
+//   setIsDownloading(true);
+//   setDownloadProgress("Fetching data...");
+
+//   try {
+//     // Create an array to track successful components
+//     const successfulComponents: string[] = [];
+//     const failedComponents: string[] = [];
+
+//     // Helper function to safely fetch data
+//     const safeFetch = async <T,>(
+//       fetchFn: () => Promise<T | null>,
+//       name: string
+//     ): Promise<T | null> => {
+//       try {
+//         setDownloadProgress(`Fetching ${name}...`);
+//         const data = await fetchFn();
+//         if (data) {
+//           successfulComponents.push(name);
+//         }
+//         return data;
+//       } catch (error) {
+//         console.error(`Failed to fetch ${name}:`, error);
+//         failedComponents.push(name);
+//         return null;
+//       }
+//     };
+
+//     // Fetch all data with progress updates
+//     const [
+//       asData,
+//       checklistData,
+//       frontPageData,
+//       gpAbstractData,
+//       workOrderData,
+//       tsData,
+//       form6Data,
+//       form8Data,
+//       form9Data,
+//       movementSlipData,
+//       wlFtoData,
+//       form32Data,
+//       materialMisData,
+//       workCompletionData,
+//       paperNotificationData,
+//       swgData,
+//       quotationData,
+//       blankNMRData,
+//       filledNMRData,
+//       materialSupplyRegisterData,
+//       invoiceData,
+//       invoiceDetailsData
+//     ] = await Promise.all([
+//       safeFetch(fetchASCopyData, "AS Copy"),
+//       safeFetch(fetchCheckListDataData, "Checklist"),
+//       safeFetch(fetchFrontPageData, "Front Page"),
+//       safeFetch(fetchGpAbstractData, "GP Abstract"),
+//       safeFetch(fetchWorkOrderData, "Work Order"),
+//       safeFetch(fetchTsCopyData, "TS Copy"),
+//       safeFetch(fetchForm6Data, "Form 6"),
+//       safeFetch(fetchForm8Data, "Form 8"),
+//       safeFetch(fetchForm9Data, "Form 9"),
+//       safeFetch(fetchMovementSlipData, "Movement Slip"),
+//       safeFetch(fetchWlFtoData, "WL/FTO"),
+//       safeFetch(fetchForm32Data, "Form 32"),
+//       safeFetch(fetchMaterialMisData, "Material MIS"),
+//       safeFetch(fetchWorkCompletionData, "Work Completion"),
+//       safeFetch(fetchPaperNotificationData, "Paper Notification"),
+//       safeFetch(fetchSwgData, "Stage-wise Geo Tagging"),
+//       safeFetch(fetchAllQuotationPdfData, "Quotation Forms"),
+//       safeFetch(fetchBlankNMRData, "Blank NMRs"),
+//       safeFetch(fetchFilledNMRData, "Filled NMRs"),
+//       safeFetch(fetchMaterialSupplyRegisteryData, "Material Supply Register"),
+//       safeFetch(async () => {
+//         const { workDetail } = useWorkStore.getState();
+//         const id = workDetail?.id;
+//         if (!id) return null;
+//         return await fetchMaterialMisDataForInvoice(id);
+//       }, "Invoice Data"),
+//       safeFetch(async () => {
+//         const { workDetail } = useWorkStore.getState();
+//         const id = workDetail?.id;
+//         if (!id) return null;
+//         return await fetchInvoiceDetails(id);
+//       }, "Invoice Details")
+//     ]);
+
+//     setDownloadProgress("Generating PDFs...");
+
+//     // Create an array to hold all PDF components
+//     const allPdfComponents: React.ReactElement[] = [];
+
+//     // Helper to add component with error handling
+//     const addComponent = (component: React.ReactElement, name: string) => {
+//       try {
+//         allPdfComponents.push(component);
+//       } catch (error) {
+//         console.error(`Failed to add ${name} component:`, error);
+//         failedComponents.push(name);
+//       }
+//     };
+
+//     // Add all components (same as before, but with error handling)
+//     if (checklistData)
+//       addComponent(
+//         <ChecklistPDF key="checklist" checklistData={checklistData} />,
+//         "Checklist"
+//       );
+//     if (frontPageData)
+//       addComponent(
+//         <FrontPagePDF key="frontpage" frontPageData={frontPageData} />,
+//         "Front Page"
+//       );
+//     if (gpAbstractData)
+//       addComponent(
+//         <GPAbstractPDF key="gpabstract" GpAbstractData={gpAbstractData} />,
+//         "GP Abstract"
+//       );
+//     if (workOrderData)
+//       addComponent(
+//         <WorkOrderPDF key="workorder" workOrderData={workOrderData} />,
+//         "Work Order"
+//       );
+//     if (tsData)
+//       addComponent(
+//         <TechnicalSanctionPDF key="tscopy" tsData={tsData} />,
+//         "TS Copy"
+//       );
+//     if (asData)
+//       addComponent(
+//         <AdministrativeSanctionPDF key="ascopy" asData={asData} />,
+//         "AS Copy"
+//       );
+//     if (form6Data)
+//       addComponent(<Form6PDF key="form6" form6Data={form6Data} />, "Form 6");
+//     if (form8Data)
+//       addComponent(
+//         <Form8PDF key="form8" form8Data={form8Data.form8Data} />,
+//         "Form 8"
+//       );
+//     if (form9Data)
+//       addComponent(
+//         <Form9PDF key="form9" form9Data={form9Data.form9Data} />,
+//         "Form 9"
+//       );
+
+//     // Handle multiple page documents
+//     if (blankNMRData?.workerData) {
+//       blankNMRData.workerData.forEach(
+//         (
+//           musterRoll: {
+//             mustrollNo: string;
+//             workers: {
+//               slNo: number;
+//               jobCardNo: string;
+//               familyHeadName: string;
+//               requestLetterFrom: string;
+//               accountNo: string;
+//             }[];
+//           },
+//           index: number
+//         ) => {
+//           addComponent(
+//             <BlankNMRPDF
+//               key={`blanknmr-${index}`}
+//               district={blankNMRData.district}
+//               taluka={blankNMRData.taluka}
+//               gramPanchayat={blankNMRData.gramPanchayat}
+//               financialYear={blankNMRData.financialYear}
+//               workCode={blankNMRData.workCode}
+//               workName={blankNMRData.workName}
+//               fromDate={blankNMRData.fromDate}
+//               toDate={blankNMRData.toDate}
+//               technicalSanctionNo={blankNMRData.technicalSanctionNo}
+//               technicalSanctionDate={blankNMRData.technicalSanctionDate}
+//               financialSanctionNo={blankNMRData.financialSanctionNo}
+//               financialSanctionDate={blankNMRData.financialSanctionDate}
+//               musterRollNo={musterRoll.mustrollNo}
+//               workerData={musterRoll.workers}
+//             />,
+//             `Blank NMR ${index + 1}`
+//           );
+//         }
+//       );
+//     }
+
+//     if (filledNMRData?.workersData) {
+//       filledNMRData.workersData.forEach(
+//         (
+//           musterRoll: {
+//             musterRollNo: string | undefined;
+//             fromDate: string | undefined;
+//             toDate: string | undefined;
+//             data: {
+//               slNo: number;
+//               name: string;
+//               jobCardNo: string;
+//               totalAttendance: number;
+//               oneDayWage: number;
+//               pendingAmountByAttendance: number;
+//               totalCashPayment: number;
+//               bankName: string;
+//               wagelistNo: string;
+//               creditedDate: string;
+//               signature: string;
+//               attendanceBy: string;
+//             }[];
+//           },
+//           index: number
+//         ) => {
+//           addComponent(
+//             <FilledENmrPDF
+//               key={`fillednmr-${index}`}
+//               district={filledNMRData.district}
+//               taluka={filledNMRData.taluka}
+//               panchayat={filledNMRData.panchayat}
+//               approvalNo={filledNMRData.approvalNo}
+//               approvalDate={filledNMRData.approvalDate}
+//               workCode={filledNMRData.workCode}
+//               workName={filledNMRData.workName}
+//               financialYear={filledNMRData.financialYear}
+//               totalWage={filledNMRData.totalWage}
+//               wage={filledNMRData.wage}
+//               totalAttendanceCount={filledNMRData.totalAttendanceCount}
+//               musterRollNo={musterRoll.musterRollNo}
+//               fromDate={musterRoll.fromDate}
+//               toDate={musterRoll.toDate}
+//               workersData={musterRoll.data}
+//             />,
+//             `Filled NMR ${index + 1}`
+//           );
+//         }
+//       );
+//     }
+
+//     // Add remaining components...
+//     if (movementSlipData)
+//       addComponent(
+//         <MovementSlipPDF
+//           key="movementslip"
+//           movementSlipData={movementSlipData}
+//         />,
+//         "Movement Slip"
+//       );
+//     if (wlFtoData)
+//       addComponent(<WLFTOPdf key="wlfto" wlfto={wlFtoData} />, "WL/FTO");
+//     if (form32Data)
+//       addComponent(
+//         <Form32PDF key="form32" form32Data={form32Data} />,
+//         "Form 32"
+//       );
+//     if (materialMisData)
+//       addComponent(
+//         <MaterialMisPDF key="materialmis" data={materialMisData} />,
+//         "Material MIS"
+//       );
+//     if (workCompletionData)
+//       addComponent(
+//         <WorkCompletionPDF
+//           key="workcompletion"
+//           workCompletionData={workCompletionData}
+//         />,
+//         "Work Completion"
+//       );
+
+//     if (materialSupplyRegisterData) {
+//       addComponent(
+//         <MaterialSupplyRegisterPDF
+//           key="materialsupplyregister"
+//           workCode={materialSupplyRegisterData.workCode}
+//           workName={materialSupplyRegisterData.workName}
+//           vendorName={materialSupplyRegisterData.vendorName}
+//           materialData={materialSupplyRegisterData.materialData}
+//         />,
+//         "Material Supply Register"
+//       );
+//     }
+
+//     if (paperNotificationData) {
+//       addComponent(
+//         <PaperNotificationPDF
+//           key="papernotification"
+//           paperNotificationData={paperNotificationData}
+//         />,
+//         "Paper Notification"
+//       );
+//     }
+
+//     // Add quotation documents
+//     if (quotationData) {
+//       const comparativeStatementDate = addDays(
+//         quotationData.tenderPublishDate,
+//         9
+//       );
+//       const supplyOrderDate = addDays(quotationData.tenderPublishDate, 10);
+//       console.log(
+//         "comparativeStatementDate combine : ",
+//         comparativeStatementDate
+//       );
+//       console.log("supplyOrderDate combine : ", supplyOrderDate);
+
+//       addComponent(
+//         <QuotationCallPDF
+//           key="quotationcall"
+//           gramPanchayat={quotationData.gramPanchayat}
+//           taluka={quotationData.taluka}
+//           district={quotationData.district}
+//           year={quotationData.year}
+//           administrativeSanction={quotationData.administrativeSanction}
+//           workCode={quotationData.workCode}
+//           workName={quotationData.workName}
+//           tenderPublishDate={quotationData.tenderPublishDate}
+//           tenderSubmissionDate={quotationData.tenderSubmissionDate}
+//           materialData={quotationData.materialData}
+//         />,
+//         "Quotation Call"
+//       );
+
+//       addComponent(
+//         <ComparativeStatementPDF
+//           key="comparativestatement"
+//           gramPanchayat={quotationData.gramPanchayat}
+//           taluka={quotationData.taluka}
+//           district={quotationData.district}
+//           year={quotationData.year}
+//           workCode={quotationData.workCode}
+//           workName={quotationData.workName}
+//           tenderPublishDate={comparativeStatementDate}
+//           vendorDetails={quotationData.vendorDetails}
+//           vendorWithVendorQuotation={quotationData.vendorWithVendorQuotation}
+//         />,
+//         "Comparative Statement"
+//       );
+
+//       // Add contractor quotations
+//       const contractors = [
+//         {
+//           name: quotationData.vendorDetails.vendorNameOne,
+//           gst: quotationData.vendorDetails.vendorGstOne,
+//           date: quotationData.vendorDetails.VendorOneQuotationSubmissiondate,
+//           number: 1
+//         },
+//         {
+//           name: quotationData.vendorDetails.vendorNameTwo,
+//           gst: quotationData.vendorDetails.vendorGstTwo,
+//           date: quotationData.vendorDetails.vendorTwoQuotationSubmissiondate,
+//           number: 2
+//         },
+//         {
+//           name: quotationData.vendorDetails.vendorNameThree,
+//           gst: quotationData.vendorDetails.vendorGstThree,
+//           date: quotationData.vendorDetails
+//             .vendorThreeQuotationSubmissiondate,
+//           number: 3
+//         }
+//       ];
+
+//       // contractors.forEach((contractor, index) => {
+//       //   addComponent(
+//       //     <ContractorQuotationPDF
+//       //       key={`contractor-${index}`}
+//       //       gramPanchayat={quotationData.gramPanchayat}
+//       //       taluka={quotationData.taluka}
+//       //       district={quotationData.district}
+//       //       year={quotationData.year}
+//       //       workCode={quotationData.workCode}
+//       //       workName={quotationData.workName}
+//       //       tenderPublishDate={contractor.date}
+//       //       contractorNumber={contractor.number}
+//       //       contractorName={contractor.name}
+//       //       contractorGst={contractor.gst}
+//       //       quotationSubmissionDate={contractor.date}
+//       //       vendorWithVendorQuotation={
+//       //         quotationData.vendorWithVendorQuotation
+//       //       }
+//       //     />,
+//       //     `Contractor ${contractor.number} Quotation`
+//       //   );
+//       // });
+//       addComponent(
+//         <Contractor1QuotationPDF
+//           gramPanchayat={quotationData.gramPanchayat}
+//           taluka={quotationData.taluka}
+//           district={quotationData.district}
+//           year={quotationData.year}
+//           workCode={quotationData.workCode}
+//           workName={quotationData.workName}
+//           tenderPublishDate={contractors[0].date}
+//           contractorNumber={1}
+//           contractorName={contractors[0].name}
+//           contractorGst={contractors[0].gst}
+//           quotationSubmissionDate={contractors[0].date}
+//           vendorWithVendorQuotation={quotationData.vendorWithVendorQuotation}
+//         />,
+//         `Contractor ${contractors[0].number} Quotation`
+//       );
+//       addComponent(
+//         <Contractor2QuotationPDF
+//           gramPanchayat={quotationData.gramPanchayat}
+//           taluka={quotationData.taluka}
+//           district={quotationData.district}
+//           year={quotationData.year}
+//           workCode={quotationData.workCode}
+//           workName={quotationData.workName}
+//           tenderPublishDate={contractors[1].date}
+//           contractorNumber={2}
+//           contractorName={contractors[1].name}
+//           contractorGst={contractors[1].gst}
+//           quotationSubmissionDate={contractors[1].date}
+//           vendorWithVendorQuotation={quotationData.vendorWithVendorQuotation}
+//         />,
+//         `Contractor ${contractors[1].number} Quotation`
+//       );
+//       addComponent(
+//         <Contractor3QuotationPDF
+//           gramPanchayat={quotationData.gramPanchayat}
+//           taluka={quotationData.taluka}
+//           district={quotationData.district}
+//           year={quotationData.year}
+//           workCode={quotationData.workCode}
+//           workName={quotationData.workName}
+//           tenderPublishDate={contractors[2].date}
+//           contractorNumber={3}
+//           contractorName={contractors[2].name}
+//           contractorGst={contractors[2].gst}
+//           quotationSubmissionDate={contractors[2].date}
+//           vendorWithVendorQuotation={quotationData.vendorWithVendorQuotation}
+//         />,
+//         `Contractor ${contractors[2].number} Quotation`
+//       );
+
+//       addComponent(
+//         <SupplyOrderPDF
+//           key="supplyorder"
+//           gramPanchayat={quotationData.gramPanchayat}
+//           taluka={quotationData.taluka}
+//           district={quotationData.district}
+//           year={quotationData.year}
+//           workCode={quotationData.workCode}
+//           workName={quotationData.workName}
+//           tenderPublishDate={supplyOrderDate}
+//           winnerContractorName={quotationData.vendorDetails.vendorNameOne}
+//           winnerContractorGst={quotationData.vendorDetails.vendorGstOne}
+//           winnerQuotationSubmissionDate={
+//             quotationData.vendorDetails.VendorOneQuotationSubmissiondate
+//           }
+//           vendorWithVendorQuotation={quotationData.vendorWithVendorQuotation}
+//           address=""
+//         />,
+//         "Supply Order"
+//       );
+//     }
+
+//     if (swgData) {
+//       addComponent(
+//         <StageWisePhotosPDF key="stagewise" sWGTData={swgData} />,
+//         "Stage-wise Photos"
+//       );
+//     }
+//     if (
+//       invoiceData &&
+//       invoiceDetailsData &&
+//       invoiceData.success &&
+//       invoiceDetailsData.success
+//     ) {
+//       try {
+//         if (invoiceData.data && invoiceDetailsData.data) {
+//           const transformedData = transformMaterialData(invoiceData.data);
+//           const workCode = transformedData.workCode;
+//           const workName = transformedData.workName;
+//           const gst =
+//             invoiceDetailsData.data?.vendorDetails?.vendorGstOne || "";
+//           const vendorName =
+//             invoiceDetailsData.data?.vendorDetails?.vendorNameOne || "";
+//           const block = invoiceDetailsData.data?.workDetails.block || "";
+//           const district =
+//             invoiceDetailsData.data?.workDetails.district || "";
+//           const panchayat =
+//             invoiceDetailsData.data?.workDetails.panchayat || "";
+
+//           transformedData.bills.forEach((bill, index) => {
+//             addComponent(
+//               <InvoicePDF
+//                 key={`invoice-${index}`}
+//                 bill={bill}
+//                 workCode={workCode}
+//                 workName={workName}
+//                 vendorGstOne={gst}
+//                 vendorNameOne={vendorName}
+//                 block={block}
+//                 district={district}
+//                 panchayat={panchayat}
+//               />,
+//               `Invoice ${index + 1}`
+//             );
+//           });
+//         }
+//       } catch (error) {
+//         console.error("Failed to process invoice data:", error);
+//         failedComponents.push("Invoice");
+//       }
+//     }
+
+//     // Check if we have any components to render
+//     if (allPdfComponents.length === 0) {
+//       toast.error("No data available to generate PDFs");
+//       return;
+//     }
+
+//     setDownloadProgress("Compiling document...");
+
+//     // Generate the combined PDF with memory optimization
+//     const document = <Document>{allPdfComponents}</Document>;
+
+//     // Use toBlob with onUpdate for progress
+//     const blob = await pdf(document).toBlob();
+
+//     // Save the combined PDF
+//     const currentDate = new Date().toISOString().split("T")[0];
+//     const fileName = `${workData.workDetail.workCode}_Complete_Documentation_${currentDate}.pdf`;
+//     saveAs(blob, fileName);
+
+//     // Show detailed success message
+//     let message = `Successfully generated ${successfulComponents.length} documents.`;
+//     if (failedComponents.length > 0) {
+//       message += ` Failed to generate: ${failedComponents.join(", ")}.`;
+//     }
+
+//     toast.success("Download Complete", {
+//       description: message,
+//       duration: 5000
+//     });
+//   } catch (error) {
+//     console.error("Error downloading all PDFs:", error);
+//     toast.error("Failed to generate complete PDF", {
+//       description:
+//         "Please try downloading individual documents or contact support."
+//     });
+//   } finally {
+//     setIsDownloading(false);
+//     setDownloadProgress("");
+//   }
+// };
