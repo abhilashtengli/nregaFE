@@ -1,5 +1,3 @@
-"use client";
-
 import type React from "react";
 
 import { useEffect, useState } from "react";
@@ -62,7 +60,7 @@ import Contractor1QuotationPDF from "./PDFs/ComparativeStatement/Contractor1Quot
 import Contractor2QuotationPDF from "./PDFs/ComparativeStatement/Contractor2Quotation";
 import Contractor3QuotationPDF from "./PDFs/ComparativeStatement/Contractor3Quotation";
 import { useVendorUpdateStore } from "@/stores/useVendorUpdateStore";
-import { PDFDocument } from "pdf-lib";
+import { PDFDocument, PDFPage } from "pdf-lib";
 import { useFetchTSCopyData } from "@/services/TsCopyService";
 
 // PDF Action buttons data
@@ -1056,7 +1054,7 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
             pdfDoc.getPageIndices()
           );
 
-          pages.forEach((page) => masterPDF.addPage(page));
+          pages.forEach((page: PDFPage) => masterPDF.addPage(page));
 
           console.log(`✅ Successfully added ${name}`);
           results.successful.push(name);
