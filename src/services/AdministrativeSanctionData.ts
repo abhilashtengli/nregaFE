@@ -64,7 +64,6 @@ const fetchAdministrativeSanction = async (
       data: formattedData
     };
   } catch (error: unknown) {
-    
     let message = "Failed to fetch administrative sanction data.";
 
     if (axios.isAxiosError(error)) {

@@ -1,8 +1,8 @@
-import { Base_Url } from "@/lib/constant";
 import { Page, Text, View, StyleSheet, Font, Image } from "@react-pdf/renderer";
 import mnreaga from "@/assets/MGNREGA logo.jpg";
 import state_logo from "@/assets/State logo.jpeg";
 import emblem from "@/assets/State embalm.jpeg";
+
 // Font registration for Kannada support
 Font.register({
   family: "NotoSansKannada",
@@ -25,6 +25,10 @@ type StageWisePhotosData = {
   beforeStageImageUrl?: string;
   duringStageImageUrl?: string;
   afterStageImageUrl?: string;
+  // Add base64 versions for PDF rendering
+  beforeStageImageBase64?: string;
+  duringStageImageBase64?: string;
+  afterStageImageBase64?: string;
 };
 
 type StageWiseGTProp = {
@@ -171,25 +175,15 @@ const StageWisePhotosPDF: React.FC<StageWiseGTProp> = ({ sWGTData }) => {
     financialYear,
     workName,
     workCode,
-    beforeStageImageUrl,
-    duringStageImageUrl,
-    afterStageImageUrl
+    beforeStageImageBase64,
+    duringStageImageBase64,
+    afterStageImageBase64
   } = sWGTData;
 
-  // Function to render photo with proxy URL
-  const renderPhoto = (
-    imageUrl?: string,
-    _altText?: string,
-    placeholderText?: string
-  ) => {
-    if (imageUrl) {
-      return (
-        <Image
-          style={styles.photoImage}
-          src={`${Base_Url}/proxy-image?url=${encodeURIComponent(imageUrl)}`}
-          cache={false}
-        />
-      );
+  // Function to render photo with base64 data
+  const renderPhoto = (imageBase64?: string, placeholderText?: string) => {
+    if (imageBase64) {
+      return <Image style={styles.photoImage} src={imageBase64} />;
     } else {
       return (
         <View style={styles.photoPlaceholder}>
@@ -252,7 +246,10 @@ const StageWisePhotosPDF: React.FC<StageWiseGTProp> = ({ sWGTData }) => {
         <View style={styles.stageContainer}>
           <Text style={styles.stageTitle}>Before Stage</Text>
           <View style={styles.photoContainer}>
-            {renderPhoto(beforeStageImageUrl, "Before Stage")}
+            {renderPhoto(
+              beforeStageImageBase64,
+              "Before Stage Photo Not Available"
+            )}
           </View>
         </View>
 
@@ -260,7 +257,10 @@ const StageWisePhotosPDF: React.FC<StageWiseGTProp> = ({ sWGTData }) => {
         <View style={styles.stageContainer}>
           <Text style={styles.stageTitle}>During Stage</Text>
           <View style={styles.photoContainer}>
-            {renderPhoto(duringStageImageUrl, "During Stage")}
+            {renderPhoto(
+              duringStageImageBase64,
+              "During Stage Photo Not Available"
+            )}
           </View>
         </View>
 
@@ -268,7 +268,10 @@ const StageWisePhotosPDF: React.FC<StageWiseGTProp> = ({ sWGTData }) => {
         <View style={styles.stageContainer}>
           <Text style={styles.stageTitle}>After Stage</Text>
           <View style={styles.photoContainer}>
-            {renderPhoto(afterStageImageUrl, "After Stage")}
+            {renderPhoto(
+              afterStageImageBase64,
+              "After Stage Photo Not Available"
+            )}
           </View>
         </View>
       </View>
