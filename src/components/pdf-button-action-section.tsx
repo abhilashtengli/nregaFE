@@ -997,7 +997,9 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
         quotationData,
         blankNMRData,
         filledNMRData,
-        materialSupplyRegisterData
+        materialSupplyRegisterData,
+        invoiceData,
+        invoiceDetailsData
       ] = await Promise.all([
         safeFetch(fetchASCopyData, "AS Copy"),
         safeFetch(fetchCheckListDataData, "Checklist"),
@@ -1018,7 +1020,19 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
         safeFetch(fetchAllQuotationPdfData, "Quotation Forms"),
         safeFetch(fetchBlankNMRData, "Blank NMRs"),
         safeFetch(fetchFilledNMRData, "Filled NMRs"),
-        safeFetch(fetchMaterialSupplyRegisteryData, "Material Supply Register")
+        safeFetch(fetchMaterialSupplyRegisteryData, "Material Supply Register"),
+        safeFetch(async () => {
+          const { workDetail } = useWorkStore.getState();
+          const id = workDetail?.id;
+          if (!id) return null;
+          return await fetchMaterialMisDataForInvoice(id);
+        }, "Invoice Data"),
+        safeFetch(async () => {
+          const { workDetail } = useWorkStore.getState();
+          const id = workDetail?.id;
+          if (!id) return null;
+          return await fetchInvoiceDetails(id);
+        }, "Invoice Details")
       ]);
 
       setDownloadProgress("Generating PDFs...");
@@ -1392,6 +1406,49 @@ export default function ActionsSection({ workData }: ActionsSectionProps) {
           <StageWisePhotosPDF key="stagewise" sWGTData={swgData} />,
           "Stage-wise Photos"
         );
+      }
+      if (
+        invoiceData &&
+        invoiceDetailsData &&
+        invoiceData.success &&
+        invoiceDetailsData.success
+      ) {
+        try {
+          if (invoiceData.data && invoiceDetailsData.data) {
+            const transformedData = transformMaterialData(invoiceData.data);
+            const workCode = transformedData.workCode;
+            const workName = transformedData.workName;
+            const gst =
+              invoiceDetailsData.data?.vendorDetails?.vendorGstOne || "";
+            const vendorName =
+              invoiceDetailsData.data?.vendorDetails?.vendorNameOne || "";
+            const block = invoiceDetailsData.data?.workDetails.block || "";
+            const district =
+              invoiceDetailsData.data?.workDetails.district || "";
+            const panchayat =
+              invoiceDetailsData.data?.workDetails.panchayat || "";
+
+            transformedData.bills.forEach((bill, index) => {
+              addComponent(
+                <InvoicePDF
+                  key={`invoice-${index}`}
+                  bill={bill}
+                  workCode={workCode}
+                  workName={workName}
+                  vendorGstOne={gst}
+                  vendorNameOne={vendorName}
+                  block={block}
+                  district={district}
+                  panchayat={panchayat}
+                />,
+                `Invoice ${index + 1}`
+              );
+            });
+          }
+        } catch (error) {
+          console.error("Failed to process invoice data:", error);
+          failedComponents.push("Invoice");
+        }
       }
 
       // Check if we have any components to render

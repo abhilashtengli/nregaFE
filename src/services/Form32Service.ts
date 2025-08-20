@@ -3,6 +3,7 @@ import { Base_Url } from "@/lib/constant";
 import type { ServiceResponse } from "@/types/types";
 import { useWorkStore } from "@/stores/workStore";
 import { toast } from "sonner";
+import { useAuthStore } from "@/stores/userAuthStore";
 
 // Types
 type materialData = {
@@ -31,6 +32,8 @@ export type Form32Data = {
 const fetchForm32 = async (
   id: string
 ): Promise<ServiceResponse<Form32Props>> => {
+  const { logout } = useAuthStore.getState();
+
   try {
     const response = await axios.get(`${Base_Url}/form-32/${id}`, {
       withCredentials: true,
@@ -66,10 +69,21 @@ const fetchForm32 = async (
       data: formattedData
     };
   } catch (error: unknown) {
+  
     let message = "Failed to fetch Form 32 data.";
 
     if (axios.isAxiosError(error)) {
       message = error.response?.data?.message || error.message || message;
+      const status = error?.response?.status;
+      const data = error?.response?.data;
+      if (data.code === "USER_NOT_FOUND" && status === 404) {
+        // Handle user not found error
+        toast.error("User not found", {
+          description: "Please log in to access this feature",
+          duration: 4000
+        });
+        logout();
+      }
     }
 
     return {

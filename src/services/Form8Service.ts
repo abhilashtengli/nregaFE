@@ -1,6 +1,7 @@
 // src/services/form8/fetchForm8.ts
 
 import { Base_Url } from "@/lib/constant";
+import { useAuthStore } from "@/stores/userAuthStore";
 import { useWorkStore } from "@/stores/workStore";
 import type { ServiceResponse } from "@/types/types";
 import { subtractDays } from "@/utils/substractDays";
@@ -35,13 +36,15 @@ export type Form8Data = {
 
 // Fetch function
 const fetchForm8 = async (id: string): Promise<ServiceResponse<Form8Data>> => {
+  const { logout } = useAuthStore.getState();
+
   try {
     const response = await axios.get(`${Base_Url}/get-form6/${id}`, {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json"
-        }
-      }); // Change URL if different
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }); // Change URL if different
     const apiData = response.data?.data;
 
     if (!apiData) {
@@ -79,10 +82,21 @@ const fetchForm8 = async (id: string): Promise<ServiceResponse<Form8Data>> => {
       data: formattedData
     };
   } catch (error: unknown) {
+    
     let message = "Failed to fetch Form8 data.";
 
     if (axios.isAxiosError(error)) {
       message = error.response?.data?.message || error.message || message;
+      const status = error?.response?.status;
+      const data = error?.response?.data;
+      if (data.code === "USER_NOT_FOUND" && status === 404) {
+        // Handle user not found error
+        toast.error("User not found", {
+          description: "Please log in to access this feature",
+          duration: 4000
+        });
+        logout();
+      }
     }
 
     return {

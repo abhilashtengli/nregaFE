@@ -1,4 +1,5 @@
 import { Base_Url } from "@/lib/constant";
+import { useAuthStore } from "@/stores/userAuthStore";
 import { useWorkStore } from "@/stores/workStore";
 import type { ServiceResponse } from "@/types/types";
 import axios from "axios";
@@ -62,20 +63,25 @@ export type CombinedPDFData = {
 const fetchComparativeStatement = async (
   id: string
 ): Promise<ServiceResponse<CombinedPDFData>> => {
+  const { logout } = useAuthStore.getState();
+
   try {
-    const response = await axios.get(`${Base_Url}/comparative-statement/${id}`, {
+    const response = await axios.get(
+      `${Base_Url}/comparative-statement/${id}`,
+      {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json"
         }
-      });
+      }
+    );
 
     const apiData = response.data?.data;
 
     if (!apiData) {
       return {
         success: false,
-        message: "No data found for the provided ID",
+        message: "No data found for the provided ID"
       };
     }
 
@@ -95,7 +101,7 @@ const fetchComparativeStatement = async (
           slNo: item.slNo,
           materialName: item.materialName,
           quantity: Number(item.quantity).toFixed(2).toString(),
-          price: item.price,
+          price: item.price
         })),
       vendorDetails: apiData.vendorDetails,
       vendorWithVendorQuotation: apiData.vendorWithVendorQuotation
@@ -111,24 +117,34 @@ const fetchComparativeStatement = async (
           unit: item.unit,
           contractor1Rate: item.contractor1Rate,
           contractor2Rate: item.contractor2Rate,
-          contractor3Rate: item.contractor3Rate,
-        })),
+          contractor3Rate: item.contractor3Rate
+        }))
     };
 
     return {
       success: true,
-      data: formattedData,
+      data: formattedData
     };
   } catch (error: unknown) {
     let message = "Failed to fetch comparative statement data.";
 
     if (axios.isAxiosError(error)) {
       message = error.response?.data?.message || error.message || message;
+      const status = error?.response?.status;
+      const data = error?.response?.data;
+      if (data.code === "USER_NOT_FOUND" && status === 404) {
+        // Handle user not found error
+        toast.error("User not found", {
+          description: "Please log in to access this feature",
+          duration: 4000
+        });
+        logout();
+      }
     }
 
     return {
       success: false,
-      message,
+      message
     };
   }
 };
@@ -141,7 +157,7 @@ export const useFetchComparativeStatement = () => {
 
     if (!id) {
       toast.error("No work Id", {
-        description: "Please refresh",
+        description: "Please refresh"
       });
       return null;
     }

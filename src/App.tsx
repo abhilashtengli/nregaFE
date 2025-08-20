@@ -17,13 +17,19 @@ import AdminPanelPage from "./pages/admin/adminPanel";
 import LandingPage from "./pages/LandingPage";
 
 function App() {
-  const { isAuthenticated, fetchUser } = useAuthStore();
+  const { isAuthenticated, fetchUser, user, logout } = useAuthStore();
 
   useEffect(() => {
     if (isAuthenticated) {
       fetchUser();
     }
   }, [fetchUser, isAuthenticated]);
+
+  useEffect(() => {
+    if (!user && isAuthenticated) {
+      logout();
+    }
+  }, [user, isAuthenticated, logout]);
   return (
     <>
       <BrowserRouter>

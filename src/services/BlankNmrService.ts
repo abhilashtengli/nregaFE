@@ -2,6 +2,7 @@ import { Base_Url } from "@/lib/constant";
 import { useWorkStore } from "@/stores/workStore";
 import { toast } from "sonner";
 import axios from "axios";
+import { useAuthStore } from "@/stores/userAuthStore";
 
 export type Worker = {
   slNo: number;
@@ -40,6 +41,8 @@ export type BlankNMRResponse = {
 };
 
 const fetchBlankNMR = async (id: string): Promise<BlankNMRResponse> => {
+  const { logout } = useAuthStore.getState();
+
   try {
     const response = await axios.get(`${Base_Url}/get-blanknmr/${id}`, {
       withCredentials: true,
@@ -65,6 +68,16 @@ const fetchBlankNMR = async (id: string): Promise<BlankNMRResponse> => {
 
     if (axios.isAxiosError(error)) {
       message = error.response?.data?.message || error.message || message;
+      const status = error?.response?.status;
+      const data = error?.response?.data;
+      if (data.code === "USER_NOT_FOUND" && status === 404) {
+        // Handle user not found error
+        toast.error("User not found", {
+          description: "Please log in to access this feature",
+          duration: 4000
+        });
+        logout();
+      }
     }
 
     return {

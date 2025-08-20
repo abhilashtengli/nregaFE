@@ -3,6 +3,8 @@
 import { Base_Url } from "@/lib/constant";
 import axios from "axios";
 import type { ServiceResponse } from "@/types/types";
+import { useAuthStore } from "@/stores/userAuthStore";
+import { toast } from "sonner";
 
 type InvoiceApiResponse = {
   vendorDetails: {
@@ -142,6 +144,8 @@ export const transformMaterialData = (
 export const fetchInvoiceDetails = async (
   id: string
 ): Promise<ServiceResponse<InvoiceApiResponse>> => {
+  const { logout } = useAuthStore.getState();
+
   try {
     const res = await axios.get(`${Base_Url}/invoice/${id}`, {
       withCredentials: true,
@@ -168,6 +172,16 @@ export const fetchInvoiceDetails = async (
 
     if (axios.isAxiosError(error)) {
       message = error.response?.data?.message || error.message || message;
+      const status = error?.response?.status;
+      const data = error?.response?.data;
+      if (data.code === "USER_NOT_FOUND" && status === 404) {
+        // Handle user not found error
+        toast.error("User not found", {
+          description: "Please log in to access this feature",
+          duration: 4000
+        });
+        logout();
+      }
     }
 
     return {

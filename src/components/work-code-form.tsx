@@ -24,6 +24,7 @@ import axios from "axios";
 import { useWorkStore } from "@/stores/workStore";
 import { Base_Url } from "@/lib/constant";
 import { useVendorUpdateStore } from "@/stores/useVendorUpdateStore";
+import { useAuthStore } from "@/stores/userAuthStore";
 
 // API Response Types
 interface ApiWorkDetail {
@@ -141,6 +142,7 @@ export default function WorkCodeForm({
   const [workCode, setWorkCode] = useState("");
   const [financialYear, setFinancialYear] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { logout } = useAuthStore();
 
   // Validation state
   const [workCodeError, setWorkCodeError] = useState<string | null>(null);
@@ -302,6 +304,21 @@ export default function WorkCodeForm({
         }
       );
 
+      console.log("API Response:", response.data);
+
+      if (
+        response.data.code === "USER_NOT_FOUND" &&
+        response.data.status === 404
+      ) {
+        // Handle user not found error
+        toast.error("User not found", {
+          description: "Please log in to access this feature",
+          duration: 4000
+        });
+        logout();
+        return;
+      }
+
       // Handle API success response
       if (response.data.success) {
         // Transform and validate response
@@ -332,7 +349,7 @@ export default function WorkCodeForm({
       } else {
         // Handle API error response (success: false)
         throw new Error(
-          response.data.error || "API returned unsuccessful response"
+          response.data.message || "API returned unsuccessful response"
         );
       }
     } catch (error: unknown) {
@@ -342,6 +359,19 @@ export default function WorkCodeForm({
 
       // Handle Axios errors
       if (axios.isAxiosError(error)) {
+        const status = error?.response?.status;
+        const data = error?.response?.data;
+
+        // ✅ Handle user not found here
+        if (status === 404 && data?.code === "USER_NOT_FOUND") {
+          toast.error("User not found", {
+            description: "Please log in to access this feature",
+            duration: 4000
+          });
+          logout(); // logout immediately
+          return;
+        }
+
         if (error.code === "ECONNABORTED") {
           errorMessage = "Request timeout";
           errorDescription = "The request took too long. Please try again.";

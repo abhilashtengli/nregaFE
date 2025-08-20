@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -21,6 +19,7 @@ import { useWorkStore } from "@/stores/workStore";
 import { Base_Url } from "@/lib/constant";
 import MaterialDataSkeleton from "./shimmer/materialDataShimmer";
 import { useVendorUpdateStore } from "@/stores/useVendorUpdateStore";
+import { useAuthStore } from "@/stores/userAuthStore";
 
 // API Response Types
 interface MaterialData {
@@ -52,6 +51,8 @@ interface VendorData {
 
 interface MaterialApiResponse {
   success: boolean;
+  code: string;
+  status: number;
   data: {
     vendorWithVendorQuotationData: MaterialData[];
     vendorData?: VendorDataProp; // Made optional since it might not exist on first call
@@ -59,11 +60,11 @@ interface MaterialApiResponse {
   message: string;
 }
 
-interface VendorApiResponse {
-  success: boolean;
-  data: VendorData[];
-  count: number;
-}
+// interface VendorApiResponse {
+//   success: boolean;
+//   data: VendorData[];
+//   count: number;
+// }
 
 // Component interfaces
 interface MaterialQuotedData {
@@ -91,6 +92,7 @@ export default function VendorInformation() {
   // Dynamic data from APIs
   const [materialData, setMaterialData] = useState<MaterialData[]>([]);
   const [vendorOptions, setVendorOptions] = useState<VendorData[]>([]);
+  const { logout } = useAuthStore();
 
   // Selected vendors (now storing full vendor objects)
   const [selectedVendors, setSelectedVendors] = useState({
@@ -167,6 +169,18 @@ export default function VendorInformation() {
           }
         }
       );
+      if (
+        response.data.code === "USER_NOT_FOUND" &&
+        response.data.status === 404
+      ) {
+        // Handle user not found error
+        toast.error("User not found", {
+          description: "Please log in to access this feature",
+          duration: 4000
+        });
+        logout();
+        return;
+      }
 
       if (response.data.success) {
         console.log("RESPONSE DATA : ", response.data);
@@ -210,8 +224,21 @@ export default function VendorInformation() {
       }
     } catch (error) {
       console.error("Error fetching material data:", error);
+      if (axios.isAxiosError(error)) {
+        const status = error?.response?.status;
+        const data = error?.response?.data;
+        if (data.code === "USER_NOT_FOUND" && status === 404) {
+          // Handle user not found error
+          toast.error("User not found", {
+            description: "Please log in to access this feature",
+            duration: 4000
+          });
+          logout();
+          return;
+        }
+      }
       toast.error("Failed to load material data", {
-        description: "Please try again or contact support"
+        description: "Please try again later or Sign in again"
       });
     } finally {
       setIsLoading(false);
@@ -221,15 +248,24 @@ export default function VendorInformation() {
   // Fetch vendor options
   const fetchVendorOptions = async () => {
     try {
-      const response = await axios.get<VendorApiResponse>(
-        `${Base_Url}/vendors/kalaburagi`,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json"
-          }
+      const response = await axios.get(`${Base_Url}/vendors/kalaburagi`, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json"
         }
-      );
+      });
+      if (
+        response.data.code === "USER_NOT_FOUND" &&
+        response.data.status === 404
+      ) {
+        // Handle user not found error
+        toast.error("User not found", {
+          description: "Please log in to access this feature",
+          duration: 4000
+        });
+        logout();
+        return;
+      }
 
       if (response.data.success) {
         setVendorOptions(response.data.data);
@@ -238,6 +274,19 @@ export default function VendorInformation() {
       }
     } catch (error) {
       console.error("Error fetching vendor data:", error);
+      if (axios.isAxiosError(error)) {
+        const status = error?.response?.status;
+        const data = error?.response?.data;
+        if (data.code === "USER_NOT_FOUND" && status === 404) {
+          // Handle user not found error
+          toast.error("User not found", {
+            description: "Please log in to access this feature",
+            duration: 4000
+          });
+          logout();
+          return;
+        }
+      }
       toast.error("Failed to load vendor options", {
         description: "Using default vendor list"
       });
@@ -276,7 +325,7 @@ export default function VendorInformation() {
       if (vendorOptions.length > 0 && materialData.length > 0) {
         try {
           // Re-fetch the latest data to get vendor information
-          const response = await axios.get<MaterialApiResponse>(
+          const response = await axios.get(
             `${Base_Url}/material-vendor-data-version2/${workDetail?.id}`,
             {
               withCredentials: true,
@@ -285,6 +334,18 @@ export default function VendorInformation() {
               }
             }
           );
+          if (
+            response.data.code === "USER_NOT_FOUND" &&
+            response.data.status === 404
+          ) {
+            // Handle user not found error
+            toast.error("User not found", {
+              description: "Please log in to access this feature",
+              duration: 4000
+            });
+            logout();
+            return;
+          }
 
           if (response.data.success && response.data.data.vendorData) {
             const vendorData = response.data.data.vendorData;
@@ -332,7 +393,19 @@ export default function VendorInformation() {
             });
           }
         } catch (error) {
-          console.error("Error setting vendors from API data:", error);
+          if (axios.isAxiosError(error)) {
+            const status = error?.response?.status;
+            const data = error?.response?.data;
+            if (data.code === "USER_NOT_FOUND" && status === 404) {
+              // Handle user not found error
+              toast.error("User not found", {
+                description: "Please log in to access this feature",
+                duration: 4000
+              });
+              logout();
+              return;
+            }
+          }
         }
       }
     };
@@ -546,6 +619,18 @@ export default function VendorInformation() {
         setVendorUpdate(false);
         // Type guard for axios error
         if (axios.isAxiosError(error)) {
+          const status = error?.response?.status;
+          const data = error?.response?.data;
+
+          // ✅ Handle user not found here
+          if (status === 404 && data?.code === "USER_NOT_FOUND") {
+            toast.error("User not found", {
+              description: "Please log in to access this feature",
+              duration: 4000
+            });
+            logout(); // logout immediately
+            return;
+          }
           if (error.response?.status === 400) {
             // Validation errors
             const errorData = error.response.data;

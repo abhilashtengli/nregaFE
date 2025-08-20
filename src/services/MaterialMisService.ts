@@ -6,6 +6,7 @@ import type { ServiceResponse } from "@/types/types";
 
 import { useWorkStore } from "@/stores/workStore";
 import { toast } from "sonner";
+import { useAuthStore } from "@/stores/userAuthStore";
 
 // Match expected PDF types
 export interface Material {
@@ -34,6 +35,7 @@ export interface MaterialMisData {
 export const fetchMaterialMisData = async (
   id: string
 ): Promise<ServiceResponse<MaterialMisData>> => {
+  const { logout } = useAuthStore.getState();
   try {
     const res = await axios.get(`${Base_Url}/material-mis-perfect/${id}`, {
       withCredentials: true,
@@ -81,6 +83,16 @@ export const fetchMaterialMisData = async (
 
     if (axios.isAxiosError(error)) {
       message = error.response?.data?.message || error.message || message;
+      const status = error?.response?.status;
+      const data = error?.response?.data;
+      if (data.code === "USER_NOT_FOUND" && status === 404) {
+        // Handle user not found error
+        toast.error("User not found", {
+          description: "Please log in to access this feature",
+          duration: 4000
+        });
+        logout();
+      }
     }
 
     return {

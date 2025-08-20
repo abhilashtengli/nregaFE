@@ -1,4 +1,5 @@
 import { Base_Url } from "@/lib/constant";
+import { useAuthStore } from "@/stores/userAuthStore";
 import { useWorkStore } from "@/stores/workStore";
 import type { ServiceResponse } from "@/types/types";
 import axios from "axios";
@@ -40,13 +41,15 @@ export type FrontPageData = {
 const fetchFrontPageData = async (
   id: string
 ): Promise<ServiceResponse<FrontPageData>> => {
+  const { logout } = useAuthStore.getState();
+
   try {
     const response = await axios.get(`${Base_Url}/get-frontpage-data/${id}`, {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
     const apiData = response.data?.data;
 
     if (!apiData) {
@@ -92,10 +95,21 @@ const fetchFrontPageData = async (
       data: formattedData
     };
   } catch (error: unknown) {
+
     let message = "Failed to fetch front page data.";
 
     if (axios.isAxiosError(error)) {
       message = error.response?.data?.message || error.message || message;
+      const status = error?.response?.status;
+      const data = error?.response?.data;
+      if (data.code === "USER_NOT_FOUND" && status === 404) {
+        // Handle user not found error
+        toast.error("User not found", {
+          description: "Please log in to access this feature",
+          duration: 4000
+        });
+        logout();
+      }
     }
 
     return {
