@@ -72,6 +72,7 @@ export const useAuthStore = create<AuthState>()(
 
       logout: async () => {
         const toastLoading = toast.loading("Logging out...");
+      
         try {
           await axios.post(`${Base_Url}/logout`, {}, { withCredentials: true }); // ✅ Correctly placed
         } catch (err) {
@@ -90,7 +91,7 @@ export const useAuthStore = create<AuthState>()(
 
         // Clear additional localStorage items
         localStorage.removeItem("project-storage");
-        localStorage.removeItem("project-storage");
+        localStorage.removeItem("auth-storage");
         toast.dismiss(toastLoading);
         toast.success("Logged out successfully", {
           description: "You have been logged out. See you again soon!"

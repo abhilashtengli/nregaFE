@@ -287,7 +287,7 @@ export default function WorkCodeForm({
     };
 
     try {
-      toast.loading("Scraping work data...", {
+      toast.loading("Fetching work data...", {
         description: "This may take a few moments",
         id: "scraping-toast"
       });
@@ -511,14 +511,27 @@ export default function WorkCodeForm({
         });
       }
     } catch (error: unknown) {
-      let message = "Failed to delete work";
+      let message = "Work Data cleared";
       if (axios.isAxiosError(error)) {
         message = error.response?.data?.error || error.message;
+        const status = error?.response?.status;
+        const data = error?.response?.data;
+        if (data.code === "WORK_NOT_FOUND" && status === 404) {
+          clearWork();
+          setWorkCode("");
+          setFinancialYear("");
+          setWorkCodeError(null);
+          setFinancialYearError(null);
+          // Handle user not found error
+          toast.info("Work not found", {
+            description: data.message,
+            duration: 4000
+          });
+        }
+        return;
       } else if (error instanceof Error) {
         message = error.message;
       }
-
-      console.error("Error deleting work:", error);
 
       toast.error("Server error", {
         description: message,

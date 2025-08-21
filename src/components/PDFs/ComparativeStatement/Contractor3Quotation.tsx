@@ -398,6 +398,41 @@ const Contractor3QuotationPDF: React.FC<ContractorQuotationProps> = ({
               </View>
             );
           })}
+          <View style={styles.tableRow} wrap={false}>
+            <Text style={[styles.tableCellSlno, styles.slNoCell]}></Text>
+            <Text
+              style={[
+                styles.tableCell,
+                styles.materialNameCell,
+                { fontWeight: "bold" }
+              ]}
+            >
+              Total
+            </Text>
+            <Text style={[styles.tableCell, styles.quantityCell]}></Text>
+            <Text style={[styles.tableCell, styles.quantityCell]}></Text>
+            <Text style={[styles.tableCell, styles.srRateCell]}></Text>
+            <Text style={[styles.tableCell, styles.quotedRateCell]}></Text>
+            <Text
+              style={[
+                styles.tableCell,
+                styles.rateWordsCell,
+                { fontWeight: "bold" }
+              ]}
+            >
+              {vendorWithVendorQuotation
+                .reduce((total, item) => {
+                  const contractorRate =
+                    contractorNumber === 1
+                      ? item.contractor1Rate
+                      : contractorNumber === 2
+                      ? item.contractor2Rate
+                      : item.contractor3Rate;
+                  return total + Number(contractorRate) * Number(item.quantity);
+                }, 0)
+                .toFixed(2)}
+            </Text>
+          </View>
         </View>
 
         {/* Footer */}

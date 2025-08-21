@@ -302,6 +302,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginRight: 44,
     marginTop: 8
+  },
+  unitCell: {
+    width: "12%"
+  },
+  srRateCell: {
+    width: "12%"
+  },
+  totalCell: {
+    width: "14%"
   }
 });
 
@@ -350,7 +359,7 @@ const SupplyOrderPDF: React.FC<SupplyOrderProps> = ({
               ಗ್ರಾಮ ಪಂಚಾಯತಿ, {gramPanchayat}, ತಾ|| {taluka}. ಜಿ|| {district}
             </Text>
             <Text style={styles.headerSubText}>
-              ಮಹಾತ್ಮ ಗಾಂಧಿ ನರೇಗಾ ಯೋಜನೆ, ಕರ್ನಾಟಕ{" "}
+              ಮಹಾತ್ಮ ಗಾಂಧಿ ನರೇಗಾ ಯೋಜನೆ, ಕರ್ನಾಟಕ{"    "}
             </Text>
           </View>
           <View style={styles.logoContainer}>
@@ -408,10 +417,21 @@ const SupplyOrderPDF: React.FC<SupplyOrderProps> = ({
             <Text style={[styles.tableCellHeading, styles.materialNameCell]}>
               ಸಾಮಗ್ರಿ ಹೆಸರು
             </Text>
+            <Text style={[styles.tableCellHeading, styles.unitCell]}>
+              ಮಾಪನ ಘಟಕ
+            </Text>
             <Text style={[styles.tableCellHeading, styles.quantityCell]}>
               ಪ್ರಮಾಣ
             </Text>
-            <Text style={[styles.tableCellHeading, styles.rateCell]}>ದರ</Text>
+            <Text style={[styles.tableCellHeading, styles.srRateCell]}>
+              ದರ (as per SR)
+            </Text>
+            <Text style={[styles.tableCellHeading, styles.rateCell]}>
+              ದರ (ಅಂಕಿಗಳಲ್ಲಿ)
+            </Text>
+            <Text style={[styles.tableCellHeading, styles.totalCell]}>
+              ಒಟ್ಟು ಮೊತ್ತ {"  "}
+            </Text>
           </View>
           {vendorWithVendorQuotation.map((item, index) => (
             <View key={item.slNo} style={styles.tableRow} wrap={false}>
@@ -421,14 +441,59 @@ const SupplyOrderPDF: React.FC<SupplyOrderProps> = ({
               <Text style={[styles.tableCell, styles.materialNameCell]}>
                 {item.materialName}
               </Text>
+              <Text style={[styles.tableCell, styles.unitCell]}>
+                {item.unit}
+              </Text>
               <Text style={[styles.tableCell, styles.quantityCell]}>
                 {item.quantity}
+              </Text>
+              <Text style={[styles.tableCell, styles.srRateCell]}>
+                {item.rate}
               </Text>
               <Text style={[styles.tableCell, styles.rateCell]}>
                 {item.contractor1Rate}
               </Text>
+              <Text style={[styles.tableCell, styles.totalCell]}>
+                {(
+                  Number.parseFloat(item.quantity) *
+                  Number.parseFloat(item.contractor1Rate)
+                ).toFixed(2)}
+              </Text>
             </View>
           ))}
+          <View style={styles.tableRow} wrap={false}>
+            <Text style={[styles.tableCellSlno, styles.slNoCell]}></Text>
+            <Text
+              style={[
+                styles.tableCell,
+                styles.materialNameCell,
+                { fontWeight: "bold" }
+              ]}
+            >
+              ಒಟ್ಟು ಮೊತ್ತ (Total)
+            </Text>
+            <Text style={[styles.tableCell, styles.unitCell]}></Text>
+            <Text style={[styles.tableCell, styles.quantityCell]}></Text>
+            <Text style={[styles.tableCell, styles.srRateCell]}></Text>
+            <Text style={[styles.tableCell, styles.rateCell]}></Text>
+            <Text
+              style={[
+                styles.tableCell,
+                styles.totalCell,
+                { fontWeight: "bold" }
+              ]}
+            >
+              {vendorWithVendorQuotation
+                .reduce(
+                  (total, item) =>
+                    total +
+                    Number.parseFloat(item.quantity) *
+                      Number.parseFloat(item.contractor1Rate),
+                  0
+                )
+                .toFixed(2)}
+            </Text>
+          </View>
         </View>
 
         {/* Footer */}

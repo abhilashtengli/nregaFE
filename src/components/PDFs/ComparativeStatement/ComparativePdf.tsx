@@ -320,7 +320,7 @@ const ComparativeStatementPDF: React.FC<ComparativeStatementProps> = ({
               ಗ್ರಾಮ ಪಂಚಾಯತಿ, {gramPanchayat}, ತಾ|| {taluka}. ಜಿ|| {district}
             </Text>
             <Text style={styles.headerSubText}>
-              ಮಹಾತ್ಮ ಗಾಂಧಿ ನರೇಗಾ ಯೋಜನೆ, ಕರ್ನಾಟಕ{" "}
+              ಮಹಾತ್ಮ ಗಾಂಧಿ ನರೇಗಾ ಯೋಜನೆ, ಕರ್ನಾಟಕ{"    "}
             </Text>
           </View>
           <View style={styles.logoContainer}>

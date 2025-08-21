@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import { useAuthStore } from "@/stores/userAuthStore";
 import { Base_Url } from "@/lib/constant";
+import { useWorkStore } from "@/stores/workStore";
 
 interface LogoutResponse {
   success: boolean;
@@ -40,6 +41,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const { user, logout: logoutFromStore, isAuthenticated } = useAuthStore();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { clearWork, workDetail } = useWorkStore();
 
   const handleLogout = async () => {
     if (isLoggingOut) return;
@@ -48,6 +50,46 @@ export default function Navbar() {
     const toastLoading = toast.loading("Logging out...");
 
     try {
+      // Call work data from backend and store
+      const clearWorkOnLogout = async () => {
+        console.log("Clearing work data on logout");
+        try {
+          const id = workDetail?.id;
+          if (!id) return;
+
+          const response = await axios.delete(`${Base_Url}/work/${id}`, {
+            withCredentials: true,
+            headers: { "Content-Type": "application/json" }
+          });
+
+          if (response.status === 200 && response.data.success) {
+            clearWork();
+          }
+        } catch (error: unknown) {
+          if (axios.isAxiosError(error)) {
+            const status = error.response?.status;
+            const data = error.response?.data;
+
+            if (status === 404 && data?.code === "WORK_NOT_FOUND") {
+              clearWork(); // no problem, just clear
+              return;
+            }
+
+            toast.error("Failed to clear work data", {
+              description: data?.error || error.message,
+              duration: 4000
+            });
+          } else if (error instanceof Error) {
+            toast.error("Failed to clear work data", {
+              description: error.message,
+              duration: 4000
+            });
+          }
+        }
+      };
+
+      await clearWorkOnLogout();
+
       // Call backend logout API
       const response = await axios.post<LogoutResponse>(
         `${Base_Url}/logout`,

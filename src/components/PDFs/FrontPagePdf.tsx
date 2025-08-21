@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     fontWeight: "normal",
     fontSize: 10,
     lineHeight: 1.4,
-    marginTop: 8
+    marginTop: 18
   },
   underlineText: {
     textDecoration: "underline",
